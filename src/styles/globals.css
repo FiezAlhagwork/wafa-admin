@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  /* Font */
+  --font-sans: var(--font-thmanyah), system-ui, sans-serif;
+
+  /* Spacing: 4px (Tailwind v4 default) → p-4 = 16, gap-3 = 12, h-14 = 56 */
+  --spacing: 0.25rem;
+
+  /* Neutrals (from navy toward off-white) */
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-50: #F7F7F5;
+  --color-neutral-100: #E7E8E8;
+  --color-neutral-200: #D7D9DB;
+  --color-neutral-300: #C1C4C9;
+  --color-neutral-400: #A3A8B1;
+  --color-neutral-500: #868C99;
+  --color-neutral-600: #6A7283;
+  --color-neutral-700: #4D566B;
+  --color-neutral-800: #2F3B53;
+  --color-neutral-900: #14213D;
+
+  /* Brand */
+  --color-brand: #1B4F72;
+  --color-brand-hover: #1A4465;
+  --color-brand-pressed: #183858;
+  --color-brand-soft: #E8EDF1;
+  --color-brand-on: #FFFFFF;
+  --color-teal: #17A398;
+  --color-teal-soft: #E6F6F4;
+  --color-amber: #F2B134;
+  --color-amber-hover: #E5A321;
+  --color-amber-pressed: #D69516;
+  --color-amber-soft: #FDF3E1;
+  --color-ink: var(--color-neutral-900);
+  --color-paper: var(--color-neutral-50);
+
+  /* Status */
+  --color-success: #0E7C73;
+  --color-success-soft: #E3F4F3;
+  --color-warning: #C2410C;
+  --color-warning-soft: #FCEBE3;
+  --color-danger: #C8372D;
+  --color-danger-soft: #FBEAE9;
+  --color-info: #2F6FD6;
+  --color-info-soft: #EAF1FC;
+
+  /* Semantic names: components use these */
+  --color-bg: var(--color-paper);
+  --color-surface: var(--color-neutral-0);
+  --color-fg: var(--color-ink);
+  --color-fg-muted: var(--color-neutral-600);
+  --color-fg-subtle: var(--color-neutral-500);
+  --color-border: var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
+  --color-border-input: var(--color-neutral-500); /* ≈ 3.4:1 on white (WCAG 3:1 for field boundaries) */
+  --color-focus: var(--color-brand);
+
+  /* Floating surfaces (menus, tooltips, toasts, dialogs). Tinted with ink (#14213D). */
+  --shadow-popup: 0 8px 24px -6px rgb(20 33 61 / 0.18), 0 2px 6px -2px rgb(20 33 61 / 0.08);
+  --shadow-dialog: 0 24px 64px -12px rgb(20 33 61 / 0.3), 0 4px 12px -4px rgb(20 33 61 / 0.1);
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+    /* Base UI portals (dialogs, menus, toasts) stack above the page */
+    isolation: isolate;
+    /* Latin digits everywhere */
+    font-variant-numeric: lining-nums;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-amber) 45%, transparent);
+    color: var(--color-ink);
+  }
+}
