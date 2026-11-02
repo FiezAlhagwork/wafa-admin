@@ -25,5 +25,5 @@ jobs:
           script: |
             set -euo pipefail
             /usr/local/bin/wafa-admin-deploy staging
-            curl -sf -o /dev/null -H 'Host: staging.wafacard.app' http://127.0.0.1:3001/ar
+            curl -sf --retry 15 --retry-delay 2 --retry-connrefused -o /dev/null -H 'Host: staging.wafacard.app' http://127.0.0.1:3001/ar
             echo "Staging deploy OK $(date -Is)"

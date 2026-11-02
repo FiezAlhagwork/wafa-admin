@@ -54,5 +54,5 @@ jobs:
             else
               /usr/local/bin/wafa-admin-deploy production
             fi
-            curl -sf -o /dev/null -H 'Host: wafacard.app' http://127.0.0.1:3000/ar
+            curl -sf --retry 15 --retry-delay 2 --retry-connrefused -o /dev/null -H 'Host: wafacard.app' http://127.0.0.1:3000/ar
             echo "Production deploy OK $(date -Is)"
