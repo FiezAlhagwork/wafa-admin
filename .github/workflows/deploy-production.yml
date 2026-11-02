@@ -1,0 +1,58 @@
+name: Deploy production
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to deploy (tag or commit). Empty = origin/master'
+        required: false
+        default: ''
+
+concurrency:
+  group: deploy-wafa-admin-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      # Safety: on tag push, only deploy if the tagged commit is on master
+      - name: Checkout (to verify tag)
+        if: github.event_name == 'push'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Make sure tag is on master
+        if: github.event_name == 'push'
+        run: |
+          git fetch origin master
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+            echo "Tag ${GITHUB_REF_NAME} is not on master - deploy cancelled"
+            exit 1
+          fi
+
+      - name: Deploy production over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          command_timeout: 20m
+          script: |
+            set -euo pipefail
+            REF='${{ github.event.inputs.ref || github.ref_name }}'
+            # On tag push, github.ref_name is the tag (e.g. v1.2.0)
+            if [ '${{ github.event_name }}' = 'push' ]; then
+              /usr/local/bin/wafa-admin-deploy production "$REF"
+            elif [ -n '${{ github.event.inputs.ref }}' ]; then
+              /usr/local/bin/wafa-admin-deploy production '${{ github.event.inputs.ref }}'
+            else
+              /usr/local/bin/wafa-admin-deploy production
+            fi
+            curl -sf --retry 15 --retry-delay 2 --retry-connrefused -o /dev/null -H 'Host: wafacard.app' http://127.0.0.1:3000/ar
+            echo "Production deploy OK $(date -Is)"
