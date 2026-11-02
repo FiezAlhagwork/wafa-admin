@@ -1,0 +1,29 @@
+name: Deploy staging
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-wafa-admin-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Deploy staging over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          command_timeout: 20m
+          script: |
+            set -euo pipefail
+            /usr/local/bin/wafa-admin-deploy staging
+            curl -sf -o /dev/null -H 'Host: staging.wafacard.app' http://127.0.0.1:3001/ar
+            echo "Staging deploy OK $(date -Is)"
