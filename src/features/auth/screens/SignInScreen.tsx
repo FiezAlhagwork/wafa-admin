@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth, useSignIn } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -134,15 +135,10 @@ export function SignInScreen() {
     <main className="flex min-h-dvh items-center justify-center p-6">
       <div className="flex w-full max-w-sm flex-col gap-6">
         <header className="flex flex-col items-center gap-3 text-center">
-          <span
-            aria-hidden
-            className="flex size-14 items-center justify-center rounded-2xl bg-brand text-3xl font-black text-brand-on"
-          >
-            و
-          </span>
+          <Image src="/brand/wafa-logo.png" alt="" width={56} height={56} priority className="size-14" />
           <span aria-hidden className="h-1 w-10 rounded-full bg-amber" />
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold text-fg">لوحة وفاء</h1>
+            <h1 className="text-2xl font-bold text-fg">لوحة وفا</h1>
             <p className="text-sm text-fg-muted">لوحة إدارة المنصة للفريق الداخلي</p>
           </div>
         </header>

@@ -6,7 +6,7 @@ import { QueryProvider } from "@/lib/query-provider";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "لوحة وفاء",
+  title: "لوحة وفا",
   robots: { index: false, follow: false },
 };
 
