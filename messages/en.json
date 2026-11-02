@@ -1,0 +1,694 @@
+{
+  "site": {
+    "brand": "Wafa",
+    "skipToContent": "Skip to content",
+    "switchLocale": "العربية",
+    "switchLocaleLabel": "اعرض هذه الصفحة بالعربية",
+    "footer": {
+      "rights": "© {year} Deep Code, Damascus, Syria. All rights reserved.",
+      "privacy": "Privacy policy",
+      "terms": "Terms of use",
+      "deleteAccount": "Delete account"
+    },
+    "missingValues": {
+      "title": "Missing values (this notice appears in development only)",
+      "message": "Fill these fields in policy-config.ts before publishing: {fields}"
+    }
+  },
+  "privacy": {
+    "meta": {
+      "title": "Privacy Policy · Wafa",
+      "description": "How the Wafa app collects, uses and protects your data, what merchants see about you, and how to delete your account."
+    },
+    "eyebrow": "Wafa app",
+    "title": "Privacy Policy",
+    "lead": "In plain language: what data we collect, why, who sees it, and how you can control or delete it.",
+    "version": "Version {version}",
+    "updated": "Last updated: {date}",
+    "referenceNote": "This English text carries the same meaning as the Arabic text; the Arabic text is the reference version.",
+    "summary": {
+      "title": "In short",
+      "items": [
+        "We do not sell your data or share it with advertisers.",
+        "We do not ask for your location, and we do not access your contacts or messages.",
+        "A merchant sees your name and a partially masked phone number, and nothing at all unless you hold their card.",
+        "Turn off offers from any shop, or from all shops, at any time.",
+        "Delete your account whenever you like, in the app or without opening it."
+      ]
+    },
+    "toc": {
+      "title": "On this page"
+    },
+    "sections": {
+      "about": {
+        "title": "Who we are",
+        "p1": "Wafa is a digital loyalty card platform: customers collect stamps from participating shops in a single app, and pick up their reward at the shop when a card is complete. The party responsible for your data is <b>the Deep Code team</b>, Damascus, Syria, which owns, develops and operates the app.",
+        "p2": "This policy is addressed to the users of both apps: customers and merchants. We collect as little data as we can, and we never sell it or share it with advertisers."
+      },
+      "apps": {
+        "title": "Apps covered",
+        "items": [
+          {
+            "label": "Customer app",
+            "text": "Available on Google Play and the App Store, for use in Syria."
+          },
+          {
+            "label": "Merchant app",
+            "text": "An Android app (APK) distributed directly to subscribed merchants, not listed on any store. Shop owners use it to add stamps, hand over rewards and manage their cards."
+          },
+          {
+            "label": "Administration dashboard",
+            "text": "An internal web dashboard for the Deep Code team, not available to the public."
+          }
+        ],
+        "payments": "Customers never pay anything inside the app. Merchants pay their subscription by local transfer outside the app, then upload proof of payment for review. The apps do not collect card or bank details."
+      },
+      "data": {
+        "title": "Data we collect",
+        "intro": "The table lists each type of data, why we need it, and when it is deleted.",
+        "columns": {
+          "data": "Data",
+          "purpose": "Purpose",
+          "retention": "Retention"
+        },
+        "groups": [
+          {
+            "title": "If you are a customer",
+            "rows": [
+              {
+                "data": "Phone number",
+                "purpose": "Sign-in with a one-time code sent over WhatsApp, and linking your stamps to your account.",
+                "retention": "Until you delete your account."
+              },
+              {
+                "data": "Name",
+                "purpose": "Shown to the merchant so they can recognise you when scanning your code.",
+                "retention": "Until you delete your account."
+              },
+              {
+                "data": "Date of birth",
+                "purpose": "Confirming you are 13 or older, and birthday greetings from merchants whose cards you hold. It cannot be edited in the app; corrections go through support.",
+                "retention": "Until you delete your account."
+              },
+              {
+                "data": "Personal QR code",
+                "purpose": "Your permanent identifier, shown as a code that refreshes every short while and is scanned by the merchant to add stamps and hand over rewards. The code carries neither your name nor your number.",
+                "retention": "Until you delete your account."
+              },
+              {
+                "data": "Your cards, stamps, rewards and visit history",
+                "purpose": "Showing your progress with each merchant and handing over your rewards.",
+                "retention": "Until you delete your account, then kept anonymized for merchant statistics."
+              },
+              {
+                "data": "Notification settings",
+                "purpose": "Respecting your choice to turn off offers from all shops or from a specific shop.",
+                "retention": "Until you delete your account."
+              },
+              {
+                "data": "Record of your consent to this policy",
+                "purpose": "Knowing which version of the policy you agreed to, and when.",
+                "retention": "Until you delete your account."
+              },
+              {
+                "data": "A phone number entered by a merchant before you sign up",
+                "purpose": "Holding your stamps until you install the app and they move to your account.",
+                "retention": "12 months after the last activity if you never sign up, then deleted with its stamps."
+              }
+            ]
+          },
+          {
+            "title": "If you are a merchant",
+            "rows": [
+              {
+                "data": "Sign-in data: email address, plus name and photo when signing in with Google",
+                "purpose": "Merchant sign-in through Clerk.",
+                "retention": "Until account deletion."
+              },
+              {
+                "data": "Business details: name, type, governorate, address, logo and cover image, Instagram, Facebook and map links, plus owner name and business phone",
+                "purpose": "Showing the shop to customers on their cards and in the shop directory, and contacting the merchant about their account.",
+                "retention": "Until account deletion; the business name remains with cards holding earned rewards (section 10)."
+              },
+              {
+                "data": "PIN",
+                "purpose": "Protecting statistics, customers and settings from anyone but the owner. Stored encrypted.",
+                "retention": "Until changed or account deletion."
+              },
+              {
+                "data": "Cards, offers and campaigns",
+                "purpose": "Running the loyalty programme and sending offers to the shop’s customers.",
+                "retention": "Until account deletion, except cards holding earned rewards."
+              },
+              {
+                "data": "Package and subscription history",
+                "purpose": "Activating the package and free trial, and managing the subscription.",
+                "retention": "Two years after account deletion, for accounting."
+              },
+              {
+                "data": "Payment records: amount in USD and SYP, exchange rate, proof image and reference number",
+                "purpose": "Reviewing payment and activating the subscription manually.",
+                "retention": "Two years after account deletion, for accounting."
+              },
+              {
+                "data": "Encrypted hash of the email address",
+                "purpose": "Preventing repeat free trials after account deletion. The email cannot be recovered from it.",
+                "retention": "Kept after account deletion."
+              }
+            ]
+          },
+          {
+            "title": "In both apps",
+            "rows": [
+              {
+                "data": "Device token for notifications",
+                "purpose": "Sending stamp, reward and campaign notifications.",
+                "retention": "Until account deletion."
+              }
+            ]
+          }
+        ],
+        "notCollected": "We do not request or access your location, we do not collect your contacts or messages, we do not collect an advertising ID, and we do not use behavioural tracking or advertising tools."
+      },
+      "merchantView": {
+        "title": "What merchants see about you",
+        "intro": "A merchant sees only what is needed to run their loyalty card, and sees nothing about you unless you hold one of their cards.",
+        "sees": {
+          "title": "What they see",
+          "items": [
+            "Your name, so they can recognise you when scanning your code.",
+            "Your phone number, partially masked: only the first four and last three digits.",
+            "Only the day and month of your birthday, in a “Today’s birthdays” list.",
+            "Your card, stamps and visits at their shop only."
+          ]
+        },
+        "notSees": {
+          "title": "What they do not see",
+          "items": [
+            "Your year of birth or age.",
+            "Your full phone number.",
+            "Your cards and stamps with other merchants, or which other shops you use."
+          ]
+        },
+        "note": "When a merchant adds you by phone number, they see the number they are typing only while entering it; once saved, it is shown masked like any other. Merchant statistics are aggregate figures without names."
+      },
+      "notifications": {
+        "title": "Notifications and merchant campaigns",
+        "intro": "The app sends two kinds of notifications:",
+        "items": [
+          {
+            "label": "Service notifications",
+            "text": "A stamp added, a card completed, a reward ready, and a notice if a merchant whose card you hold is leaving the platform. These are part of the service."
+          },
+          {
+            "label": "Merchant campaigns",
+            "text": "Offers only from merchants whose cards you hold, and birthday greetings that the merchant sends personally; they are never sent automatically."
+          }
+        ],
+        "p1": "No merchant can message you unless you hold their card, and no merchant gets a way to contact you; messages are sent through the app as text only, without images or links.",
+        "p2": "You can turn off offers from a specific shop on its card page or shop page, or from all shops in the “My account” tab, at any time; service notifications continue."
+      },
+      "preRegistration": {
+        "title": "Being added by a merchant before installing the app",
+        "p1": "A merchant can add stamps for you using your phone number before you install the app, after you give them your number. When you sign up with the same number, your stamps move to your account automatically.",
+        "p2": "If you do not sign up within 12 months of the last activity on that number, the number and its stamps are permanently deleted. If your number was added without your knowledge or by mistake, you can ask us to delete it without installing the app, using the <contact>contact details in section 15</contact>."
+      },
+      "use": {
+        "title": "How we use your data",
+        "items": [
+          "Signing you in and verifying your identity.",
+          "Adding stamps to your cards and handing over your rewards.",
+          "Sending service notifications, and merchant campaigns unless you turn them off.",
+          "Activating merchant subscriptions and reviewing proofs of payment.",
+          "Protecting accounts and preventing fraud, including repeat free trials."
+        ],
+        "never": "We do not sell your data, share it with advertisers, or use it for advertising outside the app."
+      },
+      "sharing": {
+        "title": "Who we share your data with",
+        "merchants": "<b>Merchants:</b> see only what section 4 describes, and only about customers who hold their cards.",
+        "publicShop": "<b>Public shop details:</b> a shop’s name, type, governorate, address, logo, cover image, Instagram, Facebook and map links, and active cards are shown to all customer-app users in the shop directory, as long as the merchant can add stamps.",
+        "providersIntro": "<b>Service providers</b> that process limited data to run the apps:",
+        "columns": {
+          "provider": "Provider",
+          "receives": "What it receives",
+          "why": "Why"
+        },
+        "providers": [
+          {
+            "provider": "LightOTP / WhatsApp",
+            "receives": "Customer phone number",
+            "why": "Sending the verification code."
+          },
+          {
+            "provider": "Clerk",
+            "receives": "Merchant email address, plus name and photo when signing in with Google",
+            "why": "Merchant sign-in. Its servers are in the United States."
+          },
+          {
+            "provider": "Google",
+            "receives": "Google account data of a merchant who chooses to sign in with it",
+            "why": "Sign-in with Google."
+          },
+          {
+            "provider": "Firebase Cloud Messaging (Google)",
+            "receives": "Device token",
+            "why": "Sending notifications."
+          },
+          {
+            "provider": "Expo (EAS Update)",
+            "receives": "Device type, operating system and app version, with no personal data",
+            "why": "Downloading app updates."
+          }
+        ],
+        "hosting": {
+          "provider": "Cloud server ({provider})",
+          "receives": "The app database and files",
+          "why": "Hosting and storage."
+        },
+        "contracts": "We contract with these providers to process data only for the purposes set out above, and we require them to provide a level of protection equal to what this policy states. No other party receives your data.",
+        "legal": "We may disclose data if a competent authority requires it under applicable law."
+      },
+      "retention": {
+        "title": "Retention",
+        "p1": "We keep your data only as long as the service needs it, as set out in the table in section 3. In short: your personal account data is deleted as soon as you delete your account, a phone number that was never registered is deleted 12 months after its last activity, and merchant subscription records are kept for two years for accounting. We keep encrypted database backups to protect data from loss and restore the service after a failure, for up to {backup}, after which they are deleted automatically. When you delete your account, your data is removed from the main servers immediately and disappears from backups for good within {backup} at most."
+      },
+      "delete": {
+        "title": "Deleting your account",
+        "customer": {
+          "title": "Customer accounts",
+          "intro": "You can delete your account at any time in either of two ways:",
+          "inApp": {
+            "title": "Inside the app",
+            "steps": [
+              "Open the Wafa app.",
+              "Go to the “My account” tab.",
+              "Tap “Delete account”, then confirm."
+            ]
+          },
+          "outside": {
+            "title": "Without opening the app",
+            "text": "Follow the steps on the <link>account deletion page</link>, or email <mail>{email}</mail> with the subject “Account deletion request” and your registered phone number, or contact us on WhatsApp at <wa>{phone}</wa>."
+          },
+          "whatHappens": "<b>What happens when you delete?</b> Your personal data is deleted immediately (phone number, name, date of birth, QR code and device token). Stamp and visit records remain with no link to you, for merchant statistics only.",
+          "warning": "Deleting your account permanently cancels your stamps and any rewards you have not yet collected, and they cannot be restored."
+        },
+        "merchant": {
+          "title": "Merchant accounts",
+          "intro": "Merchant accounts are managed by the administration; to delete a merchant account, <contact>contact us</contact>. When a request is made, we tell the merchant how many earned customer rewards have not yet been handed over.",
+          "items": [
+            {
+              "label": "30-day period",
+              "text": "Deletion takes effect 30 days after the request, and can be cancelled during that time."
+            },
+            {
+              "label": "During the period",
+              "text": "No new stamps can be added, rewards can still be handed over, and every customer with an earned reward is notified to collect it."
+            },
+            {
+              "label": "What is deleted",
+              "text": "Sign-in data, owner name, business phone, PIN and device token."
+            },
+            {
+              "label": "What remains",
+              "text": "The business name, its cards and customers’ earned rewards, which belong to the customer and are not deleted with the merchant’s account. Subscription history and proofs of payment are kept for two years for accounting, along with the encrypted email hash to prevent repeat free trials."
+            }
+          ]
+        }
+      },
+      "permissions": {
+        "title": "Device permissions",
+        "items": [
+          {
+            "label": "Notifications",
+            "who": "Both apps",
+            "text": "To tell you about stamps, rewards and offers."
+          },
+          {
+            "label": "Camera",
+            "who": "Merchant",
+            "text": "To scan the customer’s QR code."
+          },
+          {
+            "label": "Photos",
+            "who": "Merchant",
+            "text": "Only to choose the images the merchant uploads: the logo, cover image and proof of payment."
+          }
+        ],
+        "p1": "The customer app requests only the notifications permission, and neither app requests location. You can revoke any permission in your device settings; some features will not work without it.",
+        "p2": "You can also withdraw your consent to this policy entirely at any time by deleting your account, after which we stop processing your data and delete it as described in section 10."
+      },
+      "security": {
+        "title": "Security",
+        "p1": "Data travels between the app and the server over an encrypted connection (HTTPS), and the PIN is stored encrypted. Access to the administration dashboard is limited by roles and permissions, so each staff member sees only what their work needs, and every time the team views your full phone number it is logged. No system is perfectly secure, but we work to reduce risk and will tell you if something affects your data.",
+        "p2": "App data is stored on a server operated by {provider} in {region}. Merchant sign-in data is processed by Clerk in the United States, notifications pass through Google services, and app updates are downloaded from Expo’s servers. This means part of your data is transferred and processed outside Syria."
+      },
+      "age": {
+        "title": "Age",
+        "p1": "The service is meant for people aged 13 and over. We ask for your date of birth at sign-up and do not accept registrations from anyone under 13; if we learn that an account belongs to someone under 13, we will delete it."
+      },
+      "changes": {
+        "title": "Changes to this policy",
+        "p1": "We may update this policy when we add a feature or change the services we use. The last-updated date and version number appear at the top of this page, and we will notify you in the app about any material change and ask you to agree to the new version."
+      },
+      "contact": {
+        "title": "Contact us",
+        "intro": "For any question about your privacy, or to exercise your right to access, correct or delete your data:",
+        "email": "Email",
+        "phone": "Phone / WhatsApp",
+        "party": "Responsible party",
+        "partyValue": "The Deep Code team, Damascus, Syria"
+      }
+    }
+  },
+  "deleteAccount": {
+    "meta": {
+      "title": "Delete Account · Wafa",
+      "description": "How to delete your Wafa account, inside the app or without opening it, and what is deleted and what remains."
+    },
+    "eyebrow": "Wafa app",
+    "title": "Delete your account",
+    "lead": "You can delete your Wafa account at any time. Choose the way that suits you.",
+    "warning": {
+      "title": "Before you delete your account",
+      "text": "Deleting your account permanently cancels your stamps and any rewards you have not yet collected, and they cannot be restored. Collect your ready rewards first."
+    },
+    "inApp": {
+      "title": "Inside the app",
+      "badge": "Fastest",
+      "steps": [
+        "Open the Wafa app.",
+        "Go to the “My account” tab.",
+        "Tap “Delete account”, then confirm."
+      ],
+      "note": "Your account is deleted as soon as you confirm."
+    },
+    "outside": {
+      "title": "Without opening the app",
+      "intro": "If the app is no longer on your phone, or a merchant added your number without your knowledge, send us a deletion request:",
+      "emailLabel": "By email",
+      "emailText": "Write to <mail>{email}</mail> with the subject “Account deletion request”, and include your registered phone number.",
+      "emailSubject": "Account deletion request",
+      "whatsappLabel": "On WhatsApp",
+      "whatsappText": "Message us at <wa>{phone}</wa> and include your registered phone number."
+    },
+    "deleted": {
+      "title": "Deleted immediately",
+      "items": [
+        "Phone number",
+        "Name",
+        "Date of birth",
+        "Personal QR code",
+        "Device token for notifications",
+        "Notification settings and policy consent record"
+      ]
+    },
+    "kept": {
+      "title": "What remains",
+      "anonymized": "Stamp and visit records, with no link to you, for merchant statistics only.",
+      "backups": "Encrypted backups for up to {backup}, then they are deleted automatically."
+    },
+    "merchant": {
+      "title": "Are you a merchant?",
+      "text": "Merchant accounts are managed by the administration. Contact us by email or WhatsApp to request deletion of your shop’s account; deletion takes effect after a 30-day period during which you can cancel it. Details are in the <link>privacy policy</link>."
+    },
+    "policyLink": "Read the full privacy policy"
+  },
+  "terms": {
+    "meta": {
+      "title": "Terms of Use · Wafa",
+      "description": "Terms of use for the Wafa customer app: signing up, stamps and rewards, prohibited use, and deleting your account."
+    },
+    "eyebrow": "Wafa customer app",
+    "title": "Terms of Use",
+    "lead": "The rules for using the Wafa app, in plain language.",
+    "scope": "These terms cover the customer app only; the merchant app has separate terms.",
+    "version": "Version {version}",
+    "updated": "Effective date: {date}",
+    "referenceNote": "This English text is provided for app store reviewers. It carries the same meaning as the Arabic text; the Arabic text is the reference version.",
+    "summary": {
+      "title": "In short",
+      "items": [
+        "The app is free for customers and contains no payments.",
+        "Sign-up is for people aged 13 and over, with a mobile number that uses WhatsApp.",
+        "Only the shop adds stamps and hands over rewards, and the shop is responsible for the reward.",
+        "Stamps and rewards are not money: they cannot be exchanged for cash, moved or sold.",
+        "Delete your account whenever you like; your stamps and uncollected rewards go with it."
+      ]
+    },
+    "toc": {
+      "title": "On this page"
+    },
+    "sections": [
+      {
+        "id": "accept",
+        "title": "Accepting these terms",
+        "blocks": [
+          {
+            "p": "Welcome to Wafa. The service is provided by the <b>Deep Code</b> team in Damascus, Syria (“we”, “us”). These terms govern your use of the Wafa customer app (“the app”)."
+          },
+          {
+            "p": "By signing up and ticking the consent box, you agree to these terms and to our <privacy>Privacy Policy</privacy>. If you do not agree, do not use the app."
+          }
+        ]
+      },
+      {
+        "id": "about",
+        "title": "What Wafa is",
+        "blocks": [
+          {
+            "p": "Wafa is a digital loyalty card platform:"
+          },
+          {
+            "list": [
+              "You collect stamps from participating shops in one app, by showing your QR code at the shop.",
+              "When a card is complete, you collect its reward from the shop itself.",
+              "The app is <b>free for customers</b> and contains no payments."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "eligibility",
+        "title": "Who can sign up",
+        "blocks": [
+          {
+            "list": [
+              "You must be <b>13 or older</b>. We do not accept sign-ups from anyone under 13, and if we learn that an account belongs to someone under 13, we will delete it.",
+              "You sign up with a mobile number that uses WhatsApp, since the verification code is sent there.",
+              "One account per number. Do not sign up with a number that is not yours."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "account",
+        "title": "Your account",
+        "blocks": [
+          {
+            "list": [
+              "You enter your <b>name and date of birth</b> once at sign-up, and they cannot be edited in the app. To correct them, contact support.",
+              "Enter accurate details. Your name is shown to the shop when it scans your code, and your date of birth confirms your age.",
+              "You are responsible for your phone and your number. If your number passes to someone else or you lose it, contact support."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "qr",
+        "title": "Your personal QR code",
+        "blocks": [
+          {
+            "list": [
+              "Your code is your identity on Wafa. It refreshes automatically at short intervals and works offline.",
+              "Show it on your phone’s screen at the shop only. Do not send a picture of it to anyone, and do not let anyone else use it.",
+              "Any stamp or reward recorded with your code counts for your account."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "stamps",
+        "title": "Stamps and rewards",
+        "blocks": [
+          {
+            "list": [
+              "<b>Only the shop adds stamps and hands over rewards</b>, by scanning your code at the shop. Stamps cannot be added from the app.",
+              "Each shop sets its own card: the number of stamps, the reward, and its conditions. These are shown on the card page.",
+              "The system may require a minimum time between two stamps on the same card.",
+              "After you collect a reward, the card starts again.",
+              {
+                "text": "<b>Stamps and rewards are not money</b>:",
+                "items": [
+                  "They cannot be exchanged for cash.",
+                  "They cannot be moved to another account.",
+                  "They cannot be sold."
+                ]
+              },
+              "<b>The shop is responsible for the reward</b>: providing it, its quality, and honouring it. We provide the platform that records stamps, and we are not a party to the reward itself. If you have a problem with a shop, contact us and we will help where we can."
+            ]
+          },
+          {
+            "h3": "If a shop leaves the platform"
+          },
+          {
+            "list": [
+              "You receive a notification.",
+              "No new stamps can be added there.",
+              "You can still collect any reward you have earned during the notice period."
+            ]
+          },
+          {
+            "h3": "Stamps before you sign up"
+          },
+          {
+            "p": "A shop may add stamps using your mobile number before you install the app. When you sign up with the same number, they move to your account. If you do not sign up within 12 months of the last activity on that number, the stamps are permanently deleted."
+          }
+        ]
+      },
+      {
+        "id": "shop-content",
+        "title": "Shop content",
+        "blocks": [
+          {
+            "p": "Shops write their own names, logos, images, addresses, links and offers. They are responsible for that content."
+          },
+          {
+            "list": [
+              "<b>Links</b> (Instagram, Facebook, maps) open outside the app, on sites we do not run.",
+              "<b>If you see offensive or misleading content</b> from a shop, report it through support and we will review it."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "notifications",
+        "title": "Notifications",
+        "blocks": [
+          {
+            "list": [
+              "<b>Service notifications</b> are part of the service and cannot be turned off in the app: a stamp added, a card completed, a reward handed over, and a shop leaving.",
+              {
+                "text": "<b>Shop offers</b> reach you only from shops whose cards you hold. You can turn them off:",
+                "items": [
+                  "For one shop: on its card page or shop page.",
+                  "For all shops: in “My account”."
+                ]
+              },
+              "You can also turn off all notifications in your phone’s settings."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "prohibited",
+        "title": "Prohibited use",
+        "blocks": [
+          {
+            "p": "You may not:"
+          },
+          {
+            "list": [
+              "Game the stamp or reward system. This includes arranging fake stamps with a shop, or using someone else’s code.",
+              "Create accounts with numbers that are not yours, or with false details.",
+              "Attempt to hack the app or the server, reverse engineer the app, disrupt it, or access other people’s data.",
+              "Use the app for any unlawful purpose, or to abuse shops or their staff."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "deletion",
+        "title": "Suspension and deletion",
+        "blocks": [
+          {
+            "list": [
+              "<b>You can delete your account at any time</b> from “My account” → “Delete account”. Deletion is immediate and cannot be undone. To delete without opening the app, follow the <delete>account deletion page</delete>.",
+              "<b>We may suspend or delete an account</b> that breaks these terms, especially section 9. Stamps collected in breach of these terms may also be cancelled."
+            ]
+          },
+          {
+            "warning": "<b>Deletion permanently cancels</b> all your stamps and any reward you have not collected, and they cannot be restored."
+          }
+        ]
+      },
+      {
+        "id": "availability",
+        "title": "Availability",
+        "blocks": [
+          {
+            "list": [
+              {
+                "text": "We work to keep Wafa available and working correctly. However, the service is provided <b>“as is”</b>:",
+                "items": [
+                  "It may be unavailable at times for maintenance or for reasons beyond our control.",
+                  "We may change or discontinue some features."
+                ]
+              },
+              "Your phone’s date and time should be set automatically for your code to work correctly.",
+              "Keep the app updated to the latest version, as older versions may stop working."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Limitation of liability",
+        "blocks": [
+          {
+            "p": "To the extent permitted by law:"
+          },
+          {
+            "list": [
+              "<b>We are not responsible for</b> how a shop treats you, or for the quality or availability of its rewards or offers, or for the content of external links.",
+              "<b>We are not responsible for</b> stamps or rewards lost because you deleted your account, because a shop left the platform, or because of a service interruption.",
+              "<b>Our liability is limited in general</b>, since the app is free for customers."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "privacy",
+        "title": "Privacy",
+        "blocks": [
+          {
+            "p": "We handle your data as described in our <privacy>Privacy Policy</privacy>. This includes what shops can see about you, who we share your data with, and how it is deleted."
+          }
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Changes to these terms",
+        "blocks": [
+          {
+            "p": "We may update these terms when we add a feature or change the service. The last-updated date appears at the top of the page, and we will notify you in the app about any material change. Continuing to use the app after a change means you accept it."
+          }
+        ]
+      },
+      {
+        "id": "law",
+        "title": "Governing law",
+        "blocks": [
+          {
+            "p": "These terms are governed by the laws in force in the Syrian Arab Republic."
+          }
+        ]
+      },
+      {
+        "id": "contact",
+        "title": "Contact us",
+        "blocks": [
+          {
+            "p": "For any question about these terms, to correct your details, or to report a shop:"
+          }
+        ]
+      }
+    ],
+    "contact": {
+      "email": "Email",
+      "phone": "Phone / WhatsApp",
+      "party": "Provider",
+      "partyValue": "The Deep Code team, Damascus, Syria"
+    }
+  }
+}
