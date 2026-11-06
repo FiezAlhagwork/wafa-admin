@@ -5,7 +5,7 @@
     "switchLocale": "العربية",
     "switchLocaleLabel": "اعرض هذه الصفحة بالعربية",
     "footer": {
-      "rights": "© {year} Deep Code, Damascus, Syria. All rights reserved.",
+      "rights": "© {year} Deep Code Solution, Damascus, Syria. All rights reserved.",
       "privacy": "Privacy policy",
       "terms": "Terms of use",
       "deleteAccount": "Delete account"
@@ -42,7 +42,7 @@
     "sections": {
       "about": {
         "title": "Who we are",
-        "p1": "Wafa is a digital loyalty card platform: customers collect stamps from participating shops in a single app, and pick up their reward at the shop when a card is complete. The party responsible for your data is <b>the Deep Code team</b>, Damascus, Syria, which owns, develops and operates the app.",
+        "p1": "Wafa is a digital loyalty card platform: customers collect stamps from participating shops in a single app, and pick up their reward at the shop when a card is complete. The party responsible for your data is <b>the Deep Code Solution team</b>, Damascus, Syria, which owns, develops and operates the app.",
         "p2": "This policy is addressed to the users of both apps: customers and merchants. We collect as little data as we can, and we never sell it or share it with advertisers."
       },
       "apps": {
@@ -58,7 +58,7 @@
           },
           {
             "label": "Administration dashboard",
-            "text": "An internal web dashboard for the Deep Code team, not available to the public."
+            "text": "An internal web dashboard for the Deep Code Solution team, not available to the public."
           }
         ],
         "payments": "Customers never pay anything inside the app. Merchants pay their subscription by local transfer outside the app, then upload proof of payment for review. The apps do not collect card or bank details."
@@ -357,7 +357,7 @@
         "email": "Email",
         "phone": "Phone / WhatsApp",
         "party": "Responsible party",
-        "partyValue": "The Deep Code team, Damascus, Syria"
+        "partyValue": "The Deep Code Solution team, Damascus, Syria"
       }
     }
   },
@@ -445,7 +445,7 @@
         "title": "Accepting these terms",
         "blocks": [
           {
-            "p": "Welcome to Wafa. The service is provided by the <b>Deep Code</b> team in Damascus, Syria (“we”, “us”). These terms govern your use of the Wafa customer app (“the app”)."
+            "p": "Welcome to Wafa. The service is provided by the <b>Deep Code Solution</b> team in Damascus, Syria (“we”, “us”). These terms govern your use of the Wafa customer app (“the app”)."
           },
           {
             "p": "By signing up and ticking the consent box, you agree to these terms and to our <privacy>Privacy Policy</privacy>. If you do not agree, do not use the app."
@@ -688,7 +688,7 @@
       "email": "Email",
       "phone": "Phone / WhatsApp",
       "party": "Provider",
-      "partyValue": "The Deep Code team, Damascus, Syria"
+      "partyValue": "The Deep Code Solution team, Damascus, Syria"
     }
   }
 }

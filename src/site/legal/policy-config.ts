@@ -17,7 +17,7 @@ export const policy = {
   /** General support email (terms of use contact: questions, corrections, reporting a shop). */
   supportEmail: "support@wafacard.app",
   /** Phone / WhatsApp in international format, shown as written; wa.me links use its digits only. */
-  phone: "+963 997 013 656",
+  phone: "+963 991 734 151",
   /** Hosting provider name, e.g. `Hetzner`. */
   hostingProvider: "HardBrain Ltd",
   hostingRegion: { ar: "مراكز بيانات أوروبية (فرانكفورت، ألمانيا)", en: "European data centres (Frankfurt, Germany)" },
