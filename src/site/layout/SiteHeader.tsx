@@ -1,7 +1,14 @@
+import { WhatsappLogo } from "@phosphor-icons/react/ssr";
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
+import { focusRing } from "@/components/ui/styles";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { cn } from "@/lib/cn";
+import { whatsappLink } from "@/site/home/home-config";
+import { linkButton } from "@/site/home/styles";
+import { MobileMenu } from "./MobileMenu";
+import { siteNav } from "./site-nav";
 
 type SiteHeaderProps = {
   /** Path of the current page without the locale prefix, so the switch keeps the reader on the same page. */
@@ -13,6 +20,9 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
   const locale = (await getLocale()) as Locale;
   const otherLocale: Locale = locale === "ar" ? "en" : "ar";
 
+  const links = siteNav.map((item) => ({ section: item.section, label: t(`nav.${item.key}`) }));
+  const cta = { href: whatsappLink(t("nav.joinMessage")), label: t("nav.join") };
+
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-surface/90 backdrop-blur print:static print:border-0">
       <a
@@ -21,22 +31,55 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
       >
         {t("skipToContent")}
       </a>
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link
-          href="/"
-          className="flex items-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
-        >
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
+        <Link href="/" className={cn("flex shrink-0 items-center rounded-lg", focusRing)}>
           <Image src="/brand/wafa-logo.png" alt={t("brand")} width={44} height={44} priority className="size-11" />
         </Link>
-        <Link
-          href={pathname}
-          locale={otherLocale}
-          lang={otherLocale}
-          aria-label={t("switchLocaleLabel")}
-          className="inline-flex h-9 items-center rounded-full border border-border px-4 text-sm font-medium text-fg transition-colors outline-none hover:border-border-strong hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 print:hidden"
-        >
-          {t("switchLocale")}
-        </Link>
+
+        <nav aria-label={t("nav.label")} className="mx-auto hidden items-center gap-1 lg:flex print:hidden">
+          {links.map((link) => (
+            <Link
+              key={link.section}
+              href={{ pathname: "/", hash: link.section }}
+              className={cn(
+                "rounded-lg px-3 py-2 text-sm font-medium text-fg-muted transition-colors hover:bg-neutral-50 hover:text-fg",
+                focusRing,
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="ms-auto flex items-center gap-2 lg:ms-0 print:hidden">
+          <Link
+            href={pathname}
+            locale={otherLocale}
+            lang={otherLocale}
+            aria-label={t("switchLocaleLabel")}
+            className="inline-flex h-9 items-center rounded-full border border-border px-4 text-sm font-medium text-fg transition-colors outline-none hover:border-border-strong hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+          >
+            {t("switchLocale")}
+          </Link>
+          <a
+            href={cta.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={linkButton("primary", "hidden sm:inline-flex", "md")}
+          >
+            <WhatsappLogo aria-hidden weight="fill" />
+            {cta.label}
+          </a>
+          <div className="lg:hidden">
+            <MobileMenu
+              links={links}
+              cta={cta}
+              navLabel={t("nav.label")}
+              openLabel={t("nav.openMenu")}
+              closeLabel={t("nav.closeMenu")}
+            />
+          </div>
+        </div>
       </div>
     </header>
   );

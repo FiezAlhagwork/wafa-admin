@@ -4,6 +4,17 @@
     "skipToContent": "Skip to content",
     "switchLocale": "العربية",
     "switchLocaleLabel": "اعرض هذه الصفحة بالعربية",
+    "nav": {
+      "label": "Main navigation",
+      "how": "How it works",
+      "merchants": "For merchants",
+      "customers": "For customers",
+      "faq": "FAQ",
+      "join": "Join as a merchant",
+      "joinMessage": "Hello, I'd like to sign up my shop for Wafa.",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
     "footer": {
       "rights": "© {year} Deep Code Solution, Damascus, Syria. All rights reserved.",
       "privacy": "Privacy policy",
@@ -25,7 +36,6 @@
       "title": "Your customers come back, with their card in their pocket",
       "lead": "Wafa turns the paper stamp card into a digital card on your customer's phone. They get a stamp on every visit by showing their code, and collect their reward from your shop when the card is full.",
       "merchantCta": "Join as a merchant",
-      "merchantMessage": "Hello, I'd like to sign up my shop for Wafa.",
       "customerCta": "Get the customer app",
       "note": "Free trial for merchants. Always free for customers.",
       "card": {

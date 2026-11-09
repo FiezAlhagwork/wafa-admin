@@ -7,6 +7,7 @@ import { linkButton } from "./styles";
 
 export async function Hero() {
   const t = await getTranslations("home.hero");
+  const tNav = await getTranslations("site.nav");
 
   return (
     <section className="overflow-hidden border-b border-border bg-surface">
@@ -19,7 +20,7 @@ export async function Hero() {
           <p className="mt-5 max-w-xl text-lg leading-8 text-fg-muted">{t("lead")}</p>
 
           <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <a href={whatsappLink(t("merchantMessage"))} target="_blank" rel="noopener noreferrer" className={linkButton("accent")}>
+            <a href={whatsappLink(tNav("joinMessage"))} target="_blank" rel="noopener noreferrer" className={linkButton("accent")}>
               <WhatsappLogo aria-hidden weight="fill" />
               {t("merchantCta")}
             </a>
