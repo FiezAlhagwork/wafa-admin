@@ -30,19 +30,57 @@
       "description": "Wafa turns the paper stamp card into a card on your customer's phone: they collect stamps by showing their code and get their reward from your shop. Free for customers, with a free trial for merchants."
     },
     "hero": {
-      "eyebrow": "Digital loyalty cards for shops in Syria",
-      "title": "Your customers come back, with their card in their pocket",
-      "lead": "Wafa turns the paper stamp card into a digital card on your customer's phone. They get a stamp on every visit by showing their code, and collect their reward from your shop when the card is full.",
+      "titleLine1": "Your customers come back,",
+      "titleLine2": "with their card in their pocket",
+      "lead": "A digital stamp card for your shop, with your colour, icon and reward, on your customer's phone. They get a stamp on every visit by showing their code, and collect the reward when the card is full.",
+      "pickerLabel": "Try a card for your kind of shop",
       "downloadCta": "Get the app",
       "howCta": "How it works",
+      "stores": "The customer app is on",
       "card": {
-        "label": "Example of a stamp card in the Wafa app: seven of ten stamps, three more for a free coffee.",
-        "shop": "Jasmine Café",
-        "type": "Coffee card",
+        "label": "Example {shop} card in the Wafa app: {filled} of {total} stamps.",
         "progress": "{count} of {total}",
-        "remaining": "{count} more stamps and your next coffee is free",
-        "scan": "Show your code in the shop"
-      }
+        "remaining": "{count} more stamps for {reward}",
+        "scan": "Scan in the shop"
+      },
+      "cards": [
+        {
+          "key": "cafe",
+          "label": "Café",
+          "shop": "Jasmine Café",
+          "type": "Coffee card",
+          "reward": "a free coffee",
+          "total": 10,
+          "filled": 7
+        },
+        {
+          "key": "bakery",
+          "label": "Bakery",
+          "shop": "Sanabel Bakery",
+          "type": "Pastry card",
+          "reward": "a free box of pastries",
+          "total": 8,
+          "filled": 5
+        },
+        {
+          "key": "salon",
+          "label": "Barber",
+          "shop": "Elegance Barber",
+          "type": "Haircut card",
+          "reward": "a free haircut",
+          "total": 6,
+          "filled": 3
+        },
+        {
+          "key": "restaurant",
+          "label": "Restaurant",
+          "shop": "Beit Shami",
+          "type": "Meal card",
+          "reward": "a free meal",
+          "total": 10,
+          "filled": 3
+        }
+      ]
     },
     "features": {
       "eyebrow": "Features",
