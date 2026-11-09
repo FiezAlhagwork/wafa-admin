@@ -15,7 +15,7 @@ export async function StampCardPreview() {
       <div aria-hidden className="absolute -top-8 -end-6 size-40 rounded-full bg-amber/20" />
       <div aria-hidden className="absolute -bottom-10 -start-8 size-48 rounded-full bg-teal/20" />
 
-      <div className="relative flex flex-col gap-6 rounded-3xl bg-ink p-6 text-neutral-0 shadow-dialog sm:p-7">
+      <div className="relative flex flex-col gap-6 rounded-3xl bg-ink p-6 pb-16 text-neutral-0 shadow-dialog sm:p-7 sm:pb-16">
         <div className="flex items-center gap-3">
           <span className="grid size-12 place-items-center rounded-2xl bg-neutral-0/10">
             <Coffee weight="fill" className="size-6 text-amber" />
