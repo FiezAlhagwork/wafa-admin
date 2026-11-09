@@ -31,7 +31,8 @@ export async function Hero() {
   }));
 
   return (
-    <section className="overflow-hidden border-b border-border bg-bg">
+    <section className="relative overflow-hidden border-b border-border bg-bg">
+      <HeroStamps />
       <HeroShowcase
         cards={cards}
         pickerLabel={t("pickerLabel")}
@@ -83,5 +84,19 @@ export async function Hero() {
         }
       />
     </section>
+  );
+}
+
+/** Faint stamps scattered behind the hero, echoing the stamps on the card. Purely decorative. */
+function HeroStamps() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0">
+      <span className="absolute start-[3%] top-[8%] size-14 rounded-full bg-amber/30" />
+      <span className="absolute start-[2%] bottom-[30%] hidden size-8 rounded-full border-2 border-dashed border-amber sm:block" />
+      <span className="absolute start-[38%] bottom-[10%] hidden size-10 rounded-full border-2 border-dashed border-teal/60 sm:block" />
+      <span className="absolute start-[44%] top-[12%] hidden size-6 rounded-full bg-teal/25 sm:block" />
+      <span className="absolute end-[38%] top-[6%] size-8 rounded-full bg-brand/15" />
+      <span className="absolute end-[4%] bottom-[12%] size-12 rounded-full border-2 border-dashed border-brand/40" />
+    </div>
   );
 }

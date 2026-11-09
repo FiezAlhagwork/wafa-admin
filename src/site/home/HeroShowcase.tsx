@@ -49,7 +49,7 @@ export function HeroShowcase({ cards, pickerLabel, giftLabel, intro, actions }: 
   const CardIcon = icons[card.key] ?? Coffee;
 
   return (
-    <div className="mx-auto grid max-w-6xl items-center gap-20 px-4 pt-12 pb-24 sm:px-6 sm:pt-16 lg:grid-cols-[7fr_5fr] lg:gap-12 lg:pb-28">
+    <div className="relative mx-auto grid max-w-6xl items-center gap-20 px-4 pt-12 pb-24 sm:px-6 sm:pt-16 lg:grid-cols-[7fr_5fr] lg:gap-12 lg:pb-28">
       <div className="flex flex-col items-start">
         {intro}
 
