@@ -10,8 +10,6 @@
       "merchants": "For merchants",
       "customers": "For customers",
       "faq": "FAQ",
-      "join": "Join as a merchant",
-      "joinMessage": "Hello, I'd like to sign up my shop for Wafa.",
       "openMenu": "Open menu",
       "closeMenu": "Close menu"
     },
@@ -35,9 +33,8 @@
       "eyebrow": "Digital loyalty cards for shops in Syria",
       "title": "Your customers come back, with their card in their pocket",
       "lead": "Wafa turns the paper stamp card into a digital card on your customer's phone. They get a stamp on every visit by showing their code, and collect their reward from your shop when the card is full.",
-      "merchantCta": "Join as a merchant",
-      "customerCta": "Get the customer app",
-      "note": "Free trial for merchants. Always free for customers.",
+      "downloadCta": "Get the app",
+      "howCta": "How it works",
       "card": {
         "label": "Example of a stamp card in the Wafa app: seven of ten stamps, three more for a free coffee.",
         "shop": "Jasmine Café",

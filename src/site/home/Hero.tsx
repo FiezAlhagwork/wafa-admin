@@ -1,13 +1,12 @@
-import { DeviceMobile, WhatsappLogo } from "@phosphor-icons/react/ssr";
+import { DownloadSimple } from "@phosphor-icons/react/ssr";
 import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui";
-import { whatsappLink } from "./home-config";
+import { Link } from "@/i18n/navigation";
 import { StampCardPreview } from "./StampCardPreview";
 import { linkButton } from "./styles";
 
 export async function Hero() {
   const t = await getTranslations("home.hero");
-  const tNav = await getTranslations("site.nav");
 
   return (
     <section className="overflow-hidden border-b border-border bg-surface">
@@ -20,17 +19,14 @@ export async function Hero() {
           <p className="mt-5 max-w-xl text-lg leading-8 text-fg-muted">{t("lead")}</p>
 
           <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <a href={whatsappLink(tNav("joinMessage"))} target="_blank" rel="noopener noreferrer" className={linkButton("accent")}>
-              <WhatsappLogo aria-hidden weight="fill" />
-              {t("merchantCta")}
-            </a>
-            <a href="#download" className={linkButton("secondary")}>
-              <DeviceMobile aria-hidden />
-              {t("customerCta")}
-            </a>
+            <Link href={{ pathname: "/", hash: "download" }} className={linkButton("accent")}>
+              <DownloadSimple aria-hidden weight="bold" />
+              {t("downloadCta")}
+            </Link>
+            <Link href={{ pathname: "/", hash: "how" }} className={linkButton("secondary")}>
+              {t("howCta")}
+            </Link>
           </div>
-
-          <p className="mt-4 text-sm text-fg-muted">{t("note")}</p>
         </div>
 
         <StampCardPreview />

@@ -1,15 +1,13 @@
 "use client";
 
-import { List, WhatsappLogo, X } from "@phosphor-icons/react";
+import { List, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { focusRing } from "@/components/ui/styles";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
-import { linkButton } from "@/site/home/styles";
 
 type MobileMenuProps = {
   links: { section: string; label: string }[];
-  cta: { href: string; label: string };
   /** Accessible names of the toggle button. Text comes from the server (no messages in the browser). */
   openLabel: string;
   closeLabel: string;
@@ -17,7 +15,7 @@ type MobileMenuProps = {
 };
 
 /** Menu button and dropdown panel for small screens. The panel sits under the sticky header. */
-export function MobileMenu({ links, cta, openLabel, closeLabel, navLabel }: MobileMenuProps) {
+export function MobileMenu({ links, openLabel, closeLabel, navLabel }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -64,16 +62,6 @@ export function MobileMenu({ links, cta, openLabel, closeLabel, navLabel }: Mobi
               {link.label}
             </Link>
           ))}
-          <a
-            href={cta.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setOpen(false)}
-            className={linkButton("primary", "mt-2 w-full sm:hidden")}
-          >
-            <WhatsappLogo aria-hidden weight="fill" />
-            {cta.label}
-          </a>
         </nav>
       </div>
     </>

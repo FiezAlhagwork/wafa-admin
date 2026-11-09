@@ -1,12 +1,9 @@
-import { WhatsappLogo } from "@phosphor-icons/react/ssr";
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { focusRing } from "@/components/ui/styles";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { cn } from "@/lib/cn";
-import { whatsappLink } from "@/site/home/home-config";
-import { linkButton } from "@/site/home/styles";
 import { MobileMenu } from "./MobileMenu";
 import { siteNav } from "./site-nav";
 
@@ -21,7 +18,6 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
   const otherLocale: Locale = locale === "ar" ? "en" : "ar";
 
   const links = siteNav.map((item) => ({ section: item.section, label: t(`nav.${item.key}`) }));
-  const cta = { href: whatsappLink(t("nav.joinMessage")), label: t("nav.join") };
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-surface/90 backdrop-blur print:static print:border-0">
@@ -61,19 +57,9 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
           >
             {t("switchLocale")}
           </Link>
-          <a
-            href={cta.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={linkButton("primary", "hidden sm:inline-flex", "md")}
-          >
-            <WhatsappLogo aria-hidden weight="fill" />
-            {cta.label}
-          </a>
           <div className="lg:hidden">
             <MobileMenu
               links={links}
-              cta={cta}
               navLabel={t("nav.label")}
               openLabel={t("nav.openMenu")}
               closeLabel={t("nav.closeMenu")}
