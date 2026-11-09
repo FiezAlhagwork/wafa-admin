@@ -12,6 +12,7 @@ import {
   User,
 } from "@phosphor-icons/react/ssr";
 import { getTranslations } from "next-intl/server";
+import { cn } from "@/lib/cn";
 import { SectionHeading } from "./SectionHeading";
 
 type Item = { title: string; text: string };
@@ -19,6 +20,16 @@ type Item = { title: string; text: string };
 /** One icon per item, in the same order as home.features.merchants.items / customers.items. */
 const merchantIcons = [Palette, QrCode, Megaphone, Cake, ChartLineUp, Storefront];
 const customerIcons = [DeviceMobile, QrCode, MagnifyingGlass, BellSimpleSlash];
+
+/** Icon box colors for the merchant cards, cycling through the brand's soft tints. */
+const merchantTints = [
+  "bg-amber-soft text-ink",
+  "bg-teal-soft text-success",
+  "bg-brand-soft text-brand",
+  "bg-info-soft text-info",
+  "bg-amber-soft text-ink",
+  "bg-teal-soft text-success",
+];
 
 export async function Features() {
   const t = await getTranslations("home.features");
@@ -40,8 +51,16 @@ export async function Features() {
             {merchantItems.map((item, index) => {
               const Icon = merchantIcons[index];
               return (
-                <li key={index} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6">
-                  <span className="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand">
+                <li
+                  key={index}
+                  className="flex flex-col gap-3 rounded-xl border-2 border-ink bg-surface p-6 shadow-[4px_4px_0_var(--color-ink)]"
+                >
+                  <span
+                    className={cn(
+                      "grid size-12 place-items-center rounded-xl border-2 border-ink",
+                      merchantTints[index % merchantTints.length],
+                    )}
+                  >
                     {Icon && <Icon aria-hidden weight="duotone" className="size-6" />}
                   </span>
                   <h4 className="text-lg font-bold text-fg">{item.title}</h4>
