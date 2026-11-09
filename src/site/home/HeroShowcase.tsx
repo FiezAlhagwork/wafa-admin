@@ -77,10 +77,10 @@ export function HeroShowcase({ cards, pickerLabel, scanLabel, intro, actions }: 
       <div className="relative mx-auto w-full max-w-sm [perspective:1200px]">
         <div aria-hidden className="absolute -top-10 -end-8 size-44 rounded-full bg-amber/20 blur-2xl" />
         <div aria-hidden className="absolute -bottom-6 -start-10 size-52 rounded-full bg-teal/20 blur-2xl" />
-        <div aria-hidden className="absolute inset-x-12 -bottom-12 h-6 animate-card-shadow rounded-[50%] bg-ink blur-xl motion-reduce:animate-none motion-reduce:opacity-40" />
+        <div aria-hidden className="absolute inset-x-12 -bottom-12 h-6 hero-card-shadow rounded-[50%] bg-ink blur-xl" />
 
         {/* The sway lives on a wrapper, so the card itself can still play its enter animation when it changes */}
-        <div className="animate-card-sway motion-reduce:animate-none motion-reduce:[transform:rotateY(-12deg)_rotateX(4deg)] rtl:motion-reduce:[transform:rotateY(12deg)_rotateX(4deg)]">
+        <div className="hero-card-sway">
           <div
             key={card.key}
             role="img"
@@ -90,7 +90,7 @@ export function HeroShowcase({ cards, pickerLabel, scanLabel, intro, actions }: 
             {/* Light sliding over the card as it turns */}
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-0 animate-card-shine bg-linear-to-br from-neutral-0/0 via-neutral-0/12 to-neutral-0/0 bg-size-[250%_250%] motion-reduce:animate-none"
+              className="pointer-events-none absolute inset-0 hero-card-shine bg-linear-to-br from-neutral-0/0 via-neutral-0/12 to-neutral-0/0 bg-size-[250%_250%]"
             />
             <div className="flex items-center gap-3">
               <span className="grid size-12 place-items-center rounded-2xl bg-neutral-0/10">
