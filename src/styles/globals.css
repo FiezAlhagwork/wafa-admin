@@ -183,3 +183,22 @@
     animation: none;
   }
 }
+
+/* Website: faint stamps drifting slowly in the background of the hero and the about section. */
+@keyframes stamp-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(10deg);
+  }
+}
+.stamp-float {
+  animation: stamp-float 7s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp-float {
+    animation: none;
+  }
+}

@@ -8,14 +8,16 @@ type SectionHeadingProps = {
   lead?: string;
   align?: "start" | "center";
   className?: string;
+  /** Overrides the title size, for sections where the default is too large. */
+  titleClassName?: string;
 };
 
 /** Small label, title and optional lead at the top of a home page section. */
-export function SectionHeading({ id, eyebrow, title, lead, align = "center", className }: SectionHeadingProps) {
+export function SectionHeading({ id, eyebrow, title, lead, align = "center", className, titleClassName }: SectionHeadingProps) {
   return (
     <div className={cn("flex max-w-2xl flex-col", align === "center" ? "mx-auto items-center text-center" : "items-start", className)}>
       <p className="text-sm font-bold text-brand">{eyebrow}</p>
-      <h2 id={id} className="mt-2 text-3xl font-black text-fg sm:text-4xl">
+      <h2 id={id} className={cn("mt-2 text-3xl font-black text-fg sm:text-4xl", titleClassName)}>
         {title}
       </h2>
       {lead && <p className="mt-4 text-lg leading-8 text-fg-muted">{lead}</p>}
