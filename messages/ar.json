@@ -39,9 +39,10 @@
       "stores": "تطبيق الزبون متوفر على",
       "card": {
         "label": "مثال على بطاقة {shop} في تطبيق وفا: {filled} طوابع من {total}.",
-        "progress": "{count} من {total}",
-        "remaining": "باقي {count} طوابع للحصول على {reward}",
-        "scan": "امسح الرمز في المحل"
+        "of": "من {total} طوابع",
+        "city": "دمشق",
+        "pill": "باقي {count} طوابع على هديتك",
+        "gift": "الهدية"
       },
       "cards": [
         {

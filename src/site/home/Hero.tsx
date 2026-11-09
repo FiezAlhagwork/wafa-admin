@@ -4,7 +4,14 @@ import { Link } from "@/i18n/navigation";
 import { HeroShowcase, type ShowcaseCard } from "./HeroShowcase";
 import { linkButton } from "./styles";
 
-type CardText = { key: string; label: string; shop: string; type: string; reward: string; total: number; filled: number };
+type CardText = {
+  key: string;
+  label: string;
+  shop: string;
+  type: string;
+  total: number;
+  filled: number;
+};
 
 export async function Hero() {
   const t = await getTranslations("home.hero");
@@ -14,11 +21,12 @@ export async function Hero() {
     key: card.key,
     label: card.label,
     shop: card.shop,
-    type: card.type,
+    subtitle: `${card.label} · ${t("card.city")}`,
+    name: card.type,
     total: card.total,
     filled: card.filled,
-    progress: t("card.progress", { count: card.filled, total: card.total }),
-    remaining: t("card.remaining", { count: card.total - card.filled, reward: card.reward }),
+    of: t("card.of", { total: card.total }),
+    pill: t("card.pill", { count: card.total - card.filled }),
     ariaLabel: t("card.label", { shop: card.shop, filled: card.filled, total: card.total }),
   }));
 
@@ -27,7 +35,7 @@ export async function Hero() {
       <HeroShowcase
         cards={cards}
         pickerLabel={t("pickerLabel")}
-        scanLabel={t("card.scan")}
+        giftLabel={t("card.gift")}
         intro={
           <>
             <h1 className="text-4xl leading-tight font-black text-fg sm:text-5xl lg:text-6xl">

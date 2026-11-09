@@ -39,9 +39,10 @@
       "stores": "The customer app is on",
       "card": {
         "label": "Example {shop} card in the Wafa app: {filled} of {total} stamps.",
-        "progress": "{count} of {total}",
-        "remaining": "{count} more stamps for {reward}",
-        "scan": "Scan in the shop"
+        "of": "of {total} stamps",
+        "city": "Damascus",
+        "pill": "{count} more stamps to your reward",
+        "gift": "Reward"
       },
       "cards": [
         {

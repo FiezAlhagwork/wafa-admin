@@ -182,3 +182,13 @@
     transform: rotateY(-12deg) rotateX(4deg);
   }
 }
+
+/* Website hero card: the dotted pattern on the blue card, like the app's card. */
+.hero-card-dots {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--color-neutral-0) 16%, transparent) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 22px 22px;
+}
