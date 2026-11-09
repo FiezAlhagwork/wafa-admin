@@ -2,7 +2,7 @@ import { AppleLogo, DownloadSimple, GooglePlayLogo } from "@phosphor-icons/react
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { HeroShowcase, type ShowcaseCard } from "./HeroShowcase";
-import { linkButton } from "./styles";
+import { ctaButton } from "./styles";
 
 type CardText = {
   key: string;
@@ -48,11 +48,11 @@ export async function Hero() {
         actions={
           <>
             <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <Link href={{ pathname: "/", hash: "download" }} className={linkButton("accent", "h-14 px-8 text-lg")}>
+              <Link href={{ pathname: "/", hash: "download" }} className={ctaButton("accent")}>
                 <DownloadSimple aria-hidden weight="bold" />
                 {t("downloadCta")}
               </Link>
-              <Link href={{ pathname: "/", hash: "how" }} className={linkButton("secondary", "h-14 px-8 text-lg")}>
+              <Link href={{ pathname: "/", hash: "how" }} className={ctaButton("plain")}>
                 {t("howCta")}
               </Link>
             </div>

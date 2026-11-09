@@ -53,7 +53,7 @@ export function HeroShowcase({ cards, pickerLabel, giftLabel, intro, actions }: 
       <div className="flex flex-col items-start">
         {intro}
 
-        <div role="group" aria-label={pickerLabel} className="mt-7 flex flex-wrap gap-2">
+        <div role="group" aria-label={pickerLabel} className="mt-7 inline-flex max-w-full gap-1 rounded-full border border-border-strong bg-surface p-1">
           {cards.map((item, index) => {
             const ItemIcon = icons[item.key] ?? Coffee;
             const active = index === selected;
@@ -64,14 +64,12 @@ export function HeroShowcase({ cards, pickerLabel, giftLabel, intro, actions }: 
                 aria-pressed={active}
                 onClick={() => setSelected(index)}
                 className={cn(
-                  "inline-flex h-11 items-center gap-2 rounded-xl border px-4 font-bold transition-colors",
-                  active
-                    ? "border-amber bg-amber text-ink"
-                    : "border-border-strong bg-surface text-fg hover:border-neutral-400 hover:bg-neutral-50",
+                  "inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-bold transition-colors sm:gap-2 sm:px-4 sm:text-base",
+                  active ? "bg-brand text-brand-on" : "text-fg-muted hover:bg-neutral-50 hover:text-fg",
                   focusRing,
                 )}
               >
-                <ItemIcon aria-hidden weight={active ? "fill" : "regular"} className="size-5" />
+                <ItemIcon aria-hidden weight={active ? "fill" : "regular"} className="size-5 shrink-0" />
                 {item.label}
               </button>
             );
