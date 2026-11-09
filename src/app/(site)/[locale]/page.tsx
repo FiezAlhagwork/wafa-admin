@@ -2,6 +2,7 @@ import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { About } from "@/site/home/About";
 import { Features } from "@/site/home/Features";
 import { Hero } from "@/site/home/Hero";
 import { homeMetadata } from "@/site/home/metadata";
@@ -23,6 +24,7 @@ export default async function SiteHomePage({ params }: PageProps<"/[locale]">) {
       <SiteHeader pathname="/" />
       <main id="content">
         <Hero />
+        <About />
         <Features />
       </main>
       <SiteFooter />

@@ -82,6 +82,13 @@
         }
       ]
     },
+    "about": {
+      "eyebrow": "What is Wafa?",
+      "title": "The paper stamp card, now on your phone",
+      "lead": "Wafa lets every shop run a digital stamp card with its own name and colors. Customers never lose it, and merchants see who keeps coming back.",
+      "paper": { "label": "Paper", "note": "Gets lost, gets wet" },
+      "digital": { "label": "Digital", "note": "Always with you" }
+    },
     "features": {
       "eyebrow": "Features",
       "title": "Everything a shop and its customers need",
