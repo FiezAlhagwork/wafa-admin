@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { cn } from "@/lib/cn";
 import { MobileMenu } from "./MobileMenu";
+import { NavLinks } from "./NavLinks";
 import { siteNav } from "./site-nav";
 
 type SiteHeaderProps = {
@@ -17,7 +18,7 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
   const locale = (await getLocale()) as Locale;
   const otherLocale: Locale = locale === "ar" ? "en" : "ar";
 
-  const links = siteNav.map((item) => ({ section: item.section, label: t(`nav.${item.key}`) }));
+  const links = siteNav.map((section) => ({ section, label: t(`nav.${section}`) }));
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-surface/90 backdrop-blur print:static print:border-0">
@@ -33,18 +34,7 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
         </Link>
 
         <nav aria-label={t("nav.label")} className="mx-auto hidden items-center gap-1 lg:flex print:hidden">
-          {links.map((link) => (
-            <Link
-              key={link.section}
-              href={{ pathname: "/", hash: link.section }}
-              className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium text-fg-muted transition-colors hover:bg-neutral-50 hover:text-fg",
-                focusRing,
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          <NavLinks links={links} variant="bar" />
         </nav>
 
         <div className="ms-auto flex items-center gap-2 lg:ms-0 print:hidden">

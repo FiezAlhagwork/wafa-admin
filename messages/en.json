@@ -6,9 +6,9 @@
     "switchLocaleLabel": "اعرض هذه الصفحة بالعربية",
     "nav": {
       "label": "Main navigation",
+      "features": "Features",
       "how": "How it works",
-      "merchants": "For merchants",
-      "customers": "For customers",
+      "pricing": "Pricing",
       "faq": "FAQ",
       "openMenu": "Open menu",
       "closeMenu": "Close menu"

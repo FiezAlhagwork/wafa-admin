@@ -1,9 +1,4 @@
-/** Home page sections linked from the header. The ids match the sections on the home page. */
-export const siteNav = [
-  { section: "how", key: "how" },
-  { section: "merchants", key: "merchants" },
-  { section: "customers", key: "customers" },
-  { section: "faq", key: "faq" },
-] as const;
+/** Home page sections linked from the header, in display order. Each id matches a section on the home page. */
+export const siteNav = ["features", "how", "pricing", "faq"] as const;
 
-export type SiteNavKey = (typeof siteNav)[number]["key"];
+export type SiteSection = (typeof siteNav)[number];

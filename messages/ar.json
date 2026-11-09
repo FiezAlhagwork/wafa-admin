@@ -6,10 +6,10 @@
     "switchLocaleLabel": "View this page in English",
     "nav": {
       "label": "التنقل الرئيسي",
+      "features": "المميزات",
       "how": "كيف يعمل",
-      "merchants": "للتجار",
-      "customers": "للزبائن",
-      "faq": "أسئلة شائعة",
+      "pricing": "الأسعار",
+      "faq": "الأسئلة الشائعة",
       "openMenu": "افتح القائمة",
       "closeMenu": "أغلق القائمة"
     },

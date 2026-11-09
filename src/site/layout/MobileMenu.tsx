@@ -3,8 +3,8 @@
 import { List, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { focusRing } from "@/components/ui/styles";
-import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
+import { NavLinks } from "./NavLinks";
 
 type MobileMenuProps = {
   links: { section: string; label: string }[];
@@ -49,19 +49,7 @@ export function MobileMenu({ links, openLabel, closeLabel, navLabel }: MobileMen
         className="absolute inset-x-0 top-full border-b border-border bg-surface shadow-popup animate-enter"
       >
         <nav aria-label={navLabel} className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3 sm:px-6">
-          {links.map((link) => (
-            <Link
-              key={link.section}
-              href={{ pathname: "/", hash: link.section }}
-              onClick={() => setOpen(false)}
-              className={cn(
-                "flex h-11 items-center rounded-lg px-3 font-medium text-fg transition-colors hover:bg-neutral-50",
-                focusRing,
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          <NavLinks links={links} variant="menu" onNavigate={() => setOpen(false)} />
         </nav>
       </div>
     </>
