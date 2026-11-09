@@ -10,7 +10,7 @@ type LegalHeroProps = {
 
 export function LegalHero({ eyebrow, title, lead, meta }: LegalHeroProps) {
   return (
-    <div className="border-b border-border bg-surface">
+    <div className="border-b border-border bg-bg">
       <div className="mx-auto max-w-6xl px-4 pt-12 pb-10 sm:px-6 sm:pt-16 sm:pb-12">
         <p className="text-sm font-bold text-brand">{eyebrow}</p>
         <h1 className="mt-2 text-3xl font-black text-fg sm:text-5xl">{title}</h1>

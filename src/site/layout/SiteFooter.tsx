@@ -8,7 +8,7 @@ export async function SiteFooter() {
   const t = await getTranslations("site.footer");
 
   return (
-    <footer className="border-t border-border bg-surface">
+    <footer className="border-t border-border bg-bg">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p className="text-fg-muted">{t("rights", { year: new Date().getFullYear() })}</p>
         <nav className="flex flex-wrap gap-x-5 gap-y-2 print:hidden">

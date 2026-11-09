@@ -21,7 +21,7 @@ export default async function SiteRootLayout({ children, params }: LayoutProps<"
 
   return (
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className={thmanyah.variable}>
-      <body className="min-h-dvh">
+      <body className="site-dark min-h-dvh">
         {/* The website renders its text on the server, so no messages are sent to the browser. */}
         <NextIntlClientProvider messages={null}>{children}</NextIntlClientProvider>
       </body>
