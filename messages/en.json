@@ -15,6 +15,29 @@
       "message": "Fill these fields in policy-config.ts before publishing: {fields}"
     }
   },
+  "home": {
+    "meta": {
+      "title": "Wafa · Digital stamp cards for shops in Syria",
+      "description": "Wafa turns the paper stamp card into a card on your customer's phone: they collect stamps by showing their code and get their reward from your shop. Free for customers, with a free trial for merchants."
+    },
+    "hero": {
+      "eyebrow": "Digital loyalty cards for shops in Syria",
+      "title": "Your customers come back, with their card in their pocket",
+      "lead": "Wafa turns the paper stamp card into a digital card on your customer's phone. They get a stamp on every visit by showing their code, and collect their reward from your shop when the card is full.",
+      "merchantCta": "Join as a merchant",
+      "merchantMessage": "Hello, I'd like to sign up my shop for Wafa.",
+      "customerCta": "Get the customer app",
+      "note": "Free trial for merchants. Always free for customers.",
+      "card": {
+        "label": "Example of a stamp card in the Wafa app: seven of ten stamps, three more for a free coffee.",
+        "shop": "Jasmine Café",
+        "type": "Coffee card",
+        "progress": "{count} of {total}",
+        "remaining": "{count} more stamps and your next coffee is free",
+        "scan": "Show your code in the shop"
+      }
+    }
+  },
   "privacy": {
     "meta": {
       "title": "Privacy Policy · Wafa",
