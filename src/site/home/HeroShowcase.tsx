@@ -73,53 +73,61 @@ export function HeroShowcase({ cards, pickerLabel, scanLabel, intro, actions }: 
         {actions}
       </div>
 
-      {/* The example card, tilted toward the text, with a soft shadow on the floor */}
+      {/* The example card, swaying in 3D above a soft floor shadow */}
       <div className="relative mx-auto w-full max-w-sm [perspective:1200px]">
         <div aria-hidden className="absolute -top-10 -end-8 size-44 rounded-full bg-amber/20 blur-2xl" />
         <div aria-hidden className="absolute -bottom-6 -start-10 size-52 rounded-full bg-teal/20 blur-2xl" />
-        <div aria-hidden className="absolute inset-x-12 -bottom-12 h-6 rounded-[50%] bg-ink/50 blur-xl" />
+        <div aria-hidden className="absolute inset-x-12 -bottom-12 h-6 animate-card-shadow rounded-[50%] bg-ink blur-xl motion-reduce:animate-none motion-reduce:opacity-40" />
 
-        <div
-          key={card.key}
-          role="img"
-          aria-label={card.ariaLabel}
-          className="relative flex animate-enter flex-col gap-6 rounded-3xl bg-ink p-6 text-neutral-0 shadow-dialog [transform:rotateY(14deg)_rotateX(4deg)] sm:p-7 rtl:[transform:rotateY(-14deg)_rotateX(4deg)]"
-        >
-          <div className="flex items-center gap-3">
-            <span className="grid size-12 place-items-center rounded-2xl bg-neutral-0/10">
-              <CardIcon weight="fill" className="size-6 text-amber" />
-            </span>
-            <div className="flex min-w-0 flex-col">
-              <span className="truncate text-lg font-bold">{card.shop}</span>
-              <span className="text-sm text-neutral-0/80">{card.type}</span>
+        {/* The sway lives on a wrapper, so the card itself can still play its enter animation when it changes */}
+        <div className="animate-card-sway motion-reduce:animate-none motion-reduce:[transform:rotateY(-12deg)_rotateX(4deg)] rtl:motion-reduce:[transform:rotateY(12deg)_rotateX(4deg)]">
+          <div
+            key={card.key}
+            role="img"
+            aria-label={card.ariaLabel}
+            className="relative flex animate-enter flex-col gap-6 overflow-hidden rounded-3xl bg-ink p-6 text-neutral-0 shadow-dialog sm:p-7"
+          >
+            {/* Light sliding over the card as it turns */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 animate-card-shine bg-linear-to-br from-neutral-0/0 via-neutral-0/12 to-neutral-0/0 bg-size-[250%_250%] motion-reduce:animate-none"
+            />
+            <div className="flex items-center gap-3">
+              <span className="grid size-12 place-items-center rounded-2xl bg-neutral-0/10">
+                <CardIcon weight="fill" className="size-6 text-amber" />
+              </span>
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-lg font-bold">{card.shop}</span>
+                <span className="text-sm text-neutral-0/80">{card.type}</span>
+              </div>
+              <span className="ms-auto shrink-0 rounded-full bg-amber px-3 py-1 text-sm font-bold text-ink tabular-nums">
+                {card.progress}
+              </span>
             </div>
-            <span className="ms-auto shrink-0 rounded-full bg-amber px-3 py-1 text-sm font-bold text-ink tabular-nums">
-              {card.progress}
-            </span>
-          </div>
 
-          <div className={cn("grid gap-3", columns[card.total] ?? "grid-cols-5")}>
-            {Array.from({ length: card.total }, (_, index) => {
-              const filled = index < card.filled;
-              return (
-                <span
-                  key={index}
-                  className={cn(
-                    "grid aspect-square place-items-center rounded-full",
-                    filled ? "bg-amber text-ink" : "border-2 border-dashed border-neutral-0/30",
-                  )}
-                >
-                  {filled && <CardIcon weight="fill" className="size-5" />}
-                </span>
-              );
-            })}
-          </div>
+            <div className={cn("grid gap-3", columns[card.total] ?? "grid-cols-5")}>
+              {Array.from({ length: card.total }, (_, index) => {
+                const filled = index < card.filled;
+                return (
+                  <span
+                    key={index}
+                    className={cn(
+                      "grid aspect-square place-items-center rounded-full",
+                      filled ? "bg-amber text-ink" : "border-2 border-dashed border-neutral-0/30",
+                    )}
+                  >
+                    {filled && <CardIcon weight="fill" className="size-5" />}
+                  </span>
+                );
+              })}
+            </div>
 
-          <div className="flex items-end justify-between gap-4 border-t border-neutral-0/10 pt-5">
-            <p className="text-sm leading-6 text-neutral-0/80">{card.remaining}</p>
-            <div className="flex shrink-0 flex-col items-center gap-1.5 rounded-xl bg-neutral-0 p-2.5 text-ink">
-              <QrCode className="size-14" />
-              <span className="text-[11px] font-medium">{scanLabel}</span>
+            <div className="flex items-end justify-between gap-4 border-t border-neutral-0/10 pt-5">
+              <p className="text-sm leading-6 text-neutral-0/80">{card.remaining}</p>
+              <div className="flex shrink-0 flex-col items-center gap-1.5 rounded-xl bg-neutral-0 p-2.5 text-ink">
+                <QrCode className="size-14" />
+                <span className="text-[11px] font-medium">{scanLabel}</span>
+              </div>
             </div>
           </div>
         </div>
