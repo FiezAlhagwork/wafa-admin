@@ -2,9 +2,9 @@
 
 import { List, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
+import { focusRing } from "@/components/ui/styles";
 import { cn } from "@/lib/cn";
 import { NavLinks } from "./NavLinks";
-import { focusRingOnInk } from "./styles";
 
 type MobileMenuProps = {
   links: { section: string; label: string }[];
@@ -36,8 +36,8 @@ export function MobileMenu({ links, openLabel, closeLabel, navLabel }: MobileMen
         aria-controls="site-mobile-menu"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          "grid size-11 place-items-center rounded-lg text-neutral-0 transition-colors hover:bg-neutral-0/10 active:bg-neutral-0/20",
-          focusRingOnInk,
+          "grid size-11 place-items-center rounded-lg text-fg transition-colors hover:bg-neutral-100 active:bg-neutral-200",
+          focusRing,
         )}
       >
         {open ? <X aria-hidden className="size-6" /> : <List aria-hidden className="size-6" />}

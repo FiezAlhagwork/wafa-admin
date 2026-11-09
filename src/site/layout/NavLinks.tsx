@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { focusRing } from "@/components/ui/styles";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
-import { focusRingOnInk } from "./styles";
 
 type NavLinksProps = {
   links: { section: string; label: string }[];
@@ -47,12 +46,12 @@ export function NavLinks({ links, variant, onNavigate }: NavLinksProps) {
         onClick={onNavigate}
         className={cn(
           "font-medium transition-colors",
-          // The bar sits on the page blue (white-ish links); the menu panel is a darker surface.
+          // The bar is a row of plain links; the menu panel lists them as full-width rows.
           variant === "bar"
             ? cn(
-                "rounded-lg px-4 py-2.5 text-base hover:text-amber",
-                isActive ? "text-amber" : "text-neutral-200",
-                focusRingOnInk,
+                "rounded-lg px-4 py-2.5 text-base hover:text-brand",
+                isActive ? "text-brand" : "text-fg-muted",
+                focusRing,
               )
             : cn(
                 "flex h-11 items-center rounded-lg px-3 hover:bg-neutral-50",

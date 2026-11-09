@@ -1,11 +1,11 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { focusRing } from "@/components/ui/styles";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { cn } from "@/lib/cn";
 import { MobileMenu } from "./MobileMenu";
 import { NavLinks } from "./NavLinks";
 import { siteNav } from "./site-nav";
-import { focusRingOnInk } from "./styles";
 
 type SiteHeaderProps = {
   /** Path of the current page without the locale prefix, so the switch keeps the reader on the same page. */
@@ -28,16 +28,16 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
       >
         {t("skipToContent")}
       </a>
-      <div className="relative mx-auto max-w-6xl text-neutral-0">
+      <div className="relative mx-auto max-w-6xl text-fg">
         <div className="flex h-20 items-center gap-4 px-5 sm:px-8">
           {/*
             The transparent logo, painted with two masks of the same image: all of it white, then the two dots
             (the bottom-left corner of the image, which the clip cuts out) amber on top.
           */}
-          <Link href="/" aria-label={t("brand")} className={cn("flex shrink-0 items-center rounded-2xl", focusRingOnInk)}>
+          <Link href="/" aria-label={t("brand")} className={cn("flex shrink-0 items-center rounded-2xl", focusRing)}>
             <span aria-hidden className="relative block size-16">
               <span
-                className="absolute inset-0 bg-neutral-0 mask-contain mask-center mask-no-repeat print:bg-brand-deep"
+                className="absolute inset-0 bg-brand-deep mask-contain mask-center mask-no-repeat print:bg-brand-deep"
                 style={{ maskImage: "url(/brand/wafa-logo.png)", WebkitMaskImage: "url(/brand/wafa-logo.png)" }}
               />
               <span
@@ -62,8 +62,8 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
               lang={otherLocale}
               aria-label={t("switchLocaleLabel")}
               className={cn(
-                "inline-flex h-11 items-center rounded-full border border-neutral-0/30 px-5 text-base font-medium text-neutral-0 transition-colors hover:border-neutral-0/60 hover:bg-neutral-0/10",
-                focusRingOnInk,
+                "inline-flex h-11 items-center rounded-full border border-border-strong px-5 text-base font-medium text-fg transition-colors hover:border-neutral-400 hover:bg-neutral-100",
+                focusRing,
               )}
             >
               {t("switchLocale")}

@@ -26,7 +26,7 @@
   --color-brand-pressed: #183858;
   --color-brand-soft: #E8EDF1;
   --color-brand-on: #FFFFFF;
-  --color-brand-deep: #1B4F72; /* the brand blue as a fixed surface, even on the navy site */
+  --color-brand-deep: #1B4F72; /* the brand blue as a fixed surface (the hero card, the printed logo) */
   --color-teal: #17A398;
   --color-teal-soft: #E6F6F4;
   --color-amber: #F2B134;
@@ -88,46 +88,6 @@
   }
 }
 
-
-/*
- * The public website is brand blue (#1B4F72). Dark values for the semantic tokens, scoped to the site
- * root layout (class on <body>), so components keep using bg-surface / text-fg-muted / text-brand and just follow.
- * The dashboard never gets this class. Printing stays light (legal pages are printed).
- */
-@media not print {
-  .site-dark {
-    --color-bg: var(--color-brand-deep);
-    --color-surface: color-mix(in oklab, var(--color-brand-deep) 78%, var(--color-neutral-900));
-    --color-fg: var(--color-paper); /* paper keeps its value from :root; neutral-50 is remapped below */
-    --color-fg-muted: var(--color-neutral-200);
-    --color-fg-subtle: var(--color-neutral-300);
-    --color-border: color-mix(in oklab, var(--color-brand-deep) 66%, white);
-    --color-border-strong: color-mix(in oklab, var(--color-brand-deep) 54%, white);
-    --color-border-input: var(--color-neutral-300);
-    --color-focus: var(--color-amber);
-
-    /* Brand as text/icons on the blue: a light blue, with ink on top of it. */
-    --color-brand: #a9d1ec;
-    --color-brand-hover: #bddcf2;
-    --color-brand-pressed: #94c4e4;
-    --color-brand-soft: color-mix(in oklab, var(--color-brand-deep) 70%, var(--color-neutral-900));
-    --color-brand-on: var(--color-neutral-900);
-
-    /* Status colors lightened for the blue; the soft backgrounds become tints of it. */
-    --color-success: #5eead4;
-    --color-success-soft: color-mix(in oklab, var(--color-brand-soft) 92%, var(--color-success));
-    --color-warning: #fdba74;
-    --color-warning-soft: color-mix(in oklab, var(--color-brand-soft) 92%, var(--color-warning));
-    --color-danger: #fca5a5;
-    --color-danger-soft: color-mix(in oklab, var(--color-brand-soft) 92%, var(--color-danger));
-    --color-info: #bfdbfe;
-    --color-info-soft: color-mix(in oklab, var(--color-brand-soft) 92%, var(--color-info));
-
-    /* Raw light shades used for boxes and hovers become lighter tints of the blue. */
-    --color-neutral-50: color-mix(in oklab, var(--color-brand-deep) 92%, white);
-    --color-neutral-100: color-mix(in oklab, var(--color-brand-deep) 88%, white);
-  }
-}
 
 /*
  * Website hero: the example card sways in 3D, its shine and floor shadow move with it (same 7s loop).

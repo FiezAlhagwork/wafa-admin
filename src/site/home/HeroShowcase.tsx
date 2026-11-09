@@ -2,7 +2,7 @@
 
 import { Bread, Coffee, ForkKnife, Gift, Lightning, Scissors, type Icon } from "@phosphor-icons/react";
 import { useState, type ReactNode } from "react";
-import { focusRingOnInk } from "@/site/layout/styles";
+import { focusRing } from "@/components/ui/styles";
 import { cn } from "@/lib/cn";
 
 /** One example card, with its text already translated on the server. */
@@ -67,8 +67,8 @@ export function HeroShowcase({ cards, pickerLabel, giftLabel, intro, actions }: 
                   "inline-flex h-11 items-center gap-2 rounded-xl border px-4 font-bold transition-colors",
                   active
                     ? "border-amber bg-amber text-ink"
-                    : "border-neutral-0/20 bg-neutral-0/5 text-neutral-0 hover:border-neutral-0/40 hover:bg-neutral-0/10",
-                  focusRingOnInk,
+                    : "border-border-strong bg-surface text-fg hover:border-neutral-400 hover:bg-neutral-50",
+                  focusRing,
                 )}
               >
                 <ItemIcon aria-hidden weight={active ? "fill" : "regular"} className="size-5" />

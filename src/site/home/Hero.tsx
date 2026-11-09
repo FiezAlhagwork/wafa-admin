@@ -40,7 +40,7 @@ export async function Hero() {
           <>
             <h1 className="text-4xl leading-tight font-black text-fg sm:text-5xl lg:text-6xl">
               {t("titleLine1")}
-              <span className="block text-amber">{t("titleLine2")}</span>
+              <span className="block text-brand">{t("titleLine2")}</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-fg-muted">{t("lead")}</p>
           </>
