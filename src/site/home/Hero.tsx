@@ -39,8 +39,19 @@ export async function Hero() {
         intro={
           <>
             <h1 className="text-4xl leading-tight font-black text-fg sm:text-5xl lg:text-6xl">
-              {t("titleLine1")}
-              <span className="block text-brand">{t("titleLine2")}</span>
+              {t("title")}
+              <svg
+                aria-hidden
+                viewBox="0 0 200 12"
+                preserveAspectRatio="none"
+                className="mt-3 block h-3 w-48 fill-none stroke-amber stroke-[4] sm:w-64 lg:w-80"
+              >
+                <path
+                  d="M2 8 Q12 1 22 7 T42 7 T62 7 T82 7 T102 7 T122 7 T142 7 T162 7 T182 7 T198 7"
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-fg-muted">{t("lead")}</p>
           </>

@@ -30,8 +30,7 @@
       "description": "Wafa turns the paper stamp card into a card on your customer's phone: they collect stamps by showing their code and get their reward from your shop. Free for customers, with a free trial for merchants."
     },
     "hero": {
-      "titleLine1": "Your customers come back,",
-      "titleLine2": "with their card in their pocket",
+      "title": "Give your customers a reason to come back",
       "lead": "A digital stamp card for your shop, with your colour, icon and reward, on your customer's phone. They get a stamp on every visit by showing their code, and collect the reward when the card is full.",
       "pickerLabel": "Try a card for your kind of shop",
       "downloadCta": "Get the app",
