@@ -9,7 +9,7 @@ type CardProps = ComponentProps<"div"> & {
 export function Card({ highlight = false, className, ...props }: CardProps) {
   return (
     <div
-      className={cn("rounded-xl border border-border bg-surface", highlight && "border-s-4 border-s-amber", className)}
+      className={cn("rounded-lg border border-border bg-surface", highlight && "border-s-4 border-s-amber", className)}
       {...props}
     />
   );
@@ -24,10 +24,11 @@ type CardHeaderProps = Omit<ComponentProps<"div">, "title"> & {
 
 export function CardHeader({ title, description, actions, className, ...props }: CardHeaderProps) {
   return (
-    <div className={cn("flex items-start justify-between gap-4 border-b border-border px-5 py-4", className)} {...props}>
+    <div className={cn("flex items-start justify-between gap-4 border-b border-border px-4 py-3", className)} {...props}>
       <div className="flex min-w-0 flex-col gap-0.5">
-        <h2 className="text-base font-bold text-fg">{title}</h2>
-        {description && <p className="text-sm text-fg-muted">{description}</p>}
+        <h2 className="text-sm font-semibold text-fg">{title}</h2>
+        {/* A div, not a p: the description can be a Skeleton (a div) while data loads */}
+        {description && <div className="text-xs text-fg-muted">{description}</div>}
       </div>
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
@@ -35,5 +36,5 @@ export function CardHeader({ title, description, actions, className, ...props }:
 }
 
 export function CardBody({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("p-5", className)} {...props} />;
+  return <div className={cn("p-4", className)} {...props} />;
 }
