@@ -12,7 +12,8 @@ import { setTokenGetter } from "@/lib/api/client";
 import { isApiError } from "@/lib/api/errors";
 import { authKeys, getMe, type Me } from "./me";
 
-const AdminContext = createContext<Me | null>(null);
+// Exported only for the development preview (/dev/shell), which renders the Shell with a fake admin. Use `useAdmin()`.
+export const AdminContext = createContext<Me | null>(null);
 
 /** The signed-in admin and their permissions. Only usable under /admin (inside AdminProvider). */
 export function useAdmin() {
@@ -33,6 +34,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     queryFn: getMe,
     enabled: isLoaded && isSignedIn,
     staleTime: 5 * 60_000,
+    // A 403 here is the "no access" screen below, not a toast
+    meta: { skipSharedError: true },
   });
 
   if (me.isSuccess) return <AdminContext value={me.data}>{children}</AdminContext>;

@@ -37,6 +37,7 @@ import {
   type ButtonVariant,
   type Status,
 } from "@/components/ui";
+import { ListsPreview } from "../components/ListsPreview";
 import { OverlaysPreview } from "../components/OverlaysPreview";
 import { PreviewRow as Row, PreviewSection as Section } from "../components/PreviewLayout";
 
@@ -253,6 +254,12 @@ export function UiPreviewScreen() {
         <p className="text-fg-muted">جرّب Esc والأسهم داخل القائمة، والتركيز يرجع للزر بعد الإغلاق.</p>
       </header>
       <OverlaysPreview />
+
+      <header className="flex flex-col gap-1 border-t-4 border-amber pt-6">
+        <h2 className="text-xl font-bold">الدفعة 3 — الجداول والتنقّل</h2>
+        <p className="text-fg-muted">مكوّنات الـ Shell والقوائم.</p>
+      </header>
+      <ListsPreview />
     </main>
   );
 }
