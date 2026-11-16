@@ -10,3 +10,8 @@ export type ErrorCode = Schemas["ErrorCode"];
 export type ErrorResponse = Schemas["ErrorResponse"];
 
 export type AdminMeResponse = operations["adminMe"]["responses"][200]["content"]["application/json"];
+export type AdminOverview = Schemas["AdminOverview"];
+export type AdminPayment = Schemas["AdminPayment"];
+export type PaymentStatus = AdminPayment["status"];
+export type PaymentMethod = Schemas["PaymentMethod"];
+export type PaymentRejectionReason = Schemas["PaymentRejectionReason"];
