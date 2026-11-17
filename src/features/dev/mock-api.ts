@@ -3,7 +3,7 @@
 
 import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { api } from "@/lib/api/client";
-import type { AdminOverview, AdminPayment } from "@/lib/api/types";
+import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
 
 export type MockScenario = "full" | "reviewer" | "loading" | "error";
 
@@ -104,6 +104,13 @@ const toPayment = (seed: Seed): AdminPayment => ({
   subscription_period_id: null,
 });
 
+const adminUserSeeds: AdminUser[] = [
+  { id: 1, name: "سامر الحلبي", email: "samer@example.com", role: "super_admin", is_active: true, linked: true, last_login_at: hoursAgo(1) },
+  { id: 2, name: "ليلى المراجعة", email: "layla.reviewer@example.com", role: "payments_reviewer", is_active: true, linked: true, last_login_at: hoursAgo(30) },
+  { id: 3, name: "كريم الدعم", email: "karim.support@example.com", role: "support", is_active: true, linked: false, last_login_at: null },
+  { id: 4, name: "هالة المدير", email: "hala.admin@example.com", role: "admin", is_active: false, linked: true, last_login_at: hoursAgo(24 * 40) },
+];
+
 const PAGE_SIZE = 3; // small on purpose, so "load more" shows up in the preview
 const LATENCY_MS = 350;
 
@@ -126,6 +133,12 @@ const failure = (config: InternalAxiosRequestConfig, status: number, code: strin
 
 function createHandler(scenario: MockScenario): AxiosAdapter {
   const payments = seeds.map(toPayment);
+  const adminUsers = adminUserSeeds.map((item) => ({ ...item }));
+  const SELF_ID = 1;
+  const byActiveThenName = (a: AdminUser, b: AdminUser) =>
+    Number(b.is_active) - Number(a.is_active) || a.name.localeCompare(b.name, "ar");
+  const bodyOf = <T,>(config: InternalAxiosRequestConfig): T =>
+    (typeof config.data === "string" ? JSON.parse(config.data) : {}) as T;
 
   return async (config) => {
     await new Promise((resolve) => setTimeout(resolve, LATENCY_MS));
@@ -148,6 +161,37 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       });
     }
 
+    if (url === "/admin/admin-users" && method === "get") return respond(config, { data: [...adminUsers].sort(byActiveThenName) });
+
+    if (url === "/admin/admin-users" && method === "post") {
+      const body = bodyOf<{ name: string; email: string; role: AdminUser["role"] }>(config);
+      if (adminUsers.some((item) => item.email.toLowerCase() === body.email.toLowerCase())) {
+        throw failure(config, 422, "VALIDATION_FAILED", { fields: { email: ["taken"] } });
+      }
+      const created: AdminUser = { id: adminUsers.length + 1, ...body, is_active: true, linked: false, last_login_at: null };
+      adminUsers.push(created);
+      return { ...respond(config, { data: created }), status: 201, statusText: "Created" };
+    }
+
+    const adminUserRoute = /^\/admin\/admin-users\/(\d+)$/.exec(url);
+    if (adminUserRoute) {
+      const target = adminUsers.find((item) => item.id === Number(adminUserRoute[1]));
+      if (!target) throw failure(config, 404, "NOT_FOUND");
+      const own = failure(config, 422, "VALIDATION_FAILED", { fields: { admin_user: ["invalid"] } });
+
+      if (method === "delete") {
+        if (target.id === SELF_ID) throw own;
+        target.is_active = false;
+        return respond(config, { data: target });
+      }
+
+      const body = bodyOf<Partial<Pick<AdminUser, "name" | "email" | "role" | "is_active">>>(config);
+      if (target.id === SELF_ID && ((body.role && body.role !== target.role) || body.is_active === false)) throw own;
+      if (body.email !== undefined && target.linked) throw failure(config, 422, "VALIDATION_FAILED", { fields: { email: ["prohibits"] } });
+      Object.assign(target, body);
+      return respond(config, { data: target });
+    }
+
     const detail = /^\/admin\/payments\/(\d+)(?:\/(approve|reject))?$/.exec(url);
     const payment = detail ? payments.find((item) => item.id === Number(detail[1])) : undefined;
     if (!detail || !payment) throw failure(config, 404, "NOT_FOUND");
@@ -163,7 +207,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       throw failure(config, 409, "PAYMENT_NOT_PENDING", { status: "APPROVED" });
     }
 
-    const body = typeof config.data === "string" ? (JSON.parse(config.data) as { reason?: AdminPayment["rejection_reason"] }) : {};
+    const body = bodyOf<{ reason?: AdminPayment["rejection_reason"] }>(config);
     payment.status = detail[2] === "approve" ? "APPROVED" : "REJECTED";
     payment.rejection_reason = detail[2] === "reject" ? (body.reason ?? null) : null;
     payment.reviewed_at = new Date().toISOString();

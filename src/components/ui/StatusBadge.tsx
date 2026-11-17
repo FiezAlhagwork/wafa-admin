@@ -18,6 +18,9 @@ const statuses = {
   pending: { label: "بانتظار التنفيذ", tone: "neutral" },
   executed: { label: "منفّذ", tone: "success" },
   cancelled: { label: "ملغى", tone: "neutral" },
+  // Admin account (active uses ACTIVE)
+  admin_inactive: { label: "معطّل", tone: "neutral" },
+  admin_invited: { label: "بانتظار أول دخول", tone: "info" },
   // Alerts
   overdue: { label: "متأخر", tone: "warning" },
   duplicate_reference: { label: "مرجع مكرر", tone: "warning" },
