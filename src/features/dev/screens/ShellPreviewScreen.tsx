@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Button } from "@/components/ui";
 import { Shell } from "@/components/layout/Shell";
+import { AdminUsersScreen } from "@/features/admin-users/screens/AdminUsersScreen";
 import { OverviewScreen } from "@/features/overview/screens/OverviewScreen";
 import { PaymentsScreen } from "@/features/payments/screens/PaymentsScreen";
 import type { AdminPermission, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
 import { createMockApi, type MockScenario } from "../mock-api";
 
-type Page = "overview" | "payments";
+type Page = "overview" | "payments" | "admin-users";
 
 const scenarios: { id: MockScenario; label: string }[] = [
   { id: "full", label: "كل الصلاحيات" },
@@ -22,6 +23,7 @@ const scenarios: { id: MockScenario; label: string }[] = [
 const pages: { id: Page; label: string }[] = [
   { id: "overview", label: "الرئيسية" },
   { id: "payments", label: "الدفعات" },
+  { id: "admin-users", label: "الحسابات" },
 ];
 
 const allPermissions: AdminPermission[] = [
@@ -52,6 +54,12 @@ const user: AdminUser = {
   is_active: true,
   linked: true,
   last_login_at: null,
+};
+
+const screens: Record<Page, ReactNode> = {
+  overview: <OverviewScreen />,
+  payments: <PaymentsScreen />,
+  "admin-users": <AdminUsersScreen />,
 };
 
 const subscribe = () => () => {};
@@ -108,7 +116,7 @@ function PreviewApp({ scenario, page }: { scenario: MockScenario; page: Page }) 
   return (
     <QueryClientProvider client={client}>
       <AdminContext value={{ user, permissions }}>
-        <Shell>{page === "overview" ? <OverviewScreen /> : <PaymentsScreen />}</Shell>
+        <Shell>{screens[page]}</Shell>
       </AdminContext>
     </QueryClientProvider>
   );
