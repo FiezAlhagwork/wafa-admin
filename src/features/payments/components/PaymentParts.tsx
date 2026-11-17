@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Bank, DeviceMobile } from "@phosphor-icons/react/ssr";
-import { StatusBadge } from "@/components/ui";
+import { Latin, StatusBadge } from "@/components/ui";
 import type { AdminPayment, PaymentMethod as Method } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDate, formatRelativeDays, formatSyp, formatTime, formatUsd } from "@/lib/format";
@@ -10,18 +10,6 @@ import { methodLabels, rejectionReasonLabels } from "../labels";
 // so the two layouts can never disagree about how a payment is written.
 
 type PaymentProps = { payment: AdminPayment; className?: string };
-
-/**
- * Left-to-right text (an email, a reference) inside an Arabic layout. The block keeps the page's direction, so it lines
- * up with the lines around it; only the text inside is LTR. A bare `<bdi dir="ltr">` would take the LTR start (the left).
- */
-function Latin({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <span className={cn("block truncate", className)}>
-      <bdi dir="ltr">{children}</bdi>
-    </span>
-  );
-}
 
 /** Merchant name and email. A payment whose merchant is gone shows a dash. */
 export function PaymentMerchant({ payment, className }: PaymentProps) {

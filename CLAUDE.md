@@ -297,7 +297,8 @@ All defined in `@theme` in `styles/globals.css`. **Never use hex colors in compo
 | `GRACE` · `overdue` · `duplicate_reference` | `warning` |
 | `EXPIRED` · `PENDING` · `pending` | `neutral` |
 | `SUSPENDED` · `REJECTED` · `PENDING_DELETION` · `DELETED` | `danger` |
-| `cancelled` · registration in progress (`status: null`) | `neutral` |
+| `cancelled` · admin account deactivated · registration in progress (`status: null`) | `neutral` |
+| admin account not yet linked (waiting for the first sign-in) | `info` |
 
 ### Rules
 

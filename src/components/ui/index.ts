@@ -9,6 +9,7 @@ export { ErrorState } from "./ErrorState";
 export { Field, useFieldControl } from "./Field";
 export { IconButton } from "./IconButton";
 export { Input } from "./Input";
+export { Latin } from "./Latin";
 export { LoadMore } from "./LoadMore";
 export { Menu, MenuGroup, MenuItem, MenuSeparator } from "./Menu";
 export { OtpField } from "./OtpField";
