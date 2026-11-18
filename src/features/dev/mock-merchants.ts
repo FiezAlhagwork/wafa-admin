@@ -1,12 +1,13 @@
 // Merchants for the development preview (/dev/shell): one of every state the screens must handle. Never imported outside /dev.
+// Each preview gets its own copy (`createMerchantStore`), so the actions really change it until the scenario switches.
 
-import type { AdminMerchant } from "@/lib/api/types";
+import type { AdminLookup, AdminMerchant } from "@/lib/api/types";
 
 const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString();
 const inDays = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString();
 const hoursAgo = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
 
-type MerchantSeed = {
+export type MerchantSeed = {
   id: number;
   name: string;
   owner: string | null;
@@ -19,10 +20,26 @@ type MerchantSeed = {
   endsInDays: number | null;
   registeredDaysAgo: number;
   suspensionReason?: string;
+  /** When an action suspended it (the seeds were suspended 6 days ago) */
+  suspendedAt?: string;
+  /** The status before a suspension: reactivating goes back to it (or EXPIRED if the dates ran out) */
+  statusBeforeSuspension?: MerchantSeed["status"];
   pendingDeletion?: boolean;
+  /** An expired trial that never paid: the one EXPIRED merchant whose trial can still be extended */
+  neverPaid?: boolean;
   type: string;
   governorate: string;
+  /** Set by the actions */
+  hasCover?: boolean;
+  suspendedCardIds?: number[];
 };
+
+/** The business types (`GET /admin/business-types`), one inactive. */
+export const businessTypes: AdminLookup[] = [
+  "كافيه", "مخبز", "صالون", "مطعم", "عيادة", "متجر", "مكتبة", "حلويات", "نادي رياضي", "بقالة", "مطبعة", "ألعاب أطفال",
+].map((name, index) => ({ id: index + 1, name, sort_order: index + 1, is_active: name !== "ألعاب أطفال" }));
+
+const typeOf = (name: string) => businessTypes.find((type) => type.name === name) ?? { id: 0, name };
 
 const seeds: MerchantSeed[] = [
   { id: 101, name: "كافيه الياسمين", owner: "أحمد الصباغ", email: "shop@example.com", phone: "+963933111222", status: "TRIAL", step: "done", packageName: "المتوسطة", endsInDays: 2, registeredDaysAgo: 5, type: "كافيه", governorate: "دمشق" },
@@ -37,6 +54,7 @@ const seeds: MerchantSeed[] = [
   { id: 110, name: "بقالة الحي", owner: "منى الأحمد", email: "hayy@example.com", phone: "+963933000111", status: "PENDING_DELETION", step: "done", packageName: "الأساسية", endsInDays: 10, registeredDaysAgo: 90, pendingDeletion: true, type: "بقالة", governorate: "حماة" },
   { id: 111, name: "متجر أُغلق", owner: null, email: null, phone: null, status: "DELETED", step: "done", packageName: "الأساسية", endsInDays: -60, registeredDaysAgo: 300, type: "متجر", governorate: "دمشق" },
   { id: 112, name: "مقهى الورد", owner: "رنا فياض", email: "warda@example.com", phone: "+963944111222", status: null, step: "package", packageName: null, endsInDays: null, registeredDaysAgo: 1, type: "كافيه", governorate: "دمشق" },
+  { id: 114, name: "مشغل الأمل", owner: "سلمى درويش", email: "amal@example.com", phone: "+963966333444", status: "EXPIRED", step: "done", packageName: "الأساسية", endsInDays: -4, registeredDaysAgo: 20, neverPaid: true, type: "متجر", governorate: "حمص" },
   { id: 113, name: "مطبعة الإبداع", owner: "فادي حسن", email: "ibdaa@example.com", phone: "+963955222333", status: null, step: "pin", packageName: "الأساسية", endsInDays: null, registeredDaysAgo: 3, type: "مطبعة", governorate: "حلب" },
 ];
 
@@ -59,13 +77,13 @@ export const toMerchant = (seed: MerchantSeed) => ({
   phone: seed.phone,
   contact_phone: seed.phone && seed.id % 2 === 0 ? "+963112223344" : null,
   logo_url: null,
-  business_type: { id: 1, name: seed.type },
+  business_type: { id: typeOf(seed.type).id, name: seed.type },
   governorate: { id: 1, name: seed.governorate },
   status: seed.status,
   registration_step: seed.step,
   package: seed.packageName ? packageOf(seed.packageName) : null,
   subscription_ends_at: seed.endsInDays === null ? null : inDays(seed.endsInDays),
-  suspended_at: seed.suspensionReason ? daysAgo(6) : null,
+  suspended_at: seed.suspendedAt ?? (seed.suspensionReason ? daysAgo(6) : null),
   suspension_reason: seed.suspensionReason ?? null,
   registered_at: daysAgo(seed.registeredDaysAgo),
 });
@@ -73,11 +91,11 @@ export const toMerchant = (seed: MerchantSeed) => ({
 export function toMerchantDetail(seed: MerchantSeed) {
   const pkg = seed.packageName ? packageOf(seed.packageName) : null;
   const hasSubscription = seed.status !== null && pkg !== null;
-  const paid = hasSubscription && seed.status !== "TRIAL";
+  const paid = hasSubscription && seed.status !== "TRIAL" && !seed.neverPaid;
 
   return {
     ...toMerchant(seed),
-    cover_url: seed.id === 104 ? cover : null,
+    cover_url: seed.hasCover ? cover : null,
     address: seed.owner ? "شارع الحمرا، بناء 12" : null,
     last_login_at: seed.status === null ? null : hoursAgo(seed.id % 48),
     subscription: hasSubscription
@@ -110,9 +128,12 @@ export function toMerchantDetail(seed: MerchantSeed) {
       seed.status === null
         ? []
         : [
-            { id: 1, name: "القهوة", icon_key: "coffee", stamps_required: 5, reward_description: "قهوة مجانية", terms: null, status: "active", customers_count: 42, created_at: daysAgo(20), suspended_at: null },
-            { id: 2, name: "الحلويات", icon_key: "cake", stamps_required: 8, reward_description: "قطعة حلوى مجانية", terms: null, status: seed.status === "SUSPENDED" ? "suspended" : "active", customers_count: 17, created_at: daysAgo(10), suspended_at: seed.status === "SUSPENDED" ? daysAgo(6) : null },
-          ],
+            { id: seed.id * 10 + 1, name: "القهوة", icon_key: "coffee", stamps_required: 5, reward_description: "قهوة مجانية", terms: null, customers_count: 42, created_at: daysAgo(20) },
+            { id: seed.id * 10 + 2, name: "الحلويات", icon_key: "cake", stamps_required: 8, reward_description: "قطعة حلوى مجانية", terms: null, customers_count: 17, created_at: daysAgo(10) },
+          ].map((card) => {
+            const suspended = seed.suspendedCardIds?.includes(card.id) ?? false;
+            return { ...card, status: suspended ? "suspended" : "active", suspended_at: suspended ? daysAgo(card.id % 10 === 2 ? 6 : 0) : null };
+          }),
     stats:
       seed.status === null
         ? { customers_total: 0, stamps_total: 0, stamps_via_phone_total: 0, rewards_ready: 0, rewards_redeemed_total: 0, campaigns_total: 0 }
@@ -121,12 +142,20 @@ export function toMerchantDetail(seed: MerchantSeed) {
   };
 }
 
-export const findMerchantSeed = (id: number) => seeds.find((seed) => seed.id === id);
+/** A fresh copy of the merchants for one preview: the actions change it, and switching the scenario starts over. */
+export function createMerchantStore(): MerchantSeed[] {
+  return seeds.map((seed) => ({
+    ...seed,
+    hasCover: seed.id === 104,
+    // A suspended merchant's second card was paused too
+    suspendedCardIds: seed.status === "SUSPENDED" ? [seed.id * 10 + 2] : [],
+  }));
+}
 
 /** The same filters the real API has: status, registration_step, trial_ending and q (2 characters or more). Newest first. */
-export function filterMerchantSeeds(params: Record<string, string | undefined>) {
+export function filterMerchantSeeds(store: MerchantSeed[], params: Record<string, string | undefined>) {
   const q = params.q && params.q.trim().length >= 2 ? params.q.trim().toLowerCase() : null;
-  return seeds
+  return store
     .filter((seed) => (params.status ? seed.status === params.status : true))
     .filter((seed) => (params.registration_step ? seed.status === null && seed.step === params.registration_step : true))
     .filter((seed) => (params.trial_ending === "week" ? seed.status === "TRIAL" && seed.endsInDays !== null && seed.endsInDays <= 7 : true))
