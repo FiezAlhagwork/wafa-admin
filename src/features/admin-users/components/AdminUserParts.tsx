@@ -1,4 +1,4 @@
-import { Badge, Latin, StatusBadge } from "@/components/ui";
+import { Avatar, Badge, Latin, StatusBadge } from "@/components/ui";
 import type { AdminUser } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDate, formatRelativeDays, formatTime } from "@/lib/format";
@@ -11,12 +11,15 @@ type UserProps = { user: AdminUser; className?: string };
 /** Name and email. `isSelf` marks the signed-in account, which can't change its own role or be deactivated. */
 export function AdminUserIdentity({ user, isSelf = false, className }: UserProps & { isSelf?: boolean }) {
   return (
-    <div className={cn("flex min-w-0 flex-col", className)}>
-      <span className="flex items-center gap-2">
-        <span className="truncate font-medium text-fg">{user.name}</span>
-        {isSelf && <Badge tone="brand">أنت</Badge>}
-      </span>
-      <Latin className="text-xs text-fg-muted">{user.email}</Latin>
+    <div className={cn("flex min-w-0 items-center gap-3", className)}>
+      <Avatar name={user.name || user.email} seed={user.id} className="rounded-full" />
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="flex items-center gap-2">
+          <span className="truncate font-bold text-fg">{user.name}</span>
+          {isSelf && <Badge tone="amber">أنت</Badge>}
+        </span>
+        <Latin className="text-[13px] text-fg-muted">{user.email}</Latin>
+      </div>
     </div>
   );
 }

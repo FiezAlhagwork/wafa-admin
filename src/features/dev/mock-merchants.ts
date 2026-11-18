@@ -1,0 +1,135 @@
+// Merchants for the development preview (/dev/shell): one of every state the screens must handle. Never imported outside /dev.
+
+import type { AdminMerchant } from "@/lib/api/types";
+
+const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString();
+const inDays = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString();
+const hoursAgo = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
+
+type MerchantSeed = {
+  id: number;
+  name: string;
+  owner: string | null;
+  email: string | null;
+  phone: string | null;
+  /** `null` = still registering. DELETED is in the backend guide but not in the generated type. */
+  status: AdminMerchant["status"] | "DELETED";
+  step: AdminMerchant["registration_step"];
+  packageName: string | null;
+  endsInDays: number | null;
+  registeredDaysAgo: number;
+  suspensionReason?: string;
+  pendingDeletion?: boolean;
+  type: string;
+  governorate: string;
+};
+
+const seeds: MerchantSeed[] = [
+  { id: 101, name: "كافيه الياسمين", owner: "أحمد الصباغ", email: "shop@example.com", phone: "+963933111222", status: "TRIAL", step: "done", packageName: "المتوسطة", endsInDays: 2, registeredDaysAgo: 5, type: "كافيه", governorate: "دمشق" },
+  { id: 102, name: "مخبز الشام", owner: "ريم الخطيب", email: "sham.bakery@example.com", phone: "+963944222333", status: "TRIAL", step: "done", packageName: "الأساسية", endsInDays: 6, registeredDaysAgo: 9, type: "مخبز", governorate: "حلب" },
+  { id: 103, name: "صالون لمسة للتجميل", owner: "هدى منصور", email: "lamsa@example.com", phone: "+963955333444", status: "TRIAL", step: "done", packageName: "المتقدمة", endsInDays: 12, registeredDaysAgo: 2, type: "صالون", governorate: "دمشق" },
+  { id: 104, name: "مطعم الفرات", owner: "خالد العلي", email: "furat@example.com", phone: "+963966444555", status: "ACTIVE", step: "done", packageName: "المتوسطة", endsInDays: 25, registeredDaysAgo: 40, type: "مطعم", governorate: "دير الزور" },
+  { id: 105, name: "عيادة الشفاء", owner: "د. سامر نجار", email: "shifa@example.com", phone: "+963977555666", status: "ACTIVE", step: "done", packageName: "المتقدمة", endsInDays: 80, registeredDaysAgo: 75, type: "عيادة", governorate: "حمص" },
+  { id: 106, name: "متجر النور", owner: "نور الدين", email: "alnoor@example.com", phone: "+963988666777", status: "ACTIVE", step: "done", packageName: "الأساسية", endsInDays: 9, registeredDaysAgo: 120, type: "متجر", governorate: "اللاذقية" },
+  { id: 107, name: "مكتبة الأفق", owner: "ليلى حداد", email: "ufuq@example.com", phone: "+963999777888", status: "GRACE", step: "done", packageName: "المتوسطة", endsInDays: -2, registeredDaysAgo: 200, type: "مكتبة", governorate: "دمشق" },
+  { id: 108, name: "حلويات السلطان", owner: "عمر السلطان", email: "sultan@example.com", phone: "+963911888999", status: "EXPIRED", step: "done", packageName: "الأساسية", endsInDays: -30, registeredDaysAgo: 260, type: "حلويات", governorate: "حلب" },
+  { id: 109, name: "نادي القوة الرياضي", owner: "باسل يوسف", email: "power@example.com", phone: "+963922999000", status: "SUSPENDED", step: "done", packageName: "المتقدمة", endsInDays: 40, registeredDaysAgo: 150, suspensionReason: "مخالفة شروط الاستخدام: عروض مضللة", type: "نادي رياضي", governorate: "طرطوس" },
+  { id: 110, name: "بقالة الحي", owner: "منى الأحمد", email: "hayy@example.com", phone: "+963933000111", status: "PENDING_DELETION", step: "done", packageName: "الأساسية", endsInDays: 10, registeredDaysAgo: 90, pendingDeletion: true, type: "بقالة", governorate: "حماة" },
+  { id: 111, name: "متجر أُغلق", owner: null, email: null, phone: null, status: "DELETED", step: "done", packageName: "الأساسية", endsInDays: -60, registeredDaysAgo: 300, type: "متجر", governorate: "دمشق" },
+  { id: 112, name: "مقهى الورد", owner: "رنا فياض", email: "warda@example.com", phone: "+963944111222", status: null, step: "package", packageName: null, endsInDays: null, registeredDaysAgo: 1, type: "كافيه", governorate: "دمشق" },
+  { id: 113, name: "مطبعة الإبداع", owner: "فادي حسن", email: "ibdaa@example.com", phone: "+963955222333", status: null, step: "pin", packageName: "الأساسية", endsInDays: null, registeredDaysAgo: 3, type: "مطبعة", governorate: "حلب" },
+];
+
+const cover = `data:image/svg+xml;utf8,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600"><rect width="1200" height="600" fill="#7A3E1D"/><circle cx="930" cy="300" r="210" fill="#F2B134"/><circle cx="930" cy="300" r="120" fill="#7A3E1D"/><rect x="110" y="210" width="560" height="64" rx="32" fill="#FFFFFF"/><rect x="110" y="310" width="380" height="40" rx="20" fill="#FFFFFF" opacity=".7"/><rect x="0" y="540" width="1200" height="60" fill="#17A398"/></svg>`,
+)}`;
+
+const packageOf = (name: string) => ({
+  id: name === "الأساسية" ? 1 : name === "المتوسطة" ? 2 : 3,
+  name,
+  cards_limit: name === "الأساسية" ? 1 : name === "المتوسطة" ? 3 : 5,
+  weekly_campaigns_limit: name === "الأساسية" ? 1 : name === "المتوسطة" ? 2 : 4,
+});
+
+export const toMerchant = (seed: MerchantSeed) => ({
+  id: seed.id,
+  business_name: seed.name,
+  owner_name: seed.owner,
+  email: seed.email,
+  phone: seed.phone,
+  contact_phone: seed.phone && seed.id % 2 === 0 ? "+963112223344" : null,
+  logo_url: null,
+  business_type: { id: 1, name: seed.type },
+  governorate: { id: 1, name: seed.governorate },
+  status: seed.status,
+  registration_step: seed.step,
+  package: seed.packageName ? packageOf(seed.packageName) : null,
+  subscription_ends_at: seed.endsInDays === null ? null : inDays(seed.endsInDays),
+  suspended_at: seed.suspensionReason ? daysAgo(6) : null,
+  suspension_reason: seed.suspensionReason ?? null,
+  registered_at: daysAgo(seed.registeredDaysAgo),
+});
+
+export function toMerchantDetail(seed: MerchantSeed) {
+  const pkg = seed.packageName ? packageOf(seed.packageName) : null;
+  const hasSubscription = seed.status !== null && pkg !== null;
+  const paid = hasSubscription && seed.status !== "TRIAL";
+
+  return {
+    ...toMerchant(seed),
+    cover_url: seed.id === 104 ? cover : null,
+    address: seed.owner ? "شارع الحمرا، بناء 12" : null,
+    last_login_at: seed.status === null ? null : hoursAgo(seed.id % 48),
+    subscription: hasSubscription
+      ? {
+          status: seed.status,
+          package: pkg,
+          current_period: null,
+          trial_used: true,
+          days_remaining: seed.endsInDays !== null && seed.endsInDays > 0 ? seed.endsInDays : null,
+          capabilities: {},
+          banner: null,
+          pending_payment: seed.id === 106 ? { created_at: hoursAgo(5) } : null,
+        }
+      : null,
+    periods: hasSubscription
+      ? [
+          { id: 2, type: paid ? "paid" : "trial", package: pkg, duration_months: paid ? 3 : null, starts_at: daysAgo(30), ends_at: inDays(seed.endsInDays ?? 0), grace_ends_at: seed.status === "GRACE" ? inDays(1) : null },
+          ...(paid
+            ? [{ id: 1, type: "trial", package: pkg, duration_months: null, starts_at: daysAgo(seed.registeredDaysAgo), ends_at: daysAgo(30), grace_ends_at: null }]
+            : []),
+        ]
+      : [],
+    payments: paid
+      ? [
+          { id: 901, package: pkg, duration_months: 3, price_usd: "45.50", exchange_rate: "13000.00", amount_syp: "591500.00", method: "syriatel_cash", reference: "94817263", proof_url: "", status: "APPROVED", rejection_reason: null, created_at: daysAgo(30), reviewed_at: daysAgo(29) },
+          { id: 902, package: pkg, duration_months: 1, price_usd: "18.00", exchange_rate: "13000.00", amount_syp: "234000.00", method: "transfer", reference: "TX-30771", proof_url: "", status: "REJECTED", rejection_reason: "amount_short", created_at: daysAgo(35), reviewed_at: daysAgo(34) },
+        ]
+      : [],
+    cards:
+      seed.status === null
+        ? []
+        : [
+            { id: 1, name: "القهوة", icon_key: "coffee", stamps_required: 5, reward_description: "قهوة مجانية", terms: null, status: "active", customers_count: 42, created_at: daysAgo(20), suspended_at: null },
+            { id: 2, name: "الحلويات", icon_key: "cake", stamps_required: 8, reward_description: "قطعة حلوى مجانية", terms: null, status: seed.status === "SUSPENDED" ? "suspended" : "active", customers_count: 17, created_at: daysAgo(10), suspended_at: seed.status === "SUSPENDED" ? daysAgo(6) : null },
+          ],
+    stats:
+      seed.status === null
+        ? { customers_total: 0, stamps_total: 0, stamps_via_phone_total: 0, rewards_ready: 0, rewards_redeemed_total: 0, campaigns_total: 0 }
+        : { customers_total: 59, stamps_total: 310, stamps_via_phone_total: 25, rewards_ready: 3, rewards_redeemed_total: 51, campaigns_total: 4 },
+    deletion: seed.pendingDeletion ? { id: 7, requested_at: daysAgo(2), executes_at: inDays(5) } : null,
+  };
+}
+
+export const findMerchantSeed = (id: number) => seeds.find((seed) => seed.id === id);
+
+/** The same filters the real API has: status, registration_step, trial_ending and q (2 characters or more). Newest first. */
+export function filterMerchantSeeds(params: Record<string, string | undefined>) {
+  const q = params.q && params.q.trim().length >= 2 ? params.q.trim().toLowerCase() : null;
+  return seeds
+    .filter((seed) => (params.status ? seed.status === params.status : true))
+    .filter((seed) => (params.registration_step ? seed.status === null && seed.step === params.registration_step : true))
+    .filter((seed) => (params.trial_ending === "week" ? seed.status === "TRIAL" && seed.endsInDays !== null && seed.endsInDays <= 7 : true))
+    .filter((seed) => (q === null ? true : [seed.name, seed.email ?? "", seed.phone ?? ""].some((field) => field.toLowerCase().includes(q))))
+    .sort((a, b) => a.registeredDaysAgo - b.registeredDaysAgo);
+}

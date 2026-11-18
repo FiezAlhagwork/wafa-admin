@@ -6,9 +6,18 @@ const PAGE_SIZE = 20;
 export type PaymentsPage = { payments: AdminPayment[]; nextCursor: string | null };
 
 /** GET /admin/payments: PENDING comes oldest first, the rest newest first. `next_cursor: null` = the end. */
-export async function listPayments({ status, cursor }: { status: PaymentStatus; cursor?: string }): Promise<PaymentsPage> {
+export async function listPayments({
+  status,
+  cursor,
+  limit = PAGE_SIZE,
+}: {
+  status: PaymentStatus;
+  cursor?: string;
+  /** How many the server returns (the home page asks for a few). */
+  limit?: number;
+}): Promise<PaymentsPage> {
   const { data } = await api.get<{ data: AdminPayment[]; meta: { next_cursor: string | null } }>("/admin/payments", {
-    params: { status, cursor, limit: PAGE_SIZE },
+    params: { status, cursor, limit },
   });
   return { payments: data.data, nextCursor: data.meta.next_cursor };
 }

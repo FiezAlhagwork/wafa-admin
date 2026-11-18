@@ -16,8 +16,8 @@ export const buttonVariants: Record<ButtonVariant, string> = {
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-8 gap-1.5 px-3 text-sm",
-  md: "h-10 gap-2 px-4 text-sm",
+  sm: "h-8 gap-1.5 rounded-lg px-3 text-sm",
+  md: "h-10.5 gap-2 px-4 text-sm",
   lg: "h-12 gap-2 px-5 text-base",
 };
 
@@ -49,7 +49,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cn(
-        "relative inline-flex shrink-0 items-center justify-center rounded-lg font-medium whitespace-nowrap transition-colors select-none",
+        "relative inline-flex shrink-0 items-center justify-center rounded-xl font-bold whitespace-nowrap transition-colors select-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
         loading && "disabled:cursor-wait disabled:opacity-100",
         focusRing,

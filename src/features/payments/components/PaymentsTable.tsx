@@ -64,7 +64,7 @@ export function PaymentsTable({ payments, status, onOpen }: PaymentsTableProps) 
         {payments.map((payment) => (
           <TableRow key={payment.id}>
             <TableCell className={cell}>
-              <PaymentMerchant payment={payment} className="max-w-44" />
+              <PaymentMerchant payment={payment} className="max-w-60" />
             </TableCell>
 
             <TableCell className={cell}>
@@ -82,7 +82,7 @@ export function PaymentsTable({ payments, status, onOpen }: PaymentsTableProps) 
               {/* Two blocks, both aligned to the start: how it was paid, then when it was sent */}
               <div className="flex min-w-0 flex-col gap-2">
                 <PaymentMethod payment={payment} />
-                <PaymentSentAt payment={payment} className="border-t border-border pt-2" />
+                <PaymentSentAt payment={payment} className="border-t border-divider pt-2" />
               </div>
             </TableCell>
 

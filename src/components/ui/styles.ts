@@ -23,7 +23,7 @@ export const sheetMotion =
 
 /** Text fields: the border itself turns brand with a soft halo, no offset ring. */
 export const controlBase =
-  "w-full rounded-lg border bg-surface text-sm text-fg transition-[color,border-color,box-shadow] placeholder:text-fg-subtle " +
+  "w-full rounded-xl border bg-surface text-sm text-fg transition-[color,border-color,box-shadow] placeholder:text-fg-subtle " +
   "outline-none focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-brand/15 " +
   "disabled:cursor-not-allowed disabled:border-border-strong disabled:bg-neutral-50 disabled:text-fg-subtle";
 

@@ -38,7 +38,7 @@ export function Input({
       className={cn(
         controlBase,
         controlBorder(isInvalid),
-        "h-10 px-3",
+        "h-10.5 px-3.5",
         startIcon && "ps-10",
         endIcon && "pe-10",
         className,

@@ -10,16 +10,18 @@ type MenuProps = {
   trigger: ReactElement;
   /** Alignment against the trigger (logical: `end` = left in RTL). */
   align?: "start" | "center" | "end";
+  /** Where it opens (logical sides). `top` for a trigger at the bottom of the screen. */
+  side?: "top" | "bottom" | "inline-start" | "inline-end";
   className?: string;
   children: ReactNode;
 };
 
-export function Menu({ trigger, align = "end", className, children }: MenuProps) {
+export function Menu({ trigger, align = "end", side = "bottom", className, children }: MenuProps) {
   return (
     <BaseMenu.Root>
       <BaseMenu.Trigger render={trigger} />
       <BaseMenu.Portal>
-        <BaseMenu.Positioner side="bottom" align={align} sideOffset={6} className="z-50 outline-none">
+        <BaseMenu.Positioner side={side} align={align} sideOffset={6} className="z-50 outline-none">
           <BaseMenu.Popup className={cn(popupSurface, popupMotion, "min-w-48 origin-(--transform-origin) p-1", className)}>
             {children}
           </BaseMenu.Popup>

@@ -18,3 +18,9 @@ export type PaymentRejectionReason = Schemas["PaymentRejectionReason"];
 
 export type CreateAdminUserBody = operations["adminCreateAdminUser"]["requestBody"]["content"]["application/json"];
 export type UpdateAdminUserBody = operations["adminUpdateAdminUser"]["requestBody"]["content"]["application/json"];
+
+export type MerchantStatus = Schemas["MerchantStatus"];
+export type AdminMerchant = Schemas["AdminMerchant"];
+export type AdminMerchantDetail = Schemas["AdminMerchantDetail"];
+export type MerchantRegistrationStep = AdminMerchant["registration_step"];
+export type ListMerchantsQuery = NonNullable<operations["adminListMerchants"]["parameters"]["query"]>;

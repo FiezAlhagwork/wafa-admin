@@ -56,6 +56,23 @@
   --color-border-input: var(--color-neutral-500); /* ≈ 3.4:1 on white (WCAG 3:1 for field boundaries) */
   --color-focus: var(--color-brand);
 
+  /* The dark sidebar (ink) and what sits on it */
+  --color-sidebar: var(--color-ink);
+  --color-sidebar-fg: rgb(255 255 255 / 0.78);
+  --color-sidebar-muted: rgb(255 255 255 / 0.55);
+  --color-sidebar-hover: rgb(255 255 255 / 0.05);
+  --color-sidebar-active: rgb(255 255 255 / 0.09);
+
+  /* One scrollbar look for the whole project: thin, gray, on a transparent track */
+  --color-scrollbar: var(--color-neutral-300);
+  --color-scrollbar-hover: var(--color-neutral-400);
+
+  /* Dividers inside a card: lighter than a border */
+  --color-divider: #EEEFEF;
+
+  /* Cards rest on the page with a soft ink-tinted shadow instead of a hard border */
+  --shadow-card: 0 1px 2px rgb(20 33 61 / 0.04), 0 6px 20px -8px rgb(20 33 61 / 0.1);
+
   /* Floating surfaces (menus, tooltips, toasts, dialogs). Tinted with ink (#14213D). */
   --shadow-popup: 0 8px 24px -6px rgb(20 33 61 / 0.18), 0 2px 6px -2px rgb(20 33 61 / 0.08);
   --shadow-dialog: 0 24px 64px -12px rgb(20 33 61 / 0.3), 0 4px 12px -4px rgb(20 33 61 / 0.1);
@@ -80,8 +97,50 @@
     font-variant-numeric: lining-nums;
   }
 
+  /* The unified scrollbar. `scrollbar-color` (Firefox, Chrome 121+); the ::-webkit rules cover older WebKit/Safari */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scrollbar) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: var(--color-scrollbar);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-scrollbar-hover);
+  }
+
   ::selection {
     background-color: color-mix(in oklab, var(--color-amber) 45%, transparent);
     color: var(--color-ink);
+  }
+}
+
+/* Scrolls, but shows no bar: where scrolling is obvious without one (the sidebar, tab rows, chip rows) */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* The scrollbar on a dark surface (ink): a faint white thumb */
+@utility scrollbar-on-dark {
+  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+
+  &::-webkit-scrollbar-thumb {
+    background: rgb(255 255 255 / 0.18);
   }
 }

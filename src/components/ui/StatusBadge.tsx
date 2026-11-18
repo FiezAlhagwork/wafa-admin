@@ -34,6 +34,11 @@ type StatusBadgeProps = {
   className?: string;
 };
 
+/** The Arabic name of a status, for places that need it as text (a tooltip, an aria-label). */
+export function statusLabel(status: Status | null): string {
+  return status === null ? "قيد التسجيل" : statuses[status].label;
+}
+
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   const { label, tone } = status === null ? { label: "قيد التسجيل", tone: "neutral" as const } : statuses[status];
 
