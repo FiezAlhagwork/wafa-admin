@@ -20,6 +20,8 @@ export type NavItem = {
   icon: Icon;
   /** Missing = every role (the home page). The sidebar hides the item without it; the screen checks again. */
   permission?: AdminPermission;
+  /** A count from `GET /admin/overview` alerts, shown as a badge when above zero. */
+  count?: "payments_pending" | "deletion_requests_new";
 };
 
 export type NavGroup = {
@@ -35,10 +37,10 @@ export const navigation: NavGroup[] = [
   {
     title: "العمليات",
     items: [
-      { href: "/admin/payments", label: "الدفعات", icon: CreditCard, permission: "review-payments" },
+      { href: "/admin/payments", label: "الدفعات", icon: CreditCard, permission: "review-payments", count: "payments_pending" },
       { href: "/admin/merchants", label: "التجار", icon: Storefront, permission: "view-merchants-and-customers" },
       { href: "/admin/customers", label: "الزبائن", icon: Users, permission: "view-merchants-and-customers" },
-      { href: "/admin/deletion-requests", label: "طلبات الحذف", icon: UserMinus, permission: "execute-deletion-requests" },
+      { href: "/admin/deletion-requests", label: "طلبات الحذف", icon: UserMinus, permission: "execute-deletion-requests", count: "deletion_requests_new" },
     ],
   },
   {
@@ -58,6 +60,14 @@ export const navigation: NavGroup[] = [
     ],
   },
 ];
+
+/** The item that owns this path with its group title, for the header's breadcrumb. */
+export function findNavGroupItem(pathname: string): { group?: string; label: string } | undefined {
+  const item = findNavItem(pathname);
+  if (!item) return undefined;
+  const group = navigation.find((candidate) => candidate.items.includes(item));
+  return { group: group?.title, label: item.label };
+}
 
 /** The item that owns this path (`/admin/merchants/12` belongs to "التجار"): the longest matching href wins. */
 export function findNavItem(pathname: string): NavItem | undefined {

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Bank, DeviceMobile } from "@phosphor-icons/react/ssr";
-import { Latin, StatusBadge } from "@/components/ui";
+import { Avatar, Latin, StatusBadge } from "@/components/ui";
 import type { AdminPayment, PaymentMethod as Method } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDate, formatRelativeDays, formatSyp, formatTime, formatUsd } from "@/lib/format";
@@ -14,11 +14,15 @@ type PaymentProps = { payment: AdminPayment; className?: string };
 /** Merchant name and email. A payment whose merchant is gone shows a dash. */
 export function PaymentMerchant({ payment, className }: PaymentProps) {
   if (!payment.merchant) return <span className="text-fg-muted">—</span>;
+  const name = payment.merchant.business_name ?? "";
 
   return (
-    <div className={cn("flex min-w-0 flex-col", className)}>
-      <span className="truncate font-medium text-fg">{payment.merchant.business_name}</span>
-      {payment.merchant.email && <Latin className="text-xs text-fg-muted">{payment.merchant.email}</Latin>}
+    <div className={cn("flex min-w-0 items-center gap-3", className)}>
+      <Avatar name={name} seed={payment.merchant.id} />
+      <div className="flex min-w-0 flex-col">
+        <span className="truncate font-bold text-fg">{name}</span>
+        {payment.merchant.email && <Latin className="text-[13px] text-fg-muted">{payment.merchant.email}</Latin>}
+      </div>
     </div>
   );
 }

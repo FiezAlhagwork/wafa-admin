@@ -23,14 +23,17 @@ type TabsProps<T extends string> = {
 export function Tabs<T extends string>({ value, onValueChange, items, label, className }: TabsProps<T>) {
   return (
     <BaseTabs.Root value={value} onValueChange={onValueChange}>
-      <BaseTabs.List aria-label={label} className={cn("flex gap-1 border-b border-border", className)}>
+      <BaseTabs.List
+        aria-label={label}
+        className={cn("flex gap-1 overflow-x-auto border-b border-divider scrollbar-none", className)}
+      >
         {items.map((item) => (
           <BaseTabs.Tab
             key={item.value}
             value={item.value}
             className={cn(
-              "-mb-px inline-flex h-10 items-center gap-2 rounded-t-md border-b-2 border-transparent px-3 text-sm whitespace-nowrap text-fg-muted transition-colors select-none",
-              "hover:text-fg data-active:border-brand data-active:font-semibold data-active:text-fg",
+              "-mb-px inline-flex h-12 shrink-0 items-center gap-2 rounded-t-md border-b-[3px] border-transparent px-3.5 text-[14.5px] font-medium whitespace-nowrap text-fg-muted transition-colors select-none",
+              "hover:text-fg data-active:border-amber data-active:font-bold data-active:text-fg",
               "data-disabled:cursor-not-allowed data-disabled:opacity-50",
               focusRing,
             )}

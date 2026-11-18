@@ -16,7 +16,7 @@ export function EmptyState({ title, description, icon, action, className }: Empt
       {icon && (
         <span
           aria-hidden
-          className="flex size-12 items-center justify-center rounded-full bg-neutral-100 text-fg-subtle [&>svg]:size-6"
+          className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft text-brand [&>svg]:size-7"
         >
           {icon}
         </span>

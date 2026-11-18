@@ -59,7 +59,7 @@ export function AdminUsersTable({ users, selfId, onOpen }: AdminUsersTableProps)
         {users.map((user) => (
           <TableRow key={user.id}>
             <TableCell className={cell}>
-              <AdminUserIdentity user={user} isSelf={user.id === selfId} className="max-w-64" />
+              <AdminUserIdentity user={user} isSelf={user.id === selfId} className="max-w-80" />
             </TableCell>
             <TableCell className={cell}>
               <RoleBadge user={user} />

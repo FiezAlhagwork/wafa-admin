@@ -15,6 +15,14 @@ export function usePayments(status: PaymentStatus) {
   });
 }
 
+/** The first few of the queue, oldest first, asked from the server with `limit` (nothing is cut in the browser). */
+export function usePendingPreview(limit: number) {
+  return useQuery({
+    queryKey: paymentsKeys.preview("PENDING", limit),
+    queryFn: () => listPayments({ status: "PENDING", limit }),
+  });
+}
+
 /**
  * One payment, always re-fetched when the review dialog opens: `proof_url` is signed and valid for 30 minutes,
  * so a cached one may have expired. `placeholder` (the row from the list) shows the facts while it loads.

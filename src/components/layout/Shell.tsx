@@ -2,12 +2,11 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { List, SidebarSimple } from "@phosphor-icons/react";
+import { CaretLeft, List, SidebarSimple } from "@phosphor-icons/react";
 import { Drawer, IconButton, Tooltip } from "@/components/ui";
-import { findNavItem } from "@/config/navigation";
+import { findNavGroupItem } from "@/config/navigation";
 import { cn } from "@/lib/cn";
 import { Sidebar } from "./Sidebar";
-import { UserMenu } from "./UserMenu";
 
 const STORAGE_KEY = "wafa-admin:sidebar-collapsed";
 
@@ -28,8 +27,15 @@ const isTypingTarget = (target: EventTarget | null) =>
  * Sidebar + header + the page. Large screens: a fixed column that folds into an icon rail (Ctrl/⌘+B, remembered).
  * Small screens: a drawer. Under AdminProvider.
  */
-export function Shell({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
+type ShellProps = {
+  children: ReactNode;
+  /** Stands in for the URL (the dev preview, which lives at /dev/shell, marks the page it shows). */
+  pathname?: string;
+};
+
+export function Shell({ children, pathname: pathnameOverride }: ShellProps) {
+  const urlPathname = usePathname();
+  const pathname = pathnameOverride ?? urlPathname;
   const [menuOpen, setMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(readCollapsed);
 
@@ -52,55 +58,59 @@ export function Shell({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleLabel = collapsed ? "توسيع القائمة" : "طيّ القائمة";
-  const pageTitle = findNavItem(pathname)?.label;
+  const current = findNavGroupItem(pathname);
 
   return (
-    <div
-      className={cn(
-        "min-h-dvh transition-[padding] duration-200 ease-out motion-reduce:transition-none",
-        collapsed ? "lg:ps-16" : "lg:ps-60",
-      )}
-    >
+    // Large screens: the window never scrolls, the content column does. So the page's scrollbar sits inside the
+    // content (on its far side), never as a light strip beside the dark sidebar. Small screens keep the window
+    // scroll (the mobile address bar collapses with it).
+    <div className="min-h-dvh lg:flex lg:h-dvh lg:overflow-hidden">
       <aside
         className={cn(
-          "fixed inset-y-0 start-0 z-30 hidden border-e border-border bg-bg lg:block",
+          "z-30 hidden shrink-0 lg:block",
           "transition-[width] duration-200 ease-out motion-reduce:transition-none",
-          collapsed ? "w-16" : "w-60",
+          collapsed ? "w-18" : "w-66",
         )}
       >
-        <Sidebar collapsed={collapsed} />
+        <Sidebar collapsed={collapsed} pathname={pathname} />
       </aside>
 
-      <Drawer open={menuOpen} onOpenChange={setMenuOpen} label="القائمة الرئيسية">
-        <Sidebar onNavigate={() => setMenuOpen(false)} />
+      <Drawer open={menuOpen} onOpenChange={setMenuOpen} label="القائمة الرئيسية" className="bg-sidebar">
+        <Sidebar pathname={pathname} onNavigate={() => setMenuOpen(false)} />
       </Drawer>
 
-      <div className="flex min-h-dvh flex-col">
-        <header className="sticky top-0 z-20 flex h-12 shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-3 sm:px-4 lg:px-6">
-          <div className="flex min-w-0 items-center gap-2">
+      <div className="flex min-h-dvh flex-col lg:min-h-0 lg:min-w-0 lg:flex-1 lg:overflow-y-auto">
+        <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-ink/7 bg-bg/85 px-4 backdrop-blur-md sm:px-6 lg:px-10">
+          <IconButton
+            label="فتح القائمة"
+            icon={<List className="size-5.5" />}
+            variant="secondary"
+            className="lg:hidden"
+            onClick={() => setMenuOpen(true)}
+          />
+          <Tooltip content={`${toggleLabel} (Ctrl+B)`} side="bottom">
             <IconButton
-              label="فتح القائمة"
-              icon={<List className="size-5" />}
-              size="sm"
-              className="lg:hidden"
-              onClick={() => setMenuOpen(true)}
+              label={toggleLabel}
+              aria-expanded={!collapsed}
+              icon={<SidebarSimple className="size-5 rtl:-scale-x-100" />}
+              className="hidden text-fg-muted lg:inline-flex"
+              onClick={() => setCollapsed((value) => !value)}
             />
-            <Tooltip content={`${toggleLabel} (Ctrl+B)`} side="bottom">
-              <IconButton
-                label={toggleLabel}
-                aria-expanded={!collapsed}
-                icon={<SidebarSimple className="size-5 rtl:-scale-x-100" />}
-                size="sm"
-                className="hidden lg:inline-flex"
-                onClick={() => setCollapsed((current) => !current)}
-              />
-            </Tooltip>
-            {pageTitle && <span className="truncate text-sm font-semibold text-fg">{pageTitle}</span>}
-          </div>
-          <UserMenu />
+          </Tooltip>
+          {current && (
+            <nav aria-label="المسار" className="flex min-w-0 items-center gap-2 text-sm">
+              {current.group && (
+                <>
+                  <span className="hidden text-fg-muted sm:inline">{current.group}</span>
+                  <CaretLeft aria-hidden className="hidden size-3.5 text-fg-subtle sm:inline" />
+                </>
+              )}
+              <span className="truncate font-bold text-fg">{current.label}</span>
+            </nav>
+          )}
         </header>
 
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-10">{children}</main>
       </div>
     </div>
   );
