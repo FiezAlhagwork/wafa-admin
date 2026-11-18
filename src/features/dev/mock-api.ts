@@ -3,9 +3,10 @@
 
 import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { api } from "@/lib/api/client";
+import { filterMerchantSeeds, findMerchantSeed, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
 
-export type MockScenario = "full" | "reviewer" | "loading" | "error";
+export type MockScenario = "super_admin" | "admin" | "reviewer" | "support" | "loading" | "error";
 
 const hoursAgo = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
 const inDays = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString();
@@ -132,6 +133,8 @@ const failure = (config: InternalAxiosRequestConfig, status: number, code: strin
   });
 
 function createHandler(scenario: MockScenario): AxiosAdapter {
+  // Only the roles with `view-financials` get the finance block on the home page; the others get null
+  const canSeeFinance = scenario !== "admin" && scenario !== "support";
   const payments = seeds.map(toPayment);
   const adminUsers = adminUserSeeds.map((item) => ({ ...item }));
   const SELF_ID = 1;
@@ -148,17 +151,33 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
     const url = config.url ?? "";
     const method = (config.method ?? "get").toLowerCase();
 
-    if (url === "/admin/overview") return respond(config, { data: overview(scenario === "full") });
+    if (url === "/admin/overview") return respond(config, { data: overview(canSeeFinance) });
 
     if (url === "/admin/payments" && method === "get") {
       const status = (config.params?.status ?? "PENDING") as AdminPayment["status"];
       const start = Number(config.params?.cursor ?? 0);
       const all = payments.filter((payment) => payment.status === status);
-      const next = start + PAGE_SIZE;
+      // Respects a smaller `limit` like the real server (the home page asks for 5); pages stay small so "load more" shows
+      const next = start + Math.min(Number(config.params?.limit ?? PAGE_SIZE), PAGE_SIZE);
       return respond(config, {
         data: all.slice(start, next),
         meta: { next_cursor: next < all.length ? String(next) : null },
       });
+    }
+
+    if (url === "/admin/merchants" && method === "get") {
+      const params = (config.params ?? {}) as Record<string, string | undefined>;
+      const start = Number(params.cursor ?? 0);
+      const all = filterMerchantSeeds(params);
+      const next = start + PAGE_SIZE;
+      return respond(config, { data: all.slice(start, next).map(toMerchant), meta: { next_cursor: next < all.length ? String(next) : null } });
+    }
+
+    const merchantRoute = /^\/admin\/merchants\/(\d+)$/.exec(url);
+    if (merchantRoute && method === "get") {
+      const seed = findMerchantSeed(Number(merchantRoute[1]));
+      if (!seed) throw failure(config, 404, "NOT_FOUND");
+      return respond(config, { data: toMerchantDetail(seed) });
     }
 
     if (url === "/admin/admin-users" && method === "get") return respond(config, { data: [...adminUsers].sort(byActiveThenName) });
@@ -220,22 +239,20 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
  * Plug the fake backend into the shared axios instance. `activate` is idempotent and `deactivate` puts the real adapter
  * back (leaving /dev/shell must not leave the dashboard talking to fixtures).
  */
+// The real adapter, taken once before any preview swaps it
+const realAdapter = api.defaults.adapter;
+
 export function createMockApi(scenario: MockScenario) {
   const handler = createHandler(scenario);
-  let original: typeof api.defaults.adapter;
-  let active = false;
 
   return {
     activate() {
-      if (active) return;
-      original = api.defaults.adapter;
       api.defaults.adapter = handler;
-      active = true;
     },
+    // Only undoes its own swap: when the scenario changes, the new preview activates before the old one is cleaned up,
+    // and the old cleanup must not knock the new fake backend out
     deactivate() {
-      if (!active) return;
-      api.defaults.adapter = original;
-      active = false;
+      if (api.defaults.adapter === handler) api.defaults.adapter = realAdapter;
     },
   };
 }

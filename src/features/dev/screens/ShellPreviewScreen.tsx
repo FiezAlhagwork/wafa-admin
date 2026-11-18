@@ -1,66 +1,78 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Button } from "@/components/ui";
+import { PermissionGate } from "@/components/layout/PermissionGate";
 import { Shell } from "@/components/layout/Shell";
 import { AdminUsersScreen } from "@/features/admin-users/screens/AdminUsersScreen";
+import { MerchantDetailScreen } from "@/features/merchants/screens/MerchantDetailScreen";
+import { MerchantsScreen } from "@/features/merchants/screens/MerchantsScreen";
 import { OverviewScreen } from "@/features/overview/screens/OverviewScreen";
 import { PaymentsScreen } from "@/features/payments/screens/PaymentsScreen";
-import type { AdminPermission, AdminUser } from "@/lib/api/types";
+import type { AdminPermission, AdminRole, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
 import { createMockApi, type MockScenario } from "../mock-api";
 
-type Page = "overview" | "payments" | "admin-users";
+type Page = "overview" | "payments" | "merchants" | "admin-users";
 
-const scenarios: { id: MockScenario; label: string }[] = [
-  { id: "full", label: "كل الصلاحيات" },
-  { id: "reviewer", label: "مراجع دفعات (بدون مالية)" },
-  { id: "loading", label: "تحميل" },
-  { id: "error", label: "خطأ" },
+const pages: { id: Page; label: string; path: string }[] = [
+  { id: "overview", label: "الرئيسية", path: "/admin" },
+  { id: "payments", label: "الدفعات", path: "/admin/payments" },
+  { id: "merchants", label: "التجار", path: "/admin/merchants" },
+  { id: "admin-users", label: "الحسابات", path: "/admin/admin-users" },
 ];
 
-const pages: { id: Page; label: string }[] = [
-  { id: "overview", label: "الرئيسية" },
-  { id: "payments", label: "الدفعات" },
-  { id: "admin-users", label: "الحسابات" },
-];
-
-const allPermissions: AdminPermission[] = [
-  "manage-admin-accounts",
-  "manage-packages",
-  "manage-settings",
-  "grant-extensions",
-  "view-audit-log",
-  "review-payments",
-  "view-financials",
-  "suspend-merchants",
-  "execute-deletion-requests",
-  "cancel-stamps",
-  "manage-lookups",
-  "edit-business-identity",
-  "edit-customer-birthdate",
-  "view-merchants-and-customers",
-  "reveal-customer-phone",
-];
-
-const reviewerPermissions: AdminPermission[] = ["review-payments", "view-merchants-and-customers"];
-
-const user: AdminUser = {
-  id: 1,
-  name: "سامر الحلبي",
-  email: "samer@example.com",
-  role: "super_admin",
-  is_active: true,
-  linked: true,
-  last_login_at: null,
+// The permissions of each role, copied from the backend guide's table (§5). A scenario is a role, so the preview shows
+// exactly what that person would see. `loading` and `error` have every permission: they test the screens, not the roles.
+const permissionsByRole: Record<AdminRole, AdminPermission[]> = {
+  super_admin: [
+    "manage-admin-accounts",
+    "cancel-stamps",
+    "manage-packages",
+    "manage-settings",
+    "grant-extensions",
+    "view-audit-log",
+    "view-merchants-and-customers",
+    "edit-business-identity",
+    "suspend-merchants",
+    "edit-customer-birthdate",
+    "reveal-customer-phone",
+    "manage-lookups",
+    "execute-deletion-requests",
+    "view-financials",
+  ],
+  admin: [
+    "cancel-stamps",
+    "view-merchants-and-customers",
+    "edit-business-identity",
+    "suspend-merchants",
+    "edit-customer-birthdate",
+    "reveal-customer-phone",
+    "manage-lookups",
+    "execute-deletion-requests",
+  ],
+  payments_reviewer: ["review-payments", "view-financials"],
+  support: [
+    "view-merchants-and-customers",
+    "edit-business-identity",
+    "edit-customer-birthdate",
+    "reveal-customer-phone",
+  ],
 };
 
-const screens: Record<Page, ReactNode> = {
-  overview: <OverviewScreen />,
-  payments: <PaymentsScreen />,
-  "admin-users": <AdminUsersScreen />,
-};
+const everyPermission: AdminPermission[] = [...new Set(Object.values(permissionsByRole).flat())];
+
+type ScenarioInfo = { id: MockScenario; label: string; role: AdminRole; userId: number; name: string };
+
+const scenarios: ScenarioInfo[] = [
+  { id: "super_admin", label: "مدير عام", role: "super_admin", userId: 1, name: "سامر الحلبي" },
+  { id: "admin", label: "مدير", role: "admin", userId: 4, name: "هالة المدير" },
+  { id: "reviewer", label: "مراجع دفعات", role: "payments_reviewer", userId: 2, name: "ليلى المراجعة" },
+  { id: "support", label: "دعم", role: "support", userId: 3, name: "كريم الدعم" },
+  { id: "loading", label: "تحميل", role: "super_admin", userId: 1, name: "سامر الحلبي" },
+  { id: "error", label: "خطأ", role: "super_admin", userId: 1, name: "سامر الحلبي" },
+];
 
 const subscribe = () => () => {};
 
@@ -70,14 +82,14 @@ const subscribe = () => () => {};
  */
 export function ShellPreviewScreen() {
   const isClient = useSyncExternalStore(subscribe, () => true, () => false);
-  const [scenario, setScenario] = useState<MockScenario>("full");
+  const [scenario, setScenario] = useState<ScenarioInfo>(scenarios[0]);
   const [page, setPage] = useState<Page>("overview");
 
   if (!isClient) return null;
 
   return (
     <>
-      <PreviewApp key={scenario} scenario={scenario} page={page} />
+      <PreviewApp key={scenario.id} scenario={scenario} page={page} />
       <div className="fixed end-4 bottom-4 z-40 flex max-w-[calc(100vw-2rem)] flex-col gap-1 rounded-xl border border-border bg-surface p-1.5 shadow-popup">
         <div className="flex flex-wrap gap-1">
           {pages.map(({ id, label }) => (
@@ -87,9 +99,14 @@ export function ShellPreviewScreen() {
           ))}
         </div>
         <div className="flex flex-wrap gap-1">
-          {scenarios.map(({ id, label }) => (
-            <Button key={id} size="sm" variant={id === scenario ? "primary" : "ghost"} onClick={() => setScenario(id)}>
-              {label}
+          {scenarios.map((item) => (
+            <Button
+              key={item.id}
+              size="sm"
+              variant={item.id === scenario.id ? "primary" : "ghost"}
+              onClick={() => setScenario(item)}
+            >
+              {item.label}
             </Button>
           ))}
         </div>
@@ -98,11 +115,11 @@ export function ShellPreviewScreen() {
   );
 }
 
-function PreviewApp({ scenario, page }: { scenario: MockScenario; page: Page }) {
+function PreviewApp({ scenario, page }: { scenario: ScenarioInfo; page: Page }) {
   const [client] = useState(
     () => new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } }),
   );
-  const [mock] = useState(() => createMockApi(scenario));
+  const [mock] = useState(() => createMockApi(scenario.id));
 
   // Active before the first child effect fires its requests; the effect re-activates after StrictMode's fake unmount
   mock.activate();
@@ -111,13 +128,58 @@ function PreviewApp({ scenario, page }: { scenario: MockScenario; page: Page }) 
     return () => mock.deactivate();
   }, [mock]);
 
-  const permissions = scenario === "reviewer" ? reviewerPermissions : allPermissions;
+  const permissions =
+    scenario.id === "loading" || scenario.id === "error" ? everyPermission : permissionsByRole[scenario.role];
+  const user: AdminUser = {
+    id: scenario.userId,
+    name: scenario.name,
+    email: "preview@example.com",
+    role: scenario.role,
+    is_active: true,
+    linked: true,
+    last_login_at: null,
+  };
 
   return (
     <QueryClientProvider client={client}>
       <AdminContext value={{ user, permissions }}>
-        <Shell>{screens[page]}</Shell>
+        <Shell pathname={pages.find((item) => item.id === page)?.path}>
+          <PreviewPage page={page} />
+        </Shell>
       </AdminContext>
     </QueryClientProvider>
   );
+}
+
+/** Each screen sits behind the same permission gate as its real route, so a role test behaves like the real thing. */
+function PreviewPage({ page }: { page: Page }) {
+  // The merchant list opens a merchant inside the preview (the real route navigates, which would leave /dev/shell)
+  const [merchantId, setMerchantId] = useState<number | null>(null);
+
+  switch (page) {
+    case "overview":
+      return <OverviewScreen />;
+    case "payments":
+      return (
+        <PermissionGate permission="review-payments">
+          <PaymentsScreen />
+        </PermissionGate>
+      );
+    case "merchants":
+      return (
+        <PermissionGate permission="view-merchants-and-customers">
+          {merchantId === null ? (
+            <MerchantsScreen onOpen={setMerchantId} />
+          ) : (
+            <MerchantDetailScreen id={merchantId} onBack={() => setMerchantId(null)} />
+          )}
+        </PermissionGate>
+      );
+    case "admin-users":
+      return (
+        <PermissionGate permission="manage-admin-accounts">
+          <AdminUsersScreen />
+        </PermissionGate>
+      );
+  }
 }
