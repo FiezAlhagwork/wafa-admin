@@ -61,6 +61,13 @@ function damascusDayNumber(date: Date): number {
   return Date.UTC(year, month - 1, day) / MS_PER_DAY;
 }
 
+/** A number of days with the right Arabic form: "يوم واحد" · "يومان" · "5 أيام" · "12 يوماً". */
+export function formatDayCount(days: number): string {
+  if (days === 1) return "يوم واحد";
+  if (days === 2) return "يومان";
+  return `${days} ${days >= 3 && days <= 10 ? "أيام" : "يوماً"}`;
+}
+
 /** "اليوم" · "غداً" · "بعد يومين" · "بعد 5 أيام" · "بعد 12 يوماً" (and the past: "أمس" · "منذ 3 أيام"...). */
 export function formatRelativeDays(iso: string, now: Date = new Date()): string {
   const days = Math.round(damascusDayNumber(new Date(iso)) - damascusDayNumber(now));
