@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { CaretRight } from "@phosphor-icons/react";
 import { Button, Card, ErrorState, Skeleton } from "@/components/ui";
 import { getErrorMessage } from "@/lib/api/errors";
+import { usePermission } from "@/lib/auth/can";
+import { MerchantActionDialog, type MerchantAction } from "../components/MerchantActionDialogs";
+import { MerchantActions } from "../components/MerchantActions";
 import {
   CardsList,
   IdentityCard,
@@ -60,9 +64,12 @@ function DetailSkeleton() {
   );
 }
 
-/** One merchant, read-only: who they are, their subscription, cards, stats and latest payments. */
+/** One merchant: who they are, their subscription, cards, stats and latest payments, and the actions the role allows. */
 export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) {
   const query = useMerchant(id);
+  const [action, setAction] = useState<MerchantAction | null>(null);
+  const canEditIdentity = usePermission("edit-business-identity");
+  const canSuspend = usePermission("suspend-merchants");
 
   let body;
   if (query.isPending) {
@@ -90,20 +97,30 @@ export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) 
     );
   } else {
     const merchant = query.data;
+    // DELETED is in the backend guide but not in the generated status type (A07)
+    const status: string | null = merchant.status;
+    const deleted = status === "DELETED";
     body = (
       <>
-        <MerchantHero merchant={merchant} />
+        <MerchantHero merchant={merchant} actions={<MerchantActions merchant={merchant} onAction={setAction} />} />
         <MerchantAlerts merchant={merchant} />
         <div className="grid items-start gap-5 lg:grid-cols-3">
           <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
             <SubscriptionCard merchant={merchant} />
-            <CardsList merchant={merchant} />
+            <CardsList
+              merchant={merchant}
+              onSuspendCard={canSuspend && !deleted ? (card) => setAction({ type: "suspend-card", card }) : undefined}
+            />
             <RecentPayments merchant={merchant} />
           </div>
           <div className="flex min-w-0 flex-col gap-5">
-            <IdentityCard merchant={merchant} />
+            <IdentityCard
+              merchant={merchant}
+              onRemoveCover={canEditIdentity ? () => setAction({ type: "remove-cover" }) : undefined}
+            />
           </div>
         </div>
+        <MerchantActionDialog merchant={merchant} action={action} onClose={() => setAction(null)} />
       </>
     );
   }
