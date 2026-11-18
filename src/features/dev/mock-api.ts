@@ -3,7 +3,7 @@
 
 import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { api } from "@/lib/api/client";
-import { filterMerchantSeeds, findMerchantSeed, toMerchant, toMerchantDetail } from "./mock-merchants";
+import { businessTypes, createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
 
 export type MockScenario = "super_admin" | "admin" | "reviewer" | "support" | "loading" | "error";
@@ -142,6 +142,11 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
     Number(b.is_active) - Number(a.is_active) || a.name.localeCompare(b.name, "ar");
   const bodyOf = <T,>(config: InternalAxiosRequestConfig): T =>
     (typeof config.data === "string" ? JSON.parse(config.data) : {}) as T;
+  const merchants = createMerchantStore();
+  // The roles with `manage-lookups`; the others get 403 on the business types, like the real server
+  const canManageLookups = scenario === "super_admin" || scenario === "admin";
+  // Merchant 105 is "suspended by someone else a moment ago" on the first try: shows the conflict path
+  let conflictShown = false;
 
   return async (config) => {
     await new Promise((resolve) => setTimeout(resolve, LATENCY_MS));
@@ -168,16 +173,113 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
     if (url === "/admin/merchants" && method === "get") {
       const params = (config.params ?? {}) as Record<string, string | undefined>;
       const start = Number(params.cursor ?? 0);
-      const all = filterMerchantSeeds(params);
+      const all = filterMerchantSeeds(merchants, params);
       const next = start + PAGE_SIZE;
       return respond(config, { data: all.slice(start, next).map(toMerchant), meta: { next_cursor: next < all.length ? String(next) : null } });
     }
 
-    const merchantRoute = /^\/admin\/merchants\/(\d+)$/.exec(url);
-    if (merchantRoute && method === "get") {
-      const seed = findMerchantSeed(Number(merchantRoute[1]));
+    if (url === "/admin/business-types" && method === "get") {
+      if (!canManageLookups) throw failure(config, 403, "FORBIDDEN");
+      return respond(config, { data: businessTypes });
+    }
+
+    const merchantRoute = /^\/admin\/merchants\/(\d+)(?:\/(suspend|reactivate|trial-extension|cover))?$/.exec(url);
+    if (merchantRoute) {
+      const seed = merchants.find((item) => item.id === Number(merchantRoute[1]));
       if (!seed) throw failure(config, 404, "NOT_FOUND");
-      return respond(config, { data: toMerchantDetail(seed) });
+      const route = merchantRoute[2];
+      if (!route && method === "get") return respond(config, { data: toMerchantDetail(seed) });
+
+      // Every action: a reason of 3–255 characters, and the other fields by the same rules as the server
+      const body = bodyOf<{ reason?: string; business_name?: string; business_type_id?: number; days?: number }>(config);
+      const fields: Record<string, string[]> = {};
+      const reason = body.reason?.trim() ?? "";
+      if (reason.length < 3) fields.reason = [reason ? "min" : "required"];
+      if (reason.length > 255) fields.reason = ["max"];
+      if (body.business_name !== undefined) {
+        const name = body.business_name.trim();
+        if (name.length < 2) fields.business_name = ["min"];
+        if (name.length > 80) fields.business_name = ["max"];
+      }
+      if (
+        body.business_type_id !== undefined &&
+        !businessTypes.some((type) => type.id === body.business_type_id && type.is_active)
+      ) {
+        fields.business_type_id = ["exists"];
+      }
+      const days = Number(body.days);
+      if (route === "trial-extension" && !(Number.isInteger(days) && days >= 1 && days <= 90)) {
+        fields.days = [days > 90 ? "max" : "min"];
+      }
+      if (Object.keys(fields).length > 0) throw failure(config, 422, "VALIDATION_FAILED", { fields });
+
+      const status: string | null = seed.status;
+      const conflict = () => failure(config, 409, "MERCHANT_STATUS_CONFLICT", { status });
+
+      if (route === "suspend" && method === "post") {
+        if (status === "SUSPENDED" || status === "PENDING_DELETION" || status === "DELETED") throw conflict();
+        seed.statusBeforeSuspension = seed.status;
+        seed.status = "SUSPENDED";
+        seed.suspensionReason = reason;
+        seed.suspendedAt = new Date().toISOString();
+        if (seed.id === 105 && !conflictShown) {
+          conflictShown = true;
+          seed.suspensionReason = "قرار مدير آخر: شكاوى متكررة من الزبائن";
+          throw failure(config, 409, "MERCHANT_STATUS_CONFLICT", { status: "SUSPENDED" });
+        }
+        return respond(config, { data: toMerchantDetail(seed).subscription });
+      }
+
+      if (route === "reactivate" && method === "post") {
+        if (status !== "SUSPENDED") throw conflict();
+        // Back to what the dates say now: an ended subscription comes back EXPIRED
+        seed.status =
+          seed.endsInDays !== null && seed.endsInDays < 0 ? "EXPIRED" : (seed.statusBeforeSuspension ?? "ACTIVE");
+        seed.suspensionReason = undefined;
+        seed.suspendedAt = undefined;
+        seed.statusBeforeSuspension = undefined;
+        return respond(config, { data: toMerchantDetail(seed).subscription });
+      }
+
+      if (route === "trial-extension" && method === "post") {
+        if (status !== "TRIAL" && status !== "EXPIRED") {
+          throw failure(config, 422, "TRIAL_NOT_EXTENDABLE", { reason: "status" });
+        }
+        if (status === "EXPIRED" && !seed.neverPaid) throw failure(config, 422, "TRIAL_NOT_EXTENDABLE", { reason: "paid" });
+        // After the trial end, or after today if it ended (so an expired trial is a trial again)
+        seed.endsInDays = Math.max(seed.endsInDays ?? 0, 0) + days;
+        seed.status = "TRIAL";
+        return respond(config, { data: toMerchantDetail(seed).subscription });
+      }
+
+      if (route === "cover" && method === "delete") {
+        seed.hasCover = false;
+        return respond(config, { data: toMerchantDetail(seed) });
+      }
+
+      if (!route && method === "patch") {
+        if (body.business_name !== undefined) seed.name = body.business_name.trim();
+        const type = businessTypes.find((item) => item.id === body.business_type_id);
+        if (type) seed.type = type.name;
+        return respond(config, { data: toMerchantDetail(seed) });
+      }
+    }
+
+    const cardRoute = /^\/admin\/cards\/(\d+)\/suspend$/.exec(url);
+    if (cardRoute && method === "post") {
+      const cardId = Number(cardRoute[1]);
+      const seed = merchants.find((item) => item.id === Math.floor(cardId / 10));
+      const card = seed ? toMerchantDetail(seed).cards.find((item) => item.id === cardId) : undefined;
+      if (!seed || !card) throw failure(config, 404, "NOT_FOUND");
+      const reason = bodyOf<{ reason?: string }>(config).reason?.trim() ?? "";
+      if (reason.length < 3 || reason.length > 255) {
+        throw failure(config, 422, "VALIDATION_FAILED", { fields: { reason: [reason.length > 255 ? "max" : "min"] } });
+      }
+      // Already paused: nothing happens, like the server
+      if (!seed.suspendedCardIds?.includes(cardId)) seed.suspendedCardIds = [...(seed.suspendedCardIds ?? []), cardId];
+      return respond(config, {
+        data: { id: card.id, merchant_id: seed.id, name: card.name, status: "suspended", suspended_at: new Date().toISOString() },
+      });
     }
 
     if (url === "/admin/admin-users" && method === "get") return respond(config, { data: [...adminUsers].sort(byActiveThenName) });

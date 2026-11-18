@@ -24,3 +24,8 @@ export type AdminMerchant = Schemas["AdminMerchant"];
 export type AdminMerchantDetail = Schemas["AdminMerchantDetail"];
 export type MerchantRegistrationStep = AdminMerchant["registration_step"];
 export type ListMerchantsQuery = NonNullable<operations["adminListMerchants"]["parameters"]["query"]>;
+export type UpdateMerchantIdentityBody =
+  operations["adminUpdateMerchantIdentity"]["requestBody"]["content"]["application/json"];
+export type ExtendTrialBody = operations["adminExtendTrial"]["requestBody"]["content"]["application/json"];
+export type MerchantCard = AdminMerchantDetail["cards"][number];
+export type AdminLookup = Schemas["AdminLookup"];

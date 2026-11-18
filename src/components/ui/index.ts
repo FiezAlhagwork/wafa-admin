@@ -15,6 +15,7 @@ export { LoadMore } from "./LoadMore";
 export { Menu, MenuGroup, MenuItem, MenuSeparator } from "./Menu";
 export { OtpField } from "./OtpField";
 export { RadioGroup, type RadioOption } from "./RadioGroup";
+export { ReasonDialog, REASON_MAX, REASON_MIN } from "./ReasonDialog";
 export { Select, type SelectOption } from "./Select";
 export { Skeleton } from "./Skeleton";
 export { Spinner } from "./Spinner";

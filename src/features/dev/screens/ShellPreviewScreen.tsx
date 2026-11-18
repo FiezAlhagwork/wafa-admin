@@ -144,7 +144,8 @@ function PreviewApp({ scenario, page }: { scenario: ScenarioInfo; page: Page }) 
     <QueryClientProvider client={client}>
       <AdminContext value={{ user, permissions }}>
         <Shell pathname={pages.find((item) => item.id === page)?.path}>
-          <PreviewPage page={page} />
+          {/* Keyed by page: coming back to the merchants starts at the list, not at the last opened merchant */}
+          <PreviewPage key={page} page={page} />
         </Shell>
       </AdminContext>
     </QueryClientProvider>

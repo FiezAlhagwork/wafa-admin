@@ -10,22 +10,25 @@ import {
   ImageSquare,
   MapPin,
   Package,
+  PauseCircle,
   Phone,
   Receipt,
   Seal,
   SignIn,
   Storefront,
+  Trash,
   User,
   WarningCircle,
 } from "@phosphor-icons/react/ssr";
 import { Avatar, Card, CardHeader, EmptyState, Latin, StatusBadge } from "@/components/ui";
 import { formatDuration, methodLabels } from "@/features/payments/labels";
-import type { AdminMerchantDetail } from "@/lib/api/types";
+import type { AdminMerchantDetail, MerchantCard } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDate, formatDateTime, formatDayCount, formatNumber, formatRelativeDays, formatSyp, formatUsd } from "@/lib/format";
 import { periodTypeLabels, registrationStepLabels } from "../labels";
 
-// The sections of the merchant page. All read-only: the actions (suspend, edit, extend) come in the next stage.
+// The sections of the merchant page. They only show: the actions open dialogs through the callbacks the screen passes
+// (none when the role may not take that action).
 
 type MerchantProps = { merchant: AdminMerchantDetail };
 
@@ -42,7 +45,7 @@ function MetaPill({ icon, children }: { icon: ReactNode; children: ReactNode }) 
 }
 
 /** Logo, name, state, the facts and the headline numbers: the top of the page. The cover lives on the identity card. */
-export function MerchantHero({ merchant }: MerchantProps) {
+export function MerchantHero({ merchant, actions }: MerchantProps & { actions?: ReactNode }) {
   const { stats } = merchant;
   const figures: { label: string; value: number; hint?: string }[] = [
     { label: "الزبائن", value: stats.customers_total },
@@ -80,6 +83,7 @@ export function MerchantHero({ merchant }: MerchantProps) {
             <MetaPill icon={<Calendar />}>مسجّل منذ {formatDate(merchant.registered_at)}</MetaPill>
           </div>
         </div>
+        {actions && <div className="shrink-0 sm:self-start">{actions}</div>}
       </div>
 
       <dl className="grid grid-cols-2 border-t border-divider sm:grid-cols-3 lg:grid-cols-5">
@@ -272,7 +276,7 @@ function InfoRow({ icon, label, children }: { icon: ReactNode; label: string; ch
  * The cover at its real shape. The server always stores it as 2:1 (up to 1200×600), so a 2:1 frame shows the whole
  * picture: nothing cropped or stretched. It opens full size in a new tab (an admin may need a closer look).
  */
-function CoverImage({ url }: { url: string | null }) {
+function CoverImage({ url, onRemove }: { url: string | null; onRemove?: () => void }) {
   if (!url) {
     return (
       <div className="m-4 mb-0 flex aspect-2/1 flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border bg-neutral-50 text-fg-muted">
@@ -283,26 +287,39 @@ function CoverImage({ url }: { url: string | null }) {
   }
 
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noreferrer"
-      aria-label="عرض الغلاف بالحجم الكامل"
-      className="group/cover relative m-4 mb-0 block aspect-2/1 overflow-hidden rounded-xl ring-1 ring-ink/8 outline-none focus-visible:ring-2 focus-visible:ring-focus"
-    >
-      <Image src={url} alt="" fill unoptimized sizes="(min-width: 1024px) 22rem, 100vw" className="object-cover" />
-      <span className="absolute end-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-medium text-neutral-0 opacity-0 backdrop-blur-sm transition-opacity group-hover/cover:opacity-100 group-focus-visible/cover:opacity-100">
-        <ArrowsOut aria-hidden className="size-3.5" />
-        عرض بالحجم الكامل
-      </span>
-    </a>
+    // The remove button sits beside the link, not inside it (a button can't live in a link)
+    <div className="relative m-4 mb-0">
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="عرض الغلاف بالحجم الكامل"
+        className="group/cover relative block aspect-2/1 overflow-hidden rounded-xl ring-1 ring-ink/8 outline-none focus-visible:ring-2 focus-visible:ring-focus"
+      >
+        <Image src={url} alt="" fill unoptimized sizes="(min-width: 1024px) 22rem, 100vw" className="object-cover" />
+        <span className="absolute end-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-medium text-neutral-0 opacity-0 backdrop-blur-sm transition-opacity group-hover/cover:opacity-100 group-focus-visible/cover:opacity-100">
+          <ArrowsOut aria-hidden className="size-3.5" />
+          عرض بالحجم الكامل
+        </span>
+      </a>
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="absolute start-2 top-2 inline-flex h-7.5 cursor-pointer items-center gap-1 rounded-full bg-surface/90 px-2.5 text-xs font-bold text-danger shadow-card backdrop-blur-sm transition-colors outline-none hover:bg-surface focus-visible:ring-2 focus-visible:ring-focus"
+        >
+          <Trash aria-hidden className="size-3.5" />
+          إزالة الغلاف
+        </button>
+      )}
+    </div>
   );
 }
 
-export function IdentityCard({ merchant }: MerchantProps) {
+export function IdentityCard({ merchant, onRemoveCover }: MerchantProps & { onRemoveCover?: () => void }) {
   return (
     <Card className="overflow-hidden">
-      <CoverImage url={merchant.cover_url} />
+      <CoverImage url={merchant.cover_url} onRemove={onRemoveCover} />
       <CardHeader icon={<IdentificationCard />} iconTone="neutral" title="بيانات النشاط" />
       <dl className="px-5 py-1">
         <InfoRow icon={<Storefront />} label="النوع">
@@ -339,7 +356,7 @@ export function IdentityCard({ merchant }: MerchantProps) {
 const cardFaces = ["bg-brand", "bg-ink", "bg-success"];
 const MAX_DOTS = 12;
 
-export function CardsList({ merchant }: MerchantProps) {
+export function CardsList({ merchant, onSuspendCard }: MerchantProps & { onSuspendCard?: (card: MerchantCard) => void }) {
   const { cards } = merchant;
 
   return (
@@ -391,6 +408,16 @@ export function CardsList({ merchant }: MerchantProps) {
                 </div>
                 {card.suspended_at && (
                   <span className="text-xs text-neutral-0/85">موقوفة منذ {formatDate(card.suspended_at)}</span>
+                )}
+                {!suspended && onSuspendCard && (
+                  <button
+                    type="button"
+                    onClick={() => onSuspendCard(card)}
+                    className="inline-flex h-8 cursor-pointer items-center gap-1.5 self-start rounded-full bg-neutral-0/15 px-3 text-[13px] font-bold transition-colors outline-none hover:bg-neutral-0/25 focus-visible:ring-2 focus-visible:ring-neutral-0"
+                  >
+                    <PauseCircle aria-hidden className="size-4" />
+                    إيقاف البطاقة
+                  </button>
                 )}
               </li>
             );
