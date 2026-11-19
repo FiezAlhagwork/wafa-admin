@@ -26,6 +26,7 @@ import {
   MenuGroup,
   MenuItem,
   MenuSeparator,
+  Notice,
   ReasonDialog,
   REASON_MIN,
   Textarea,
@@ -283,6 +284,13 @@ function ReasonDialogPreview() {
         <Button variant="secondary" onClick={() => open("loading")}>
           أثناء الإرسال
         </Button>
+      </PreviewRow>
+
+      <PreviewRow label="Notice">
+        <div className="flex w-full max-w-lg flex-col gap-2">
+          <Notice>إذا كان هذا الطابع هو الذي أكمل البطاقة، تعود الدورة لجمع الأختام.</Notice>
+          <Notice tone="warning">لا أختام ولا زبائن جدد ولا حملات. تسليم الهدايا الجاهزة يبقى شغّالاً.</Notice>
+        </div>
       </PreviewRow>
 
       {demo && (

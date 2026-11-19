@@ -3,14 +3,13 @@
 import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import { ArrowClockwise, Bank, DeviceMobile, ImageBroken, Warning } from "@phosphor-icons/react";
-import { Badge, Button, ConfirmDialog, Dialog, focusRing, Skeleton, StatusBadge, toast } from "@/components/ui";
+import { Badge, Button, ConfirmDialog, CopyValue, Dialog, focusRing, Skeleton, StatusBadge, toast } from "@/components/ui";
 import { getErrorMessage, isApiError } from "@/lib/api/errors";
 import type { AdminPayment, PaymentMethod } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDateTime, formatDecimal, formatRelativeDays, formatSyp, formatUsd } from "@/lib/format";
 import { useApprovePayment, usePayment } from "../hooks";
 import { formatDuration, methodLabels, rejectionReasonLabels } from "../labels";
-import { CopyValue } from "./CopyValue";
 import { RejectPaymentDialog } from "./RejectPaymentDialog";
 
 type PaymentReviewDialogProps = {

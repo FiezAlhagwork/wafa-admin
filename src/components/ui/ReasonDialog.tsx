@@ -1,6 +1,9 @@
 "use client";
 
 import { useId, type ComponentProps, type FormEventHandler, type ReactNode } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useWatch, type UseFormSetError } from "react-hook-form";
+import { z } from "zod";
 import { cn } from "@/lib/cn";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
@@ -101,5 +104,42 @@ export function ReasonDialog({
         </Field>
       </form>
     </Dialog>
+  );
+}
+
+/** The reason's rules in a zod schema, with the Arabic text shown next to the field. */
+export const reasonField = z
+  .string()
+  .trim()
+  .min(REASON_MIN, `اكتب السبب (${REASON_MIN} أحرف على الأقل)`)
+  .max(REASON_MAX, `السبب أطول من ${REASON_MAX} حرفاً`);
+
+const reasonOnlySchema = z.object({ reason: reasonField });
+type ReasonOnlyValues = z.infer<typeof reasonOnlySchema>;
+
+type ReasonOnlyDialogProps = Omit<
+  ReasonDialogProps,
+  "onSubmit" | "reasonProps" | "reasonLength" | "reasonError" | "loading"
+> & {
+  /** Usually `mutation.isPending`. */
+  pending: boolean;
+  /** The trimmed reason, and `setError` to put the server's 422 on the field (`applyFieldErrors`). */
+  onConfirm: (reason: string, setError: UseFormSetError<ReasonOnlyValues>) => void;
+};
+
+/** For the actions that take nothing but a reason (suspend, reactivate, remove, cancel a stamp): owns its form. */
+export function ReasonOnlyDialog({ onConfirm, pending, ...dialog }: ReasonOnlyDialogProps) {
+  const form = useForm<ReasonOnlyValues>({ resolver: zodResolver(reasonOnlySchema), defaultValues: { reason: "" } });
+  const reason = useWatch({ control: form.control, name: "reason" });
+
+  return (
+    <ReasonDialog
+      {...dialog}
+      loading={pending}
+      onSubmit={form.handleSubmit((values) => onConfirm(values.reason, form.setError))}
+      reasonProps={form.register("reason")}
+      reasonLength={reason.length}
+      reasonError={form.formState.errors.reason?.message}
+    />
   );
 }

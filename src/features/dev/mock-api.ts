@@ -3,6 +3,7 @@
 
 import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { api } from "@/lib/api/client";
+import { createCustomerStore } from "./mock-customers";
 import { businessTypes, createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
 
@@ -143,6 +144,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
   const bodyOf = <T,>(config: InternalAxiosRequestConfig): T =>
     (typeof config.data === "string" ? JSON.parse(config.data) : {}) as T;
   const merchants = createMerchantStore();
+  const customers = createCustomerStore();
   // The roles with `manage-lookups`; the others get 403 on the business types, like the real server
   const canManageLookups = scenario === "super_admin" || scenario === "admin";
   // Merchant 105 is "suspended by someone else a moment ago" on the first try: shows the conflict path
@@ -263,6 +265,54 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
         if (type) seed.type = type.name;
         return respond(config, { data: toMerchantDetail(seed) });
       }
+    }
+
+    // Customers: found by the full number only, like the server (both 09… and +9639…)
+    if (url === "/admin/customers" && method === "get") {
+      const phone = String(config.params?.phone ?? "");
+      if (!/^(?:09\d{8}|\+9639\d{8})$/.test(phone)) throw failure(config, 422, "VALIDATION_FAILED", { fields: { phone: ["format"] } });
+      const found = customers.find(phone);
+      return respond(config, { data: found ? [found] : [] });
+    }
+
+    const customerRoute = /^\/admin\/customers\/(\d+)(?:\/(reveal-phone))?$/.exec(url);
+    if (customerRoute) {
+      const id = Number(customerRoute[1]);
+      if (!customers.get(id)) throw failure(config, 404, "NOT_FOUND");
+      if (customerRoute[2] === "reveal-phone" && method === "post") return respond(config, { data: { phone: customers.phoneOf(id) } });
+      if (!customerRoute[2] && method === "get") return respond(config, { data: customers.get(id) });
+      if (!customerRoute[2] && method === "patch") {
+        const body = bodyOf<{ birthdate?: string; reason?: string }>(config);
+        const reason = body.reason?.trim() ?? "";
+        const fields: Record<string, string[]> = {};
+        if (reason.length < 3 || reason.length > 255) fields.reason = [reason.length > 255 ? "max" : "min"];
+        if (!body.birthdate || !/^\d{4}-\d{2}-\d{2}$/.test(body.birthdate)) fields.birthdate = ["format"];
+        if (Object.keys(fields).length > 0) throw failure(config, 422, "VALIDATION_FAILED", { fields });
+        // Under 13 (by the year, enough for the preview)
+        if (new Date().getFullYear() - Number(body.birthdate!.slice(0, 4)) < 13) {
+          throw failure(config, 422, "UNDER_AGE", { min_age: 13 });
+        }
+        return respond(config, { data: customers.setBirthdate(id, body.birthdate!) });
+      }
+    }
+
+    const cycleRoute = /^\/admin\/card-cycles\/(\d+)$/.exec(url);
+    if (cycleRoute && method === "get") {
+      const cycle = customers.cycle(Number(cycleRoute[1]));
+      if (!cycle) throw failure(config, 404, "NOT_FOUND");
+      return respond(config, { data: cycle });
+    }
+
+    const stampRoute = /^\/admin\/stamps\/(\d+)\/cancel$/.exec(url);
+    if (stampRoute && method === "post") {
+      const reason = bodyOf<{ reason?: string }>(config).reason?.trim() ?? "";
+      if (reason.length < 3 || reason.length > 255) {
+        throw failure(config, 422, "VALIDATION_FAILED", { fields: { reason: [reason.length > 255 ? "max" : "min"] } });
+      }
+      const outcome = customers.cancelStamp(Number(stampRoute[1]), reason, { id: 1, name: "سامر الحلبي" });
+      if (outcome.result === "not_found") throw failure(config, 404, "NOT_FOUND");
+      if (outcome.result === "redeemed") throw failure(config, 409, "REWARD_ALREADY_REDEEMED");
+      return respond(config, { data: outcome.data });
     }
 
     const cardRoute = /^\/admin\/cards\/(\d+)\/suspend$/.exec(url);

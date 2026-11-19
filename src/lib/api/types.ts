@@ -29,3 +29,10 @@ export type UpdateMerchantIdentityBody =
 export type ExtendTrialBody = operations["adminExtendTrial"]["requestBody"]["content"]["application/json"];
 export type MerchantCard = AdminMerchantDetail["cards"][number];
 export type AdminLookup = Schemas["AdminLookup"];
+
+export type AdminCustomer = Schemas["AdminCustomer"];
+export type CustomerCycle = NonNullable<AdminCustomer["cycles"]>[number];
+export type AdminCardCycle = Schemas["AdminCardCycle"];
+export type CycleStamp = AdminCardCycle["stamps"][number];
+export type UpdateCustomerBirthdateBody =
+  operations["adminUpdateCustomerBirthdate"]["requestBody"]["content"]["application/json"];

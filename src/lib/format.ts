@@ -80,3 +80,31 @@ export function formatRelativeDays(iso: string, now: Date = new Date()): string 
   if (count === 2) return days > 0 ? "بعد يومين" : "منذ يومين";
   return days > 0 ? `بعد ${count} ${unit}` : `منذ ${count} ${unit}`;
 }
+
+/** Whole years: "سنة واحدة" · "سنتان" · "5 سنوات" · "27 سنة". */
+export function formatYears(years: number): string {
+  if (years === 1) return "سنة واحدة";
+  if (years === 2) return "سنتان";
+  return `${years} ${years >= 3 && years <= 10 ? "سنوات" : "سنة"}`;
+}
+
+/** Age in whole years from a "YYYY-MM-DD" birthdate, on Damascus calendar days. */
+export function ageFromBirthdate(birthdate: string, now: Date = new Date()): number {
+  const [year, month, day] = birthdate.split("-").map(Number);
+  const [nowYear, nowMonth, nowDay] = dayKeyFormat.format(now).split("-").map(Number);
+  const hadBirthday = nowMonth > month || (nowMonth === month && nowDay >= day);
+  return nowYear - year - (hadBirthday ? 0 : 1);
+}
+
+/** A "YYYY-MM-DD" day (a birthdate), without moving it through a time zone: "12 أبريل 1996". */
+export function formatDay(day: string): string {
+  const [year, month, date] = day.split("-").map(Number);
+  return new Intl.DateTimeFormat(LOCALE, { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(
+    new Date(Date.UTC(year, month - 1, date, 12)),
+  );
+}
+
+/** Today in Damascus as "YYYY-MM-DD" (the `max` of a date field). */
+export function todayKey(now: Date = new Date()): string {
+  return dayKeyFormat.format(now);
+}
