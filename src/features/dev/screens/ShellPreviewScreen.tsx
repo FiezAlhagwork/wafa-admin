@@ -6,6 +6,8 @@ import { Button } from "@/components/ui";
 import { PermissionGate } from "@/components/layout/PermissionGate";
 import { Shell } from "@/components/layout/Shell";
 import { AdminUsersScreen } from "@/features/admin-users/screens/AdminUsersScreen";
+import { CustomerDetailScreen } from "@/features/customers/screens/CustomerDetailScreen";
+import { CustomersScreen } from "@/features/customers/screens/CustomersScreen";
 import { MerchantDetailScreen } from "@/features/merchants/screens/MerchantDetailScreen";
 import { MerchantsScreen } from "@/features/merchants/screens/MerchantsScreen";
 import { OverviewScreen } from "@/features/overview/screens/OverviewScreen";
@@ -14,12 +16,13 @@ import type { AdminPermission, AdminRole, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
 import { createMockApi, type MockScenario } from "../mock-api";
 
-type Page = "overview" | "payments" | "merchants" | "admin-users";
+type Page = "overview" | "payments" | "merchants" | "customers" | "admin-users";
 
 const pages: { id: Page; label: string; path: string }[] = [
   { id: "overview", label: "الرئيسية", path: "/admin" },
   { id: "payments", label: "الدفعات", path: "/admin/payments" },
   { id: "merchants", label: "التجار", path: "/admin/merchants" },
+  { id: "customers", label: "الزبائن", path: "/admin/customers" },
   { id: "admin-users", label: "الحسابات", path: "/admin/admin-users" },
 ];
 
@@ -156,6 +159,7 @@ function PreviewApp({ scenario, page }: { scenario: ScenarioInfo; page: Page }) 
 function PreviewPage({ page }: { page: Page }) {
   // The merchant list opens a merchant inside the preview (the real route navigates, which would leave /dev/shell)
   const [merchantId, setMerchantId] = useState<number | null>(null);
+  const [customerId, setCustomerId] = useState<number | null>(null);
 
   switch (page) {
     case "overview":
@@ -173,6 +177,16 @@ function PreviewPage({ page }: { page: Page }) {
             <MerchantsScreen onOpen={setMerchantId} />
           ) : (
             <MerchantDetailScreen id={merchantId} onBack={() => setMerchantId(null)} />
+          )}
+        </PermissionGate>
+      );
+    case "customers":
+      return (
+        <PermissionGate permission="view-merchants-and-customers">
+          {customerId === null ? (
+            <CustomersScreen onOpen={setCustomerId} />
+          ) : (
+            <CustomerDetailScreen id={customerId} onBack={() => setCustomerId(null)} />
           )}
         </PermissionGate>
       );
