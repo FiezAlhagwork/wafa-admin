@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Info, Warning } from "@phosphor-icons/react";
 import { Controller, useForm, useWatch, type FieldValues, type UseFormSetError } from "react-hook-form";
-import { Button, Field, Input, ReasonDialog, Select, toast } from "@/components/ui";
+import { Button, Field, Input, Notice, ReasonDialog, ReasonOnlyDialog, Select, toast } from "@/components/ui";
 import { useBusinessTypes } from "@/features/lookups/hooks";
-import { applyFieldErrors, getErrorMessage, toApiError } from "@/lib/api/errors";
+import { handleActionError } from "@/lib/api/action-errors";
 import type { AdminMerchantDetail, MerchantCard, UpdateMerchantIdentityBody } from "@/lib/api/types";
 import { usePermission } from "@/lib/auth/can";
-import { cn } from "@/lib/cn";
 import { formatDate } from "@/lib/format";
 import {
   useExtendTrial,
@@ -22,11 +20,9 @@ import {
 import {
   extendTrialSchema,
   identitySchema,
-  reasonSchema,
   type ExtendTrialFormInput,
   type ExtendTrialFormValues,
   type IdentityFormValues,
-  type ReasonFormValues,
 } from "../schemas";
 
 /** What the merchant page can ask for. One dialog at a time, mounted only while open. */
@@ -40,67 +36,13 @@ export type MerchantAction =
 
 type DialogProps = { merchant: AdminMerchantDetail; onClose: () => void };
 
-/** The merchant changed under us (or is gone): nothing left to do in this dialog. The hook refetches the page. */
-const closingCodes = new Set(["MERCHANT_STATUS_CONFLICT", "TRIAL_NOT_EXTENDABLE", "NOT_FOUND", "FORBIDDEN"]);
+/** Someone else changed the merchant first: the dialog closes and the page is refetched. */
+const conflicts = ["MERCHANT_STATUS_CONFLICT", "TRIAL_NOT_EXTENDABLE"] as const;
 
-/**
- * A 422 goes next to its field and the dialog stays open. 403 and 429 are shown once by the query client.
- * Anything else is a toast; a conflict also closes the dialog, since the page is being refetched.
- */
-function handleActionError<T extends FieldValues>(error: unknown, setError: UseFormSetError<T>, onClose: () => void) {
-  if (applyFieldErrors(error, setError)) return;
-  const { code } = toApiError(error);
-  if (code !== "FORBIDDEN" && code !== "RATE_LIMITED") toast.error(getErrorMessage(error));
-  if (closingCodes.has(code)) onClose();
-}
-
-function Note({ tone = "info", children }: { tone?: "info" | "warning"; children: ReactNode }) {
-  return (
-    <div
-      className={cn(
-        "flex items-start gap-2.5 rounded-xl px-3.5 py-3 text-sm leading-relaxed",
-        tone === "warning" ? "bg-warning-soft text-fg" : "bg-neutral-50 text-fg",
-      )}
-    >
-      {tone === "warning" ? (
-        <Warning aria-hidden weight="fill" className="mt-0.5 size-4.5 shrink-0 text-warning" />
-      ) : (
-        <Info aria-hidden weight="fill" className="mt-0.5 size-4.5 shrink-0 text-fg-muted" />
-      )}
-      <div className="min-w-0">{children}</div>
-    </div>
-  );
-}
-
-type ReasonOnlyDialogProps = {
-  title: ReactNode;
-  description?: ReactNode;
-  confirmLabel: string;
-  tone?: "primary" | "danger";
-  pending: boolean;
-  onClose: () => void;
-  onConfirm: (reason: string, setError: UseFormSetError<ReasonFormValues>) => void;
-  children?: ReactNode;
-};
-
-/** The actions that take nothing but a reason. */
-function ReasonOnlyDialog({ onConfirm, pending, children, ...dialog }: ReasonOnlyDialogProps) {
-  const form = useForm<ReasonFormValues>({ resolver: zodResolver(reasonSchema), defaultValues: { reason: "" } });
-  const reason = useWatch({ control: form.control, name: "reason" });
-
-  return (
-    <ReasonDialog
-      {...dialog}
-      loading={pending}
-      onSubmit={form.handleSubmit((values) => onConfirm(values.reason, form.setError))}
-      reasonProps={form.register("reason")}
-      reasonLength={reason.length}
-      reasonError={form.formState.errors.reason?.message}
-    >
-      {children}
-    </ReasonDialog>
-  );
-}
+const onActionError =
+  <T extends FieldValues>(setError: UseFormSetError<T>, onClose: () => void) =>
+  (error: unknown) =>
+    handleActionError(error, { setError, onClose, conflicts: [...conflicts] });
 
 function SuspendMerchantDialog({ merchant, onClose }: DialogProps) {
   const suspend = useSuspendMerchant();
@@ -121,14 +63,14 @@ function SuspendMerchantDialog({ merchant, onClose }: DialogProps) {
               toast.success("تم إيقاف التاجر", { description: "يظهر السبب في صفحته وفي سجل التدقيق." });
               onClose();
             },
-            onError: (error) => handleActionError(error, setError, onClose),
+            onError: onActionError(setError, onClose),
           },
         )
       }
     >
-      <Note tone="warning">
+      <Notice tone="warning">
         لا أختام ولا زبائن جدد ولا حملات، ويختفي من دليل المحلات. <b>تسليم الهدايا الجاهزة يبقى شغّالاً.</b>
-      </Note>
+      </Notice>
     </ReasonOnlyDialog>
   );
 }
@@ -150,14 +92,14 @@ function ReactivateMerchantDialog({ merchant, onClose }: DialogProps) {
               toast.success("تمت إعادة تفعيل التاجر");
               onClose();
             },
-            onError: (error) => handleActionError(error, setError, onClose),
+            onError: onActionError(setError, onClose),
           },
         )
       }
     >
-      <Note>
+      <Notice>
         تعود حالته حسب تواريخ اشتراكه الآن: إذا انتهى الاشتراك أثناء الإيقاف يصبح «منتهي» حتى يدفع.
-      </Note>
+      </Notice>
     </ReasonOnlyDialog>
   );
 }
@@ -181,7 +123,7 @@ function RemoveCoverDialog({ merchant, onClose }: DialogProps) {
               toast.success("تمت إزالة الغلاف");
               onClose();
             },
-            onError: (error) => handleActionError(error, setError, onClose),
+            onError: onActionError(setError, onClose),
           },
         )
       }
@@ -208,14 +150,14 @@ function SuspendCardDialog({ merchant, card, onClose }: DialogProps & { card: Me
               toast.success("تم إيقاف البطاقة");
               onClose();
             },
-            onError: (error) => handleActionError(error, setError, onClose),
+            onError: onActionError(setError, onClose),
           },
         )
       }
     >
-      <Note>
+      <Notice>
         لا تقبل أختاماً جديدة، والهدايا المستحقة لزبائنها ({card.customers_count} زبون) تُسلَّم عادي.
-      </Note>
+      </Notice>
     </ReasonOnlyDialog>
   );
 }
@@ -268,7 +210,7 @@ function EditIdentityDialog({ merchant, onClose }: DialogProps) {
           toast.success("تم حفظ بيانات النشاط");
           onClose();
         },
-        onError: (error) => handleActionError(error, form.setError, onClose),
+        onError: onActionError(form.setError, onClose),
       },
     );
   });
@@ -286,10 +228,10 @@ function EditIdentityDialog({ merchant, onClose }: DialogProps) {
       reasonError={errors.reason?.message}
     >
       {registeredLongAgo && (
-        <Note tone="warning">
+        <Notice tone="warning">
           سُجّل هذا التاجر قبل أكثر من أسبوع ({formatDate(merchant.registered_at)}). تأكّد أن التعديل تصحيح وليس تغييراً
           لهوية النشاط.
-        </Note>
+        </Notice>
       )}
 
       <Field label="اسم النشاط" required disabled={pending} error={errors.business_name?.message}>
@@ -344,7 +286,7 @@ function ExtendTrialDialog({ merchant, onClose }: DialogProps) {
           toast.success("تم تمديد التجربة", { description: `أُضيف ${values.days} يوماً.` });
           onClose();
         },
-        onError: (error) => handleActionError(error, form.setError, onClose),
+        onError: onActionError(form.setError, onClose),
       },
     ),
   );

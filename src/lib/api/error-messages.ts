@@ -40,6 +40,7 @@ export const errorMessages: Partial<Record<ApiError["code"], ErrorText>> = {
   MERCHANT_STATUS_CONFLICT: "حالة التاجر تغيّرت ولم تعد تسمح بهذه العملية",
   DELETION_REQUEST_NOT_PENDING: "تم تنفيذ هذا الطلب أو إلغاؤه مسبقاً",
   REWARD_ALREADY_REDEEMED: "تم تسليم الهدية بالفعل، لا يمكن إلغاء الختم",
+  UNDER_AGE: ({ min_age }) => `العمر أقل من ${typeof min_age === "number" ? min_age : 13} سنة، وهو الحد الأدنى`,
 };
 
 /** `VALIDATION_FAILED` details.fields: each field maps to a list of rule names. */

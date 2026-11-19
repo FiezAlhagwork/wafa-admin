@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Check, Copy } from "@phosphor-icons/react";
-import { IconButton, toast } from "@/components/ui";
+import { IconButton } from "./IconButton";
+import { toast } from "./Toast";
 
 type CopyValueProps = {
   value: string;
@@ -10,7 +11,7 @@ type CopyValueProps = {
   label: string;
 };
 
-/** A code shown left-to-right with a button that copies it (the reviewer matches it against the account). */
+/** A code or number shown left-to-right with a button that copies it (a payment reference, a revealed phone). */
 export function CopyValue({ value, label }: CopyValueProps) {
   const [copied, setCopied] = useState(false);
 

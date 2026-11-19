@@ -1,17 +1,7 @@
 import { z } from "zod";
-import { REASON_MAX, REASON_MIN } from "@/components/ui";
+import { reasonField as reason } from "@/components/ui";
 
 // The server's rules (openapi.yaml), checked before sending. The server checks again; its 422 lands next to the field.
-
-const reason = z
-  .string()
-  .trim()
-  .min(REASON_MIN, `اكتب السبب (${REASON_MIN} أحرف على الأقل)`)
-  .max(REASON_MAX, `السبب أطول من ${REASON_MAX} حرفاً`);
-
-/** Suspend, reactivate, remove the cover, suspend a card: the reason only. */
-export const reasonSchema = z.object({ reason });
-export type ReasonFormValues = z.infer<typeof reasonSchema>;
 
 export const identitySchema = z.object({
   business_name: z.string().trim().min(2, "أدخل اسم النشاط (حرفان على الأقل)").max(80, "الاسم أطول من 80 حرفاً"),
