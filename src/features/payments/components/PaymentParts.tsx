@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { Icon } from "@phosphor-icons/react";
 import { Bank, DeviceMobile } from "@phosphor-icons/react/ssr";
 import { Avatar, Latin, StatusBadge } from "@/components/ui";
 import type { AdminPayment, PaymentMethod as Method } from "@/lib/api/types";
@@ -36,6 +37,9 @@ export function PaymentAmount({ payment, className }: PaymentProps) {
     </div>
   );
 }
+
+/** The icon of each payment method (the review dialog shows it in a badge). */
+export const MethodIcon: Record<Method, Icon> = { syriatel_cash: DeviceMobile, transfer: Bank };
 
 const methodIcons: Record<Method, ReactNode> = {
   syriatel_cash: <DeviceMobile aria-hidden className="size-4 shrink-0 text-fg-muted" />,

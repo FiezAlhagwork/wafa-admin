@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Plus, ShieldCheck } from "@phosphor-icons/react";
-import { Button, Card, EmptyState, ErrorState } from "@/components/ui";
+import { Button, ByWidth, Card, EmptyState, ErrorState } from "@/components/ui";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getErrorMessage } from "@/lib/api/errors";
 import type { AdminUser } from "@/lib/api/types";
@@ -11,16 +11,6 @@ import { AdminUserCards, AdminUserCardsSkeleton } from "../components/AdminUserC
 import { AdminUserFormDialog } from "../components/AdminUserFormDialog";
 import { AdminUsersTable, AdminUsersTableSkeleton } from "../components/AdminUsersTable";
 import { useAdminUsers } from "../hooks";
-
-/** Cards on small screens, the table from `lg` up: the list never scrolls sideways. */
-function ByWidth({ cards, table }: { cards: ReactNode; table: ReactNode }) {
-  return (
-    <>
-      <div className="lg:hidden">{cards}</div>
-      <div className="hidden lg:block">{table}</div>
-    </>
-  );
-}
 
 /** The accounts that can sign in to the dashboard, and the role of each. No pagination: the list is a small team. */
 export function AdminUsersScreen() {

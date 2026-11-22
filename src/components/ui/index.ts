@@ -1,6 +1,7 @@
 export { Avatar, initialsOf } from "./Avatar";
 export { Badge, type BadgeTone } from "./Badge";
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from "./Button";
+export { ByWidth } from "./ByWidth";
 export { Card, CardBody, CardHeader, IconTile, type IconTone } from "./Card";
 export { ConfirmDialog } from "./ConfirmDialog";
 export { CopyValue } from "./CopyValue";
@@ -14,6 +15,7 @@ export { Input } from "./Input";
 export { Latin } from "./Latin";
 export { LoadMore } from "./LoadMore";
 export { Menu, MenuGroup, MenuItem, MenuSeparator } from "./Menu";
+export { MetaPill } from "./MetaPill";
 export { Notice } from "./Notice";
 export { OtpField } from "./OtpField";
 export { RadioGroup, type RadioOption } from "./RadioGroup";
