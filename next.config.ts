@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   experimental: {
     agentUpgrade: "security",
+    // Two root layouts (website and dashboard): an unmatched URL gets app/global-not-found.tsx
+    globalNotFound: true,
   },
   turbopack: {
     rules: {

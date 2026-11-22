@@ -26,7 +26,7 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
           href="/"
           className="flex items-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
         >
-          <Image src="/brand/wafa-logo.png" alt={t("brand")} width={44} height={44} priority className="size-11" />
+          <Image src="/brand/wafa-logo.png" alt={t("brand")} width={44} height={44} preload className="size-11" />
         </Link>
         <Link
           href={pathname}
