@@ -1,7 +1,7 @@
 "use client";
 
+import { CaretLeft } from "@phosphor-icons/react";
 import {
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -29,7 +29,7 @@ function Head({ status }: { status: PaymentStatus }) {
         <TableHeaderCell className={cell}>الطريقة · الإرسال</TableHeaderCell>
         <TableHeaderCell className={cell}>{status === "PENDING" ? "تنبيهات" : "الحالة"}</TableHeaderCell>
         <TableHeaderCell className={cell}>
-          <span className="sr-only">إجراءات</span>
+          <span className="sr-only">فتح</span>
         </TableHeaderCell>
       </tr>
     </TableHead>
@@ -62,7 +62,7 @@ export function PaymentsTable({ payments, status, onOpen }: PaymentsTableProps) 
       <Head status={status} />
       <TableBody>
         {payments.map((payment) => (
-          <TableRow key={payment.id}>
+          <TableRow key={payment.id} className="relative cursor-pointer has-focus-visible:bg-neutral-50 has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-focus">
             <TableCell className={cell}>
               <PaymentMerchant payment={payment} className="max-w-60" />
             </TableCell>
@@ -90,10 +90,16 @@ export function PaymentsTable({ payments, status, onOpen }: PaymentsTableProps) 
               <PaymentBadges payment={payment} queue={queue} empty={<span className="text-fg-muted">—</span>} />
             </TableCell>
 
-            <TableCell className={`${cell} text-end`}>
-              <Button size="sm" variant="secondary" onClick={() => onOpen(payment)}>
-                {queue ? "مراجعة" : "عرض"}
-              </Button>
+            <TableCell className={`${cell} w-10 text-end`}>
+              {/* Stretched over the row (the row is `relative`): one real button per row, the whole row opens it */}
+              <button
+                type="button"
+                aria-label={`${queue ? "مراجعة" : "عرض"} الدفعة #${payment.id}`}
+                onClick={() => onOpen(payment)}
+                className="inline-flex cursor-pointer text-fg-subtle outline-none after:absolute after:inset-0 after:content-['']"
+              >
+                <CaretLeft aria-hidden className="size-4.5" />
+              </button>
             </TableCell>
           </TableRow>
         ))}

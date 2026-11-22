@@ -86,7 +86,8 @@ export function OverviewScreen() {
         }
       />
 
-      {overview.isError ? (
+      {/* Only with nothing to show: a failed background refetch keeps the numbers already on screen */}
+      {overview.isError && !data ? (
         <Card>
           <ErrorState
             description={getErrorMessage(overview.error)}

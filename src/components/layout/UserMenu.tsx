@@ -20,14 +20,14 @@ export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
       trigger={
         <button
           type="button"
-          aria-label="قائمة الحساب"
+          aria-label={collapsed ? `${user.name}، ${roleLabels[user.role]}` : undefined}
           className={cn(
             "flex w-full items-center gap-3 rounded-xl p-2 text-start transition-colors outline-none",
             "hover:bg-sidebar-hover focus-visible:ring-2 focus-visible:ring-amber data-popup-open:bg-sidebar-active",
             collapsed && "justify-center p-1.5",
           )}
         >
-          <Avatar name={name} seed={1} size="sm" className="rounded-full ring-2 ring-neutral-0/10" />
+          <Avatar name={name} seed={user.id} size="sm" className="rounded-full ring-2 ring-neutral-0/10" />
           {!collapsed && (
             <>
               <span className="flex min-w-0 flex-1 flex-col">

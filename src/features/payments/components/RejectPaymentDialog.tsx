@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Button, Dialog, RadioGroup, toast } from "@/components/ui";
-import { getErrorMessage, isApiError } from "@/lib/api/errors";
+import { toastActionError } from "@/lib/api/action-errors";
+import { isApiError } from "@/lib/api/errors";
 import type { AdminPayment, PaymentRejectionReason } from "@/lib/api/types";
 import { useRejectPayment } from "../hooks";
 import { rejectionReasonOptions } from "../labels";
@@ -30,7 +31,7 @@ export function RejectPaymentDialog({ payment, onCancel, onRejected }: RejectPay
           onRejected();
         },
         onError: (error) => {
-          toast.error(getErrorMessage(error));
+          toastActionError(error);
           // Someone else decided first: the item is refetched by the hook, there is nothing left to reject here
           if (isApiError(error) && error.code === "PAYMENT_NOT_PENDING") onCancel();
         },

@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { SignOut } from "@phosphor-icons/react";
@@ -28,6 +29,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   // Registered during render on purpose: it is an idempotent write, and it must be in place before the
   // first request below fires (an effect could run after the query starts and send it without a token).
   setTokenGetter(getToken);
+
+  // Signed out, here or in another tab (Clerk syncs the session across tabs): back to the sign-in page. Based on
+  // Clerk's own state, not on an API 401, so it can't loop when the origin is missing on the backend.
+  const router = useRouter();
+  const signedOut = isLoaded && !isSignedIn;
+  useEffect(() => {
+    if (signedOut) router.replace("/sign-in");
+  }, [signedOut, router]);
 
   const me = useQuery({
     queryKey: authKeys.me,

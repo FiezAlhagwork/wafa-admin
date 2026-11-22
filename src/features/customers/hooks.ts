@@ -20,6 +20,8 @@ export function useCustomerSearch(phone: string | null) {
     queryKey: customersKeys.search(phone ?? ""),
     queryFn: () => findCustomer(phone ?? ""),
     enabled: phone !== null,
+    // The key holds the full number: dropped as soon as the search screen is gone
+    gcTime: 0,
   });
 }
 
@@ -27,13 +29,8 @@ export function useCustomer(id: number) {
   return useQuery({ queryKey: customersKeys.detail(id), queryFn: () => getCustomer(id) });
 }
 
-/** `null` while no cycle is open. */
-export function useCardCycle(id: number | null) {
-  return useQuery({
-    queryKey: customersKeys.cycle(id ?? 0),
-    queryFn: () => getCardCycle(id ?? 0),
-    enabled: id !== null,
-  });
+export function useCardCycle(id: number) {
+  return useQuery({ queryKey: customersKeys.cycle(id), queryFn: () => getCardCycle(id) });
 }
 
 export function useUpdateCustomerBirthdate() {

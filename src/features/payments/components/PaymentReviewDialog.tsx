@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { createElement, useState, type MouseEvent, type ReactNode } from "react";
 import Image from "next/image";
-import { ArrowClockwise, Bank, DeviceMobile, ImageBroken, Warning } from "@phosphor-icons/react";
+import { ArrowClockwise, ImageBroken, Warning } from "@phosphor-icons/react";
 import { Badge, Button, ConfirmDialog, CopyValue, Dialog, focusRing, Skeleton, StatusBadge, toast } from "@/components/ui";
-import { getErrorMessage, isApiError } from "@/lib/api/errors";
-import type { AdminPayment, PaymentMethod } from "@/lib/api/types";
+import { toastActionError } from "@/lib/api/action-errors";
+import { isApiError } from "@/lib/api/errors";
+import type { AdminPayment } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDateTime, formatDecimal, formatRelativeDays, formatSyp, formatUsd } from "@/lib/format";
 import { useApprovePayment, usePayment } from "../hooks";
 import { formatDuration, methodLabels, rejectionReasonLabels } from "../labels";
+import { MethodIcon } from "./PaymentParts";
 import { RejectPaymentDialog } from "./RejectPaymentDialog";
 
 type PaymentReviewDialogProps = {
@@ -25,10 +27,6 @@ export function PaymentReviewDialog({ payment, onClose }: PaymentReviewDialogPro
 
 type Confirm = "approve" | "reject" | null;
 
-const methodIcons: Record<PaymentMethod, ReactNode> = {
-  syriatel_cash: <DeviceMobile />,
-  transfer: <Bank />,
-};
 
 function ReviewContent({ payment, onClose }: { payment: AdminPayment; onClose: () => void }) {
   const query = usePayment(payment.id, payment);
@@ -51,7 +49,7 @@ function ReviewContent({ payment, onClose }: { payment: AdminPayment; onClose: (
         onClose();
       },
       onError: (error) => {
-        toast.error(getErrorMessage(error));
+        toastActionError(error);
         // Someone else decided first: the hook refetches the payment, which then shows its real state
         if (isApiError(error) && error.code === "PAYMENT_NOT_PENDING") setConfirm(null);
       },
@@ -101,6 +99,10 @@ function ReviewContent({ payment, onClose }: { payment: AdminPayment; onClose: (
               loading={loadingProof}
               refreshing={query.isFetching}
               onRefresh={() => void query.refetch()}
+              fetchFreshUrl={async () => {
+                const { data } = await query.refetch();
+                return data?.proof_url ?? null;
+              }}
             />
           </div>
 
@@ -118,7 +120,7 @@ function ReviewContent({ payment, onClose }: { payment: AdminPayment; onClose: (
               {current.package.name} · {formatDuration(current.duration_months)}
             </Row>
             <Row label="طريقة الدفع">
-              <Badge tone="neutral" icon={methodIcons[current.method]}>
+              <Badge tone="neutral" icon={createElement(MethodIcon[current.method])}>
                 {methodLabels[current.method]}
               </Badge>
             </Row>
@@ -211,13 +213,15 @@ type ProofImageProps = {
   loading: boolean;
   refreshing: boolean;
   onRefresh: () => void;
+  /** A freshly signed URL for the full-size view (the one on screen may have expired while the dialog stayed open). */
+  fetchFreshUrl: () => Promise<string | null>;
 };
 
 // A thumbnail on small screens (tap it to open the full image), a roomy picture from `md`
 const proofBox = "h-44 md:h-80";
 
 /** The proof image. Keyed by its URL, so a refreshed link gets a clean "broken" state. */
-function ProofImage({ url, loading, refreshing, onRefresh }: ProofImageProps) {
+function ProofImage({ url, loading, refreshing, onRefresh, fetchFreshUrl }: ProofImageProps) {
   const [broken, setBroken] = useState(false);
 
   if (loading) return <Skeleton className={cn(proofBox, "w-full rounded-lg")} />;
@@ -248,11 +252,23 @@ function ProofImage({ url, loading, refreshing, onRefresh }: ProofImageProps) {
     );
   }
 
+  // The tab opens at once (inside the click, so it is not blocked as a popup), then gets the freshly signed URL
+  const openFull = async (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const tab = window.open("", "_blank");
+    if (!tab) return;
+    tab.opener = null;
+    const fresh = await fetchFreshUrl().catch(() => null);
+    if (fresh) tab.location.href = fresh;
+    else tab.close();
+  };
+
   return (
     <a
       href={url}
       target="_blank"
       rel="noreferrer"
+      onClick={(event) => void openFull(event)}
       aria-label="فتح صورة الإثبات بحجم كامل في تبويب جديد"
       className={cn("relative block overflow-hidden rounded-lg border border-border bg-neutral-50", proofBox, focusRing)}
     >
@@ -262,7 +278,6 @@ function ProofImage({ url, loading, refreshing, onRefresh }: ProofImageProps) {
         alt="صورة إثبات الدفع"
         fill
         unoptimized
-        sizes="(min-width: 768px) 18rem, 100vw"
         className="object-contain"
         onError={() => setBroken(true)}
       />

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Eye, EyeSlash, Phone } from "@phosphor-icons/react";
-import { ConfirmDialog, CopyValue, Latin, toast } from "@/components/ui";
-import { getErrorMessage, toApiError } from "@/lib/api/errors";
+import { ConfirmDialog, CopyValue, Latin } from "@/components/ui";
+import { toastActionError } from "@/lib/api/action-errors";
 import type { AdminCustomer } from "@/lib/api/types";
 import { usePermission } from "@/lib/auth/can";
 import { useRevealCustomerPhone } from "../hooks";
@@ -28,8 +28,7 @@ export function RevealPhone({ customer }: { customer: AdminCustomer }) {
         setConfirming(false);
       },
       onError: (error) => {
-        // 403 is shown once by the query client
-        if (toApiError(error).code !== "FORBIDDEN") toast.error(getErrorMessage(error));
+        toastActionError(error);
         setConfirming(false);
       },
     });

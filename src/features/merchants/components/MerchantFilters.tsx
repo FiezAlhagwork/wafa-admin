@@ -17,28 +17,41 @@ type MerchantFiltersProps = {
 /** Status tabs, search and "trial ends this week". The search waits for a pause in typing before it reaches the URL. */
 export function MerchantFilters({ filters, onChange }: MerchantFiltersProps) {
   const [text, setText] = useState(filters.q);
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // The last search this box sent: when the URL catches up with it, the box keeps what was typed since
+  const [sentQ, setSentQ] = useState(filters.q);
 
   // The URL changed from outside (back button, a link): the box follows it
   const [seenQ, setSeenQ] = useState(filters.q);
   if (filters.q !== seenQ) {
     setSeenQ(filters.q);
-    setText(filters.q);
+    if (filters.q !== sentQ) setText(filters.q);
   }
 
-  // A pending search must not fire after the screen is gone (it would pull the user back to this list)
-  useEffect(() => () => clearTimeout(timer.current), []);
+  // The search reaches the URL after a pause in typing. The cleanup also stops a pending search once the screen is
+  // gone (it would pull the user back to this list).
+  const pending = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    if (text === filters.q) return;
+    pending.current = setTimeout(() => {
+      setSentQ(text);
+      onChange({ ...filters, q: text });
+    }, SEARCH_DELAY_MS);
+    return () => clearTimeout(pending.current);
+  }, [text, filters, onChange]);
 
-  const search = (next: string) => {
-    setText(next);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => onChange({ ...filters, q: next }), SEARCH_DELAY_MS);
+  // Any other filter change sends what is typed with it and drops the pending search: a tab clicked while typing is
+  // kept, never undone by an older timer that fires before the URL has caught up.
+  const commit = (next: Filters) => {
+    clearTimeout(pending.current);
+    setSentQ(next.q);
+    onChange(next);
   };
 
+  const search = (next: string) => setText(next);
+
   const clear = () => {
-    clearTimeout(timer.current);
     setText("");
-    onChange({ ...filters, q: "" });
+    commit({ ...filters, q: "" });
   };
 
   const tooShort = text.trim().length === 1;
@@ -48,7 +61,7 @@ export function MerchantFilters({ filters, onChange }: MerchantFiltersProps) {
       <Tabs
         label="حالة التاجر"
         value={filters.status}
-        onValueChange={(status) => onChange({ ...filters, status })}
+        onValueChange={(status) => commit({ ...filters, status, q: text })}
         items={statusOptions}
         className="px-3"
       />
@@ -88,7 +101,7 @@ export function MerchantFilters({ filters, onChange }: MerchantFiltersProps) {
               ? "border-brand bg-brand-soft text-brand hover:bg-brand-soft active:bg-brand-soft"
               : "border-dashed border-neutral-400 font-medium text-neutral-700",
           )}
-          onClick={() => onChange({ ...filters, trialEnding: !filters.trialEnding })}
+          onClick={() => commit({ ...filters, trialEnding: !filters.trialEnding, q: text })}
         >
           تنتهي تجربته هذا الأسبوع
           {filters.trialEnding && <X aria-hidden className="size-3.5" />}

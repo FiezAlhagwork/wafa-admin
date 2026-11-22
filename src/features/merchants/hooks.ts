@@ -1,7 +1,9 @@
 "use client";
 
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { customersKeys } from "@/features/customers/keys";
 import { overviewKeys } from "@/features/overview/keys";
+import { paymentsKeys } from "@/features/payments/keys";
 import type { AdminMerchantDetail } from "@/lib/api/types";
 import { merchantsKeys, type MerchantsQuery } from "./keys";
 import {
@@ -31,7 +33,8 @@ export function useMerchant(id: number) {
 }
 
 /**
- * After any merchant action: every merchants list and detail, and the home page (its counts and alerts change).
+ * After any merchant action: every merchants list and detail, the home page (its counts and alerts change), and the
+ * payments and customers (they show the merchant's name and its cards' status).
  * Also runs after a failure on purpose: MERCHANT_STATUS_CONFLICT / TRIAL_NOT_EXTENDABLE mean someone else changed
  * the merchant first, so the page is refetched.
  */
@@ -40,6 +43,8 @@ function useRefreshAfterAction() {
   return () => {
     void queryClient.invalidateQueries({ queryKey: merchantsKeys.all });
     void queryClient.invalidateQueries({ queryKey: overviewKeys.all });
+    void queryClient.invalidateQueries({ queryKey: paymentsKeys.all });
+    void queryClient.invalidateQueries({ queryKey: customersKeys.all });
   };
 }
 

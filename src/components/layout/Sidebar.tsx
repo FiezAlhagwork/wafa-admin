@@ -41,7 +41,7 @@ export function Sidebar({ collapsed = false, onNavigate, pathname }: SidebarProp
           collapsed && "mx-3 justify-center px-0",
         )}
       >
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-neutral-0 shadow-[0_0_0_4px_rgb(255_255_255/0.06)]">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-neutral-0 ring-4 ring-neutral-0/6">
           <Image src="/brand/wafa-logo.png" alt="" width={26} height={26} className="size-6.5" />
         </span>
         {!collapsed && (

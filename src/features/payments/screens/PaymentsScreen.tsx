@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle, Receipt } from "@phosphor-icons/react";
-import { Card, EmptyState, ErrorState, LoadMore, Tabs } from "@/components/ui";
+import { ByWidth, Card, EmptyState, ErrorState, LoadMore, Tabs } from "@/components/ui";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getErrorMessage } from "@/lib/api/errors";
 import type { AdminPayment, PaymentStatus } from "@/lib/api/types";
@@ -20,16 +20,6 @@ const emptyStates: Record<PaymentStatus, { title: string; description: string }>
   APPROVED: { title: "لا توجد دفعات مقبولة بعد", description: "ستظهر هنا الدفعات التي تتم الموافقة عليها." },
   REJECTED: { title: "لا توجد دفعات مرفوضة", description: "ستظهر هنا الدفعات التي يتم رفضها مع السبب." },
 };
-
-/** Cards on small screens, the table from `lg` up: the list never scrolls sideways. */
-function ByWidth({ cards, table }: { cards: ReactNode; table: ReactNode }) {
-  return (
-    <>
-      <div className="lg:hidden">{cards}</div>
-      <div className="hidden lg:block">{table}</div>
-    </>
-  );
-}
 
 /** The payment review queue. The status tab lives in the URL (`?status=`), so a view can be saved and shared. */
 export function PaymentsScreen() {
@@ -80,6 +70,7 @@ export function PaymentsScreen() {
           hasNextPage={query.hasNextPage}
           loading={query.isFetchingNextPage}
           onLoadMore={() => void query.fetchNextPage()}
+          failed={query.isFetchNextPageError}
         />
       </>
     );
