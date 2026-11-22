@@ -145,7 +145,7 @@ export function SignInScreen() {
         )}
       >
         <header className="flex animate-enter flex-col items-center gap-3 text-center motion-reduce:animate-none">
-          <Image src="/brand/wafa-logo.png" alt="" width={56} height={56} priority className="size-14" />
+          <Image src="/brand/wafa-logo.png" alt="" width={56} height={56} preload className="size-14" />
           <span aria-hidden className="h-1 w-10 rounded-full bg-amber" />
           <h1 className="text-2xl font-bold text-fg">لوحة وفا</h1>
         </header>

@@ -20,12 +20,12 @@ import {
   User,
   WarningCircle,
 } from "@phosphor-icons/react/ssr";
-import { Avatar, Card, CardHeader, EmptyState, Latin, StatusBadge } from "@/components/ui";
+import { Avatar, Card, CardHeader, EmptyState, Latin, MetaPill, StatusBadge } from "@/components/ui";
 import { formatDuration, methodLabels } from "@/features/payments/labels";
 import type { AdminMerchantDetail, MerchantCard } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDate, formatDateTime, formatDayCount, formatNumber, formatRelativeDays, formatSyp, formatUsd } from "@/lib/format";
-import { periodTypeLabels, registrationStepLabels } from "../labels";
+import { cardStatusLabels, periodTypeLabels, registrationStepLabels } from "../labels";
 
 // The sections of the merchant page. They only show: the actions open dialogs through the callbacks the screen passes
 // (none when the role may not take that action).
@@ -33,16 +33,6 @@ import { periodTypeLabels, registrationStepLabels } from "../labels";
 type MerchantProps = { merchant: AdminMerchantDetail };
 
 const dash = <span className="text-fg-muted">—</span>;
-
-/** A fact about the merchant under its name: an icon and a short text on a soft pill. */
-function MetaPill({ icon, children }: { icon: ReactNode; children: ReactNode }) {
-  return (
-    <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-neutral-50 px-3 text-[13.5px] text-neutral-700 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-fg-muted">
-      {icon}
-      {children}
-    </span>
-  );
-}
 
 /** Logo, name, state, the facts and the headline numbers: the top of the page. The cover lives on the identity card. */
 export function MerchantHero({ merchant, actions }: MerchantProps & { actions?: ReactNode }) {
@@ -296,7 +286,7 @@ function CoverImage({ url, onRemove }: { url: string | null; onRemove?: () => vo
         aria-label="عرض الغلاف بالحجم الكامل"
         className="group/cover relative block aspect-2/1 overflow-hidden rounded-xl ring-1 ring-ink/8 outline-none focus-visible:ring-2 focus-visible:ring-focus"
       >
-        <Image src={url} alt="" fill unoptimized sizes="(min-width: 1024px) 22rem, 100vw" className="object-cover" />
+        <Image src={url} alt="" fill unoptimized className="object-cover" />
         <span className="absolute end-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-medium text-neutral-0 opacity-0 backdrop-blur-sm transition-opacity group-hover/cover:opacity-100 group-focus-visible/cover:opacity-100">
           <ArrowsOut aria-hidden className="size-3.5" />
           عرض بالحجم الكامل
@@ -386,7 +376,7 @@ export function CardsList({ merchant, onSuspendCard }: MerchantProps & { onSuspe
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-[17px] font-black">{card.name}</span>
                   <span className="shrink-0 rounded-full bg-neutral-0/15 px-2.5 py-0.5 text-xs font-bold">
-                    {suspended ? "موقوفة" : "فعّالة"}
+                    {cardStatusLabels[card.status]}
                   </span>
                 </div>
                 <div aria-hidden className="flex flex-wrap gap-1.5">

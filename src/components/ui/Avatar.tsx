@@ -3,11 +3,11 @@ import { cn } from "@/lib/cn";
 
 type AvatarSize = "sm" | "md" | "lg" | "xl";
 
-const sizes: Record<AvatarSize, { box: string; text: string; px: string }> = {
-  sm: { box: "size-9 rounded-xl", text: "text-sm", px: "2.25rem" },
-  md: { box: "size-10.5 rounded-xl", text: "text-[15px]", px: "2.625rem" },
-  lg: { box: "size-14 rounded-2xl", text: "text-xl", px: "3.5rem" },
-  xl: { box: "size-24 rounded-3xl", text: "text-3xl", px: "6rem" },
+const sizes: Record<AvatarSize, { box: string; text: string }> = {
+  sm: { box: "size-9 rounded-xl", text: "text-sm" },
+  md: { box: "size-10.5 rounded-xl", text: "text-[15px]" },
+  lg: { box: "size-14 rounded-2xl", text: "text-xl" },
+  xl: { box: "size-24 rounded-3xl", text: "text-3xl" },
 };
 
 // Soft background + matching text. Amber keeps ink text (never white or amber text).
@@ -38,7 +38,7 @@ type AvatarProps = {
 
 /** A record's picture: its logo when it has one, otherwise its initials on a soft color. Decorative: the name is always next to it. */
 export function Avatar({ name, src, seed = 0, size = "md", className }: AvatarProps) {
-  const { box, text, px } = sizes[size];
+  const { box, text } = sizes[size];
 
   return (
     <span
@@ -51,7 +51,7 @@ export function Avatar({ name, src, seed = 0, size = "md", className }: AvatarPr
         className,
       )}
     >
-      {src ? <Image src={src} alt="" fill unoptimized sizes={px} className="object-cover" /> : initialsOf(name)}
+      {src ? <Image src={src} alt="" fill unoptimized className="object-cover" /> : initialsOf(name)}
     </span>
   );
 }

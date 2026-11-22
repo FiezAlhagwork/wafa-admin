@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CaretRight } from "@phosphor-icons/react";
+import { BackLink } from "@/components/layout/BackLink";
 import { Button, Card, ErrorState, Skeleton } from "@/components/ui";
 import { getErrorMessage } from "@/lib/api/errors";
 import { usePermission } from "@/lib/auth/can";
@@ -23,31 +23,6 @@ type MerchantDetailScreenProps = {
   /** Back to the list. By default a link to `/admin/merchants`; the dev preview passes its own. */
   onBack?: () => void;
 };
-
-const backClass =
-  "inline-flex items-center gap-1 self-start rounded-md text-sm text-fg-muted transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-bg outline-none";
-
-function BackToList({ onBack }: { onBack?: () => void }) {
-  const content = (
-    <>
-      <CaretRight aria-hidden className="size-4" />
-      التجار
-    </>
-  );
-  // The caret points toward the list: right in RTL is "back", so it keeps its direction (no flip)
-  if (onBack) {
-    return (
-      <button type="button" onClick={onBack} className={backClass}>
-        {content}
-      </button>
-    );
-  }
-  return (
-    <Link href="/admin/merchants" className={backClass}>
-      {content}
-    </Link>
-  );
-}
 
 function DetailSkeleton() {
   return (
@@ -72,9 +47,10 @@ export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) 
   const canSuspend = usePermission("suspend-merchants");
 
   let body;
-  if (query.isPending) {
+  // Nothing to show yet. With data on screen, a failed background refetch keeps it instead of an error
+  if (query.data === undefined && !query.isError) {
     body = <DetailSkeleton />;
-  } else if (query.isError) {
+  } else if (query.data === undefined) {
     body = (
       <Card>
         <ErrorState
@@ -127,7 +103,7 @@ export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) 
 
   return (
     <div className="flex flex-col gap-5">
-      <BackToList onBack={onBack} />
+      <BackLink href="/admin/merchants" label="التجار" onBack={onBack} />
       {body}
     </div>
   );

@@ -113,6 +113,35 @@ const adminUserSeeds: AdminUser[] = [
   { id: 4, name: "هالة المدير", email: "hala.admin@example.com", role: "admin", is_active: false, linked: true, last_login_at: hoursAgo(24 * 40) },
 ];
 
+/**
+ * Failures the preview can cause on purpose (the "أعطال" row in /dev/shell), to see paths the fixtures never reach:
+ * - `next`: the next write (any non-GET) answers 403 or 429 once, then this resets to null.
+ * - `failNextPage`: every "load more" (a GET with a cursor past the first page) answers 500 until it is turned off.
+ */
+export type MockFaults = { next: "forbidden" | "rate-limited" | null; failNextPage: boolean };
+
+let faults: MockFaults = { next: null, failNextPage: false };
+const faultListeners = new Set<() => void>();
+
+export function setMockFault(change: Partial<MockFaults>) {
+  faults = { ...faults, ...change };
+  faultListeners.forEach((listener) => listener());
+}
+
+export const getMockFaults = () => faults;
+
+/** For useSyncExternalStore: the toolbar re-renders when a one-shot fault is used up. */
+export function subscribeMockFaults(listener: () => void) {
+  faultListeners.add(listener);
+  return () => {
+    faultListeners.delete(listener);
+  };
+}
+
+// A real URL (Chrome refuses to open a data: URL in a new tab), signed anew on every fetch like the server's
+let proofSignature = 0;
+const freshProofUrl = () => `/dev/proof-sample.svg?sig=${++proofSignature}`;
+
 const PAGE_SIZE = 3; // small on purpose, so "load more" shows up in the preview
 const LATENCY_MS = 350;
 
@@ -157,6 +186,16 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
 
     const url = config.url ?? "";
     const method = (config.method ?? "get").toLowerCase();
+
+    if (method !== "get" && faults.next) {
+      const fault = faults.next;
+      setMockFault({ next: null });
+      if (fault === "forbidden") throw failure(config, 403, "FORBIDDEN");
+      throw failure(config, 429, "RATE_LIMITED", { retry_after_seconds: 30 });
+    }
+    if (method === "get" && faults.failNextPage && Number(config.params?.cursor ?? 0) > 0) {
+      throw failure(config, 500, "SERVER_ERROR");
+    }
 
     if (url === "/admin/overview") return respond(config, { data: overview(canSeeFinance) });
 
@@ -367,7 +406,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
     const payment = detail ? payments.find((item) => item.id === Number(detail[1])) : undefined;
     if (!detail || !payment) throw failure(config, 404, "NOT_FOUND");
 
-    if (!detail[2]) return respond(config, { data: payment });
+    if (!detail[2]) return respond(config, { data: { ...payment, proof_url: freshProofUrl() } });
 
     if (payment.status !== "PENDING") throw failure(config, 409, "PAYMENT_NOT_PENDING", { status: payment.status });
 

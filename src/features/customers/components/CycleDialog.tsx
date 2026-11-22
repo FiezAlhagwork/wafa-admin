@@ -148,21 +148,24 @@ function CancelStampDialog({ stamp, onClose }: { stamp: CycleStamp; onClose: () 
 }
 
 type CycleDialogProps = {
-  /** The cycle to show, or `null` when closed. */
-  cycleId: number | null;
+  cycleId: number;
   /** Its title while it loads (from the customer page's row). */
   title: string;
   onClose: () => void;
 };
 
-/** A cycle's stamps in order, the cancelled ones too. With `cancel-stamps`, a wrong stamp is cancelled from here. */
+/**
+ * A cycle's stamps in order, the cancelled ones too. With `cancel-stamps`, a wrong stamp is cancelled from here.
+ * Mounted only while open (like the other dialogs), so closing never flashes an empty, loading dialog.
+ */
 export function CycleDialog({ cycleId, title, onClose }: CycleDialogProps) {
   const query = useCardCycle(cycleId);
   const canCancel = usePermission("cancel-stamps");
   const [stampToCancel, setStampToCancel] = useState<CycleStamp | null>(null);
 
   let body;
-  if (query.isPending) {
+  // Nothing to show yet. With data on screen, a failed background refetch keeps it instead of an error
+  if (query.data === undefined && !query.isError) {
     body = (
       <div aria-hidden className="flex flex-col gap-4">
         <Skeleton className="h-24 w-full rounded-xl" />
@@ -170,7 +173,7 @@ export function CycleDialog({ cycleId, title, onClose }: CycleDialogProps) {
         <Skeleton className="h-12 w-full" />
       </div>
     );
-  } else if (query.isError) {
+  } else if (query.data === undefined) {
     body = (
       <ErrorState description={getErrorMessage(query.error)} onRetry={() => void query.refetch()} retrying={query.isFetching} />
     );
@@ -180,18 +183,17 @@ export function CycleDialog({ cycleId, title, onClose }: CycleDialogProps) {
 
   const cycle = query.data;
   return (
-    <>
-      <Dialog
-        open={cycleId !== null}
-        onOpenChange={(open) => !open && onClose()}
-        size="lg"
-        sheet
-        title={cycle ? `${cycle.card.name} · ${cycle.merchant.business_name}` : title}
-        footer={<DialogClose>إغلاق</DialogClose>}
-      >
-        {body}
-      </Dialog>
+    <Dialog
+      open
+      onOpenChange={(open) => !open && onClose()}
+      size="lg"
+      sheet
+      title={cycle ? `${cycle.card.name} · ${cycle.merchant.business_name}` : title}
+      footer={<DialogClose>إغلاق</DialogClose>}
+    >
+      {body}
+      {/* Inside the cycle dialog, so focus and Esc go to the confirmation on top of it */}
       {stampToCancel && <CancelStampDialog stamp={stampToCancel} onClose={() => setStampToCancel(null)} />}
-    </>
+    </Dialog>
   );
 }

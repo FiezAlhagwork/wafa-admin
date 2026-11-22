@@ -1,7 +1,7 @@
 "use client";
 
+import { CaretLeft } from "@phosphor-icons/react";
 import {
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -26,7 +26,7 @@ function Head() {
         <TableHeaderCell className={cell}>الحالة</TableHeaderCell>
         <TableHeaderCell className={cell}>آخر دخول</TableHeaderCell>
         <TableHeaderCell className={cell}>
-          <span className="sr-only">إجراءات</span>
+          <span className="sr-only">فتح</span>
         </TableHeaderCell>
       </tr>
     </TableHead>
@@ -57,7 +57,7 @@ export function AdminUsersTable({ users, selfId, onOpen }: AdminUsersTableProps)
       <Head />
       <TableBody>
         {users.map((user) => (
-          <TableRow key={user.id}>
+          <TableRow key={user.id} className="relative cursor-pointer has-focus-visible:bg-neutral-50 has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-focus">
             <TableCell className={cell}>
               <AdminUserIdentity user={user} isSelf={user.id === selfId} className="max-w-80" />
             </TableCell>
@@ -70,10 +70,16 @@ export function AdminUsersTable({ users, selfId, onOpen }: AdminUsersTableProps)
             <TableCell className={cell}>
               <LastLogin user={user} />
             </TableCell>
-            <TableCell className={`${cell} text-end`}>
-              <Button size="sm" variant="secondary" onClick={() => onOpen(user)}>
-                تعديل
-              </Button>
+            <TableCell className={`${cell} w-10 text-end`}>
+              {/* Stretched over the row (the row is `relative`): one real button per row, the whole row opens it */}
+              <button
+                type="button"
+                aria-label={`تعديل حساب ${user.name}`}
+                onClick={() => onOpen(user)}
+                className="inline-flex cursor-pointer text-fg-subtle outline-none after:absolute after:inset-0 after:content-['']"
+              >
+                <CaretLeft aria-hidden className="size-4.5" />
+              </button>
             </TableCell>
           </TableRow>
         ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Button } from "@/components/ui";
 import { PermissionGate } from "@/components/layout/PermissionGate";
 import { Shell } from "@/components/layout/Shell";
@@ -14,7 +14,8 @@ import { OverviewScreen } from "@/features/overview/screens/OverviewScreen";
 import { PaymentsScreen } from "@/features/payments/screens/PaymentsScreen";
 import type { AdminPermission, AdminRole, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
-import { createMockApi, type MockScenario } from "../mock-api";
+import { createQueryClient } from "@/lib/query-client";
+import { createMockApi, getMockFaults, setMockFault, subscribeMockFaults, type MockScenario } from "../mock-api";
 
 type Page = "overview" | "payments" | "merchants" | "customers" | "admin-users";
 
@@ -113,15 +114,54 @@ export function ShellPreviewScreen() {
             </Button>
           ))}
         </div>
+        <FaultControls />
       </div>
     </>
   );
 }
 
-function PreviewApp({ scenario, page }: { scenario: ScenarioInfo; page: Page }) {
-  const [client] = useState(
-    () => new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } }),
+/** Causes the failures the fixtures never reach (403/429 on the next write, a failing "load more"). */
+function FaultControls() {
+  const faults = useSyncExternalStore(subscribeMockFaults, getMockFaults, getMockFaults);
+  const toggleNext = (next: "forbidden" | "rate-limited") =>
+    setMockFault({ next: faults.next === next ? null : next });
+
+  return (
+    <div className="flex flex-wrap items-center gap-1 border-t border-border pt-1">
+      <span className="px-2 text-xs text-fg-muted">أعطال</span>
+      <Button size="sm" variant={faults.next === "forbidden" ? "danger" : "ghost"} onClick={() => toggleNext("forbidden")}>
+        403 للعملية الجاية
+      </Button>
+      <Button
+        size="sm"
+        variant={faults.next === "rate-limited" ? "danger" : "ghost"}
+        onClick={() => toggleNext("rate-limited")}
+      >
+        429 للعملية الجاية
+      </Button>
+      <Button
+        size="sm"
+        variant={faults.failNextPage ? "danger" : "ghost"}
+        aria-pressed={faults.failNextPage}
+        onClick={() => setMockFault({ failNextPage: !faults.failNextPage })}
+      >
+        فشل تحميل المزيد
+      </Button>
+    </div>
   );
+}
+
+function PreviewApp({ scenario, page }: { scenario: ScenarioInfo; page: Page }) {
+  // The dashboard's own client (its shared 403/429 toasts included), without retries and focus refetches
+  const [client] = useState(() => {
+    const queryClient = createQueryClient();
+    const defaults = queryClient.getDefaultOptions();
+    queryClient.setDefaultOptions({
+      ...defaults,
+      queries: { ...defaults.queries, retry: false, refetchOnWindowFocus: false },
+    });
+    return queryClient;
+  });
   const [mock] = useState(() => createMockApi(scenario.id));
 
   // Active before the first child effect fires its requests; the effect re-activates after StrictMode's fake unmount

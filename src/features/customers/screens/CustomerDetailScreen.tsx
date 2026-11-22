@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CaretRight, Cake } from "@phosphor-icons/react";
+import { Cake } from "@phosphor-icons/react";
+import { BackLink } from "@/components/layout/BackLink";
 import { Button, Card, ErrorState, Skeleton } from "@/components/ui";
 import { getErrorMessage } from "@/lib/api/errors";
 import type { CustomerCycle } from "@/lib/api/types";
@@ -18,31 +19,6 @@ type CustomerDetailScreenProps = {
   onBack?: () => void;
 };
 
-const backClass =
-  "inline-flex items-center gap-1 self-start rounded-md text-sm text-fg-muted transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-bg outline-none";
-
-function BackToSearch({ onBack }: { onBack?: () => void }) {
-  // The caret points toward the search: right in RTL is "back", so it keeps its direction
-  const content = (
-    <>
-      <CaretRight aria-hidden className="size-4" />
-      الزبائن
-    </>
-  );
-  if (onBack) {
-    return (
-      <button type="button" onClick={onBack} className={backClass}>
-        {content}
-      </button>
-    );
-  }
-  return (
-    <Link href="/admin/customers" className={backClass}>
-      {content}
-    </Link>
-  );
-}
-
 /** One customer: who they are, the phone behind a logged reveal, the birthdate fix, and their cycles. */
 export function CustomerDetailScreen({ id, onBack }: CustomerDetailScreenProps) {
   const query = useCustomer(id);
@@ -52,14 +28,15 @@ export function CustomerDetailScreen({ id, onBack }: CustomerDetailScreenProps) 
   const [now] = useState(() => new Date());
 
   let body;
-  if (query.isPending) {
+  // Nothing to show yet. With data on screen, a failed background refetch keeps it instead of an error
+  if (query.data === undefined && !query.isError) {
     body = (
       <div aria-hidden className="flex flex-col gap-5">
         <Skeleton className="h-44 w-full rounded-2xl" />
         <Skeleton className="h-72 w-full rounded-2xl" />
       </div>
     );
-  } else if (query.isError) {
+  } else if (query.data === undefined) {
     body = (
       <Card>
         <ErrorState
@@ -96,11 +73,13 @@ export function CustomerDetailScreen({ id, onBack }: CustomerDetailScreenProps) 
           }
         />
         <CyclesList customer={customer} onOpen={setOpenCycle} />
-        <CycleDialog
-          cycleId={openCycle?.id ?? null}
-          title={openCycle ? `${openCycle.card.name} · ${openCycle.merchant.business_name}` : ""}
-          onClose={() => setOpenCycle(null)}
-        />
+        {openCycle && (
+          <CycleDialog
+            cycleId={openCycle.id}
+            title={`${openCycle.card.name} · ${openCycle.merchant.business_name}`}
+            onClose={() => setOpenCycle(null)}
+          />
+        )}
         {editingBirthdate && <BirthdateDialog customer={customer} onClose={() => setEditingBirthdate(false)} />}
       </>
     );
@@ -108,7 +87,7 @@ export function CustomerDetailScreen({ id, onBack }: CustomerDetailScreenProps) 
 
   return (
     <div className="flex flex-col gap-5">
-      <BackToSearch onBack={onBack} />
+      <BackLink href="/admin/customers" label="الزبائن" onBack={onBack} />
       {body}
     </div>
   );

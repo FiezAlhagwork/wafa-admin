@@ -3,20 +3,11 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { BellSlash, Cake, Calendar, ClockCounterClockwise, Seal, Storefront } from "@phosphor-icons/react";
-import { Avatar, Badge, Card, CardHeader, EmptyState } from "@/components/ui";
+import { Avatar, Badge, Card, CardHeader, EmptyState, MetaPill } from "@/components/ui";
 import type { AdminCustomer, CustomerCycle } from "@/lib/api/types";
 import { ageFromBirthdate, formatDate, formatDay, formatYears } from "@/lib/format";
 import { customerName, CycleStatusBadge, RegisteredBadge, StampsProgress } from "./CustomerParts";
 import { RevealPhone } from "./RevealPhone";
-
-function MetaPill({ icon, children }: { icon: ReactNode; children: ReactNode }) {
-  return (
-    <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-neutral-50 px-3 text-[13.5px] text-neutral-700 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-fg-muted">
-      {icon}
-      {children}
-    </span>
-  );
-}
 
 type CustomerHeroProps = {
   customer: AdminCustomer;

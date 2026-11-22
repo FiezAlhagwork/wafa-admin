@@ -1,9 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MagnifyingGlass, Storefront } from "@phosphor-icons/react";
-import { Button, Card, EmptyState, ErrorState, LoadMore } from "@/components/ui";
+import { Button, ByWidth, Card, EmptyState, ErrorState, LoadMore } from "@/components/ui";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getErrorMessage } from "@/lib/api/errors";
 import { cn } from "@/lib/cn";
@@ -12,16 +11,6 @@ import { MerchantFilters } from "../components/MerchantFilters";
 import { MerchantsTable, MerchantsTableSkeleton } from "../components/MerchantsTable";
 import { emptyFilters, filtersToSearch, parseFilters, toQuery, type MerchantFilters as Filters } from "../filters";
 import { useMerchants } from "../hooks";
-
-/** Cards on small screens, the table from `lg` up: the list never scrolls sideways. */
-function ByWidth({ cards, table }: { cards: ReactNode; table: ReactNode }) {
-  return (
-    <>
-      <div className="lg:hidden">{cards}</div>
-      <div className="hidden lg:block">{table}</div>
-    </>
-  );
-}
 
 type MerchantsScreenProps = {
   /** Opens a merchant. By default the screen navigates to `/admin/merchants/{id}`; the dev preview passes its own. */
@@ -88,6 +77,7 @@ export function MerchantsScreen({ onOpen }: MerchantsScreenProps) {
           hasNextPage={query.hasNextPage}
           loading={query.isFetchingNextPage}
           onLoadMore={() => void query.fetchNextPage()}
+          failed={query.isFetchNextPageError}
         />
       </>
     );

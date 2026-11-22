@@ -1,6 +1,7 @@
 "use client";
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { merchantsKeys } from "@/features/merchants/keys";
 import { overviewKeys } from "@/features/overview/keys";
 import type { AdminPayment, PaymentStatus } from "@/lib/api/types";
 import { paymentsKeys } from "./keys";
@@ -38,13 +39,15 @@ export function usePayment(id: number, placeholder?: AdminPayment) {
 }
 
 /**
- * After approving or rejecting: every payments list and detail, and the home page (its alerts and counts change).
+ * After approving or rejecting: every payments list and detail, the merchants (an approval makes the merchant ACTIVE
+ * with a new paid period, and the merchant page lists its payments), and the home page (its alerts and counts change).
  * Also runs after a failure on purpose: PAYMENT_NOT_PENDING means someone else decided first, so we refetch the item.
  */
 function useRefreshAfterReview() {
   const queryClient = useQueryClient();
   return () => {
     void queryClient.invalidateQueries({ queryKey: paymentsKeys.all });
+    void queryClient.invalidateQueries({ queryKey: merchantsKeys.all });
     void queryClient.invalidateQueries({ queryKey: overviewKeys.all });
   };
 }

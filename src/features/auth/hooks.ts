@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/components/ui";
 
 /** Signs out of Clerk and drops every cached response, so nothing from this account stays in memory. */
 export function useSignOut() {
@@ -20,6 +21,9 @@ export function useSignOut() {
       await signOut();
       queryClient.clear();
       router.replace("/sign-in");
+    } catch {
+      // The session is still there: say so instead of leaving an unhandled rejection
+      toast.error("تعذّر تسجيل الخروج، تحقّق من اتصالك وحاول مرة أخرى");
     } finally {
       setPending(false);
     }

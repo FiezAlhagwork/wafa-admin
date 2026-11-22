@@ -5,7 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { WarningCircle } from "@phosphor-icons/react";
 import { Controller, useForm } from "react-hook-form";
 import { Button, ConfirmDialog, Dialog, Field, Input, RadioGroup, toast } from "@/components/ui";
-import { applyFieldErrors, getErrorMessage, toApiError } from "@/lib/api/errors";
+import { toastActionError } from "@/lib/api/action-errors";
+import { applyFieldErrors, toApiError } from "@/lib/api/errors";
 import type { AdminUser, UpdateAdminUserBody } from "@/lib/api/types";
 import { useAdmin } from "@/lib/auth/admin-provider";
 import { useCreateAdminUser, useDeactivateAdminUser, useUpdateAdminUser } from "../hooks";
@@ -31,6 +32,7 @@ export function AdminUserFormDialog({ target, onClose }: AdminUserFormDialogProp
   const isSelf = user !== null && user.id === signedIn.id;
   const formId = useId();
   const [confirmingDeactivate, setConfirmingDeactivate] = useState(false);
+  const [confirmingReactivate, setConfirmingReactivate] = useState(false);
 
   const create = useCreateAdminUser();
   const update = useUpdateAdminUser();
@@ -49,7 +51,7 @@ export function AdminUserFormDialog({ target, onClose }: AdminUserFormDialogProp
       toast.error("لا يمكنك تغيير دور حسابك أو تعطيله");
       return;
     }
-    if (!applyFieldErrors(error, form.setError)) toast.error(getErrorMessage(error));
+    if (!applyFieldErrors(error, form.setError)) toastActionError(error);
   };
 
   const submit = form.handleSubmit((values) => {
@@ -97,7 +99,7 @@ export function AdminUserFormDialog({ target, onClose }: AdminUserFormDialogProp
         onClose();
       },
       onError: (error) => {
-        toast.error(getErrorMessage(error));
+        toastActionError(error);
         setConfirmingDeactivate(false);
       },
     });
@@ -110,9 +112,13 @@ export function AdminUserFormDialog({ target, onClose }: AdminUserFormDialogProp
       {
         onSuccess: () => {
           toast.success("تمت إعادة تفعيل الحساب");
+          setConfirmingReactivate(false);
           onClose();
         },
-        onError: (error) => toast.error(getErrorMessage(error)),
+        onError: (error) => {
+          toastActionError(error);
+          setConfirmingReactivate(false);
+        },
       },
     );
   };
@@ -216,27 +222,36 @@ export function AdminUserFormDialog({ target, onClose }: AdminUserFormDialogProp
                 variant="secondary"
                 size="sm"
                 className="self-start"
-                loading={reactivate.isPending}
                 disabled={busy}
-                onClick={reactivateAccount}
+                onClick={() => setConfirmingReactivate(true)}
               >
                 إعادة التفعيل
               </Button>
             </section>
           )}
         </form>
-      </Dialog>
 
-      <ConfirmDialog
-        open={confirmingDeactivate}
-        onOpenChange={setConfirmingDeactivate}
-        tone="danger"
-        title="تعطيل هذا الحساب؟"
-        description={user ? `${user.name} لن يتمكن من الدخول إلى اللوحة. يمكنك إعادة تفعيله لاحقاً.` : undefined}
-        confirmLabel="تعطيل الحساب"
-        loading={deactivate.isPending}
-        onConfirm={confirmDeactivate}
-      />
+        {/* Inside the edit dialog, so focus and Esc go to the confirmation on top of it */}
+        <ConfirmDialog
+          open={confirmingDeactivate}
+          onOpenChange={setConfirmingDeactivate}
+          tone="danger"
+          title="تعطيل هذا الحساب؟"
+          description={user ? `${user.name} لن يتمكن من الدخول إلى اللوحة. يمكنك إعادة تفعيله لاحقاً.` : undefined}
+          confirmLabel="تعطيل الحساب"
+          loading={deactivate.isPending}
+          onConfirm={confirmDeactivate}
+        />
+        <ConfirmDialog
+          open={confirmingReactivate}
+          onOpenChange={setConfirmingReactivate}
+          title="إعادة تفعيل هذا الحساب؟"
+          description={user ? `${user.name} سيتمكن من الدخول إلى اللوحة من جديد بدوره الحالي.` : undefined}
+          confirmLabel="إعادة التفعيل"
+          loading={reactivate.isPending}
+          onConfirm={reactivateAccount}
+        />
+      </Dialog>
     </>
   );
 }
