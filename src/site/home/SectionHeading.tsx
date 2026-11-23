@@ -15,7 +15,8 @@ type SectionHeadingProps = {
 /** Small label, title and optional lead at the top of a home page section. */
 export function SectionHeading({ id, eyebrow, title, lead, align = "center", className, titleClassName }: SectionHeadingProps) {
   return (
-    <div className={cn("flex max-w-2xl flex-col", align === "center" ? "mx-auto items-center text-center" : "items-start", className)}>
+    // data-reveal: fades up the first time it scrolls into view (RevealOnScroll)
+    <div data-reveal className={cn("flex max-w-2xl flex-col", align === "center" ? "mx-auto items-center text-center" : "items-start", className)}>
       <p className="text-sm font-bold text-brand">{eyebrow}</p>
       <h2 id={id} className={cn("mt-2 text-3xl font-black text-fg sm:text-4xl", titleClassName)}>
         {title}

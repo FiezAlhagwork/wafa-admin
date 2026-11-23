@@ -32,7 +32,7 @@ export async function Features() {
         <SectionHeading id="features-title" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
 
         {/* Merchants */}
-        <div className="flex flex-col gap-6">
+        <div data-reveal className="flex flex-col gap-6">
           <h3 className="flex items-center gap-2 text-xl font-bold text-fg">
             <Storefront aria-hidden weight="duotone" className="size-6 text-brand" />
             {t("merchants.title")}
@@ -41,7 +41,7 @@ export async function Features() {
         </div>
 
         {/* Customers: the app on a phone beside what it does for them */}
-        <div className="grid items-center gap-10 rounded-3xl bg-brand p-6 text-neutral-0 sm:p-10 lg:grid-cols-[2fr_3fr] lg:gap-14">
+        <div data-reveal className="grid items-center gap-10 rounded-3xl bg-brand p-6 text-neutral-0 sm:p-10 lg:grid-cols-[2fr_3fr] lg:gap-14">
           <CustomerPhone title={t("customers.phone.title")} cards={phoneCards} />
 
           <div className="flex flex-col gap-6">

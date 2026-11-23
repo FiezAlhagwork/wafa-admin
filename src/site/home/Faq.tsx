@@ -1,5 +1,6 @@
 import { WhatsappLogo } from "@phosphor-icons/react/ssr";
 import { getTranslations } from "next-intl/server";
+import type { CSSProperties } from "react";
 import { policy } from "@/site/legal/policy-config";
 import { FaqShowcase, type FaqGroup } from "./FaqShowcase";
 import { SectionHeading } from "./SectionHeading";
@@ -23,15 +24,18 @@ export async function Faq() {
             <>
               <SectionHeading id="faq-title" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} align="start" />
               {whatsapp && (
-                <a
-                  href={`https://wa.me/${whatsapp}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={ctaButton("accent", "mt-6 h-12 px-6 text-base")}
-                >
-                  <WhatsappLogo aria-hidden weight="fill" />
-                  {t("whatsapp")}
-                </a>
+                // The reveal sits on a wrapper: on the link itself it would override the button's own press effect
+                <div data-reveal style={{ "--reveal-delay": "120ms" } as CSSProperties} className="mt-6">
+                  <a
+                    href={`https://wa.me/${whatsapp}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={ctaButton("accent", "h-12 px-6 text-base")}
+                  >
+                    <WhatsappLogo aria-hidden weight="fill" />
+                    {t("whatsapp")}
+                  </a>
+                </div>
               )}
             </>
           }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Plus } from "@phosphor-icons/react";
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { focusRing } from "@/components/ui/styles";
 import { cn } from "@/lib/cn";
 
@@ -26,7 +26,13 @@ export function FaqShowcase({ intro, groupsLabel, groups }: FaqShowcaseProps) {
       <div className="flex flex-col items-start">
         {intro}
 
-        <div role="group" aria-label={groupsLabel} className="mt-8 flex gap-2 lg:flex-col lg:self-stretch">
+        <div
+          data-reveal
+          style={{ "--reveal-delay": "200ms" } as CSSProperties}
+          role="group"
+          aria-label={groupsLabel}
+          className="mt-8 flex gap-2 lg:flex-col lg:self-stretch"
+        >
           {groups.map((group, index) => {
             const active = index === selected;
             return (
@@ -50,7 +56,7 @@ export function FaqShowcase({ intro, groupsLabel, groups }: FaqShowcaseProps) {
         </div>
       </div>
 
-      <div>
+      <div data-reveal style={{ "--reveal-delay": "150ms" } as CSSProperties}>
         {groups.map((group, index) => (
           <div key={index} hidden={index !== selected} className="flex flex-col gap-3">
             {group.items.map((item, itemIndex) => (

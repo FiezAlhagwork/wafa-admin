@@ -1,5 +1,6 @@
 import { ArrowRight, DeviceMobile, Notepad } from "@phosphor-icons/react/ssr";
 import { getTranslations } from "next-intl/server";
+import type { CSSProperties } from "react";
 import { SectionHeading } from "./SectionHeading";
 import { StampsBackdrop } from "./StampsBackdrop";
 
@@ -21,7 +22,7 @@ export async function About() {
         />
 
         {/* Paper card turning into the digital one */}
-        <div aria-hidden className="flex items-center justify-center gap-4 sm:gap-6">
+        <div data-reveal style={{ "--reveal-delay": "150ms" } as CSSProperties} aria-hidden className="flex items-center justify-center gap-4 sm:gap-6">
           <div className="flex w-36 -rotate-3 flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-border-strong bg-surface p-5 text-center sm:w-40">
             <Notepad weight="duotone" className="size-10 text-neutral-500" />
             <span className="font-bold text-fg">{t("paper.label")}</span>
