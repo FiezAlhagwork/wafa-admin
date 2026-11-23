@@ -5,6 +5,7 @@ import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRe
 import { api } from "@/lib/api/client";
 import { createCustomerStore } from "./mock-customers";
 import { createPackageStore, type PackageResult } from "./mock-packages";
+import { createSettingsStore, type MethodResult } from "./mock-settings";
 import { businessTypes, createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
 
@@ -76,14 +77,14 @@ type Seed = {
 };
 
 const seeds: Seed[] = [
-  { id: 1, name: "مقهى الياسمين", email: "yasmine@example.com", packageName: "المتوسطة", months: 3, usd: "45.50", syp: "591500.00", method: "syriatel_cash", reference: "94817263", status: "PENDING", hours: 74, overdue: true },
-  { id: 2, name: "مخبز الشام", email: "sham.bakery@example.com", packageName: "الأساسية", months: 1, usd: "15.00", syp: "195000.00", method: "transfer", reference: "TX-20931", status: "PENDING", hours: 20, duplicate: true },
-  { id: 3, name: "صالون لمسة للتجميل", email: "lamsa@example.com", packageName: "المتقدمة", months: 12, usd: "320.00", syp: "4160000.00", method: "transfer", reference: "TX-55102", status: "PENDING", hours: 9 },
-  { id: 4, name: null, packageName: "الأساسية", months: 1, usd: "15.00", syp: "195000.00", method: "syriatel_cash", reference: "77120045", status: "PENDING", hours: 6 },
-  { id: 5, name: "مطعم الفرات", email: "furat@example.com", packageName: "المتوسطة", months: 1, usd: "18.00", syp: "234000.00", method: "syriatel_cash", reference: null, status: "PENDING", hours: 2 },
-  { id: 6, name: "عيادة الشفاء", email: "shifa@example.com", packageName: "المتقدمة", months: 3, usd: "90.00", syp: "1170000.00", method: "transfer", reference: "TX-10002", status: "APPROVED", hours: 50 },
-  { id: 7, name: "متجر النور", email: "alnoor@example.com", packageName: "الأساسية", months: 12, usd: "150.00", syp: "1950000.00", method: "syriatel_cash", reference: "55009981", status: "APPROVED", hours: 120 },
-  { id: 8, name: "مكتبة الأفق", email: "ufuq@example.com", packageName: "المتوسطة", months: 1, usd: "18.00", syp: "234000.00", method: "transfer", reference: "TX-30771", status: "REJECTED", hours: 30, reason: "amount_short" },
+  { id: 1, name: "مقهى الياسمين", email: "yasmine@example.com", packageName: "المتوسطة", months: 3, usd: "45.50", syp: "591500.00", method: "sham_cash", reference: "94817263", status: "PENDING", hours: 74, overdue: true },
+  { id: 2, name: "مخبز الشام", email: "sham.bakery@example.com", packageName: "الأساسية", months: 1, usd: "15.00", syp: "195000.00", method: "haram", reference: "TX-20931", status: "PENDING", hours: 20, duplicate: true },
+  { id: 3, name: "صالون لمسة للتجميل", email: "lamsa@example.com", packageName: "المتقدمة", months: 12, usd: "320.00", syp: "4160000.00", method: "haram", reference: "TX-55102", status: "PENDING", hours: 9 },
+  { id: 4, name: null, packageName: "الأساسية", months: 1, usd: "15.00", syp: "195000.00", method: "sham_cash", reference: "77120045", status: "PENDING", hours: 6 },
+  { id: 5, name: "مطعم الفرات", email: "furat@example.com", packageName: "المتوسطة", months: 1, usd: "18.00", syp: "234000.00", method: "sham_cash", reference: null, status: "PENDING", hours: 2 },
+  { id: 6, name: "عيادة الشفاء", email: "shifa@example.com", packageName: "المتقدمة", months: 3, usd: "90.00", syp: "1170000.00", method: "haram", reference: "TX-10002", status: "APPROVED", hours: 50 },
+  { id: 7, name: "متجر النور", email: "alnoor@example.com", packageName: "الأساسية", months: 12, usd: "150.00", syp: "1950000.00", method: "sham_cash", reference: "55009981", status: "APPROVED", hours: 120 },
+  { id: 8, name: "مكتبة الأفق", email: "ufuq@example.com", packageName: "المتوسطة", months: 1, usd: "18.00", syp: "234000.00", method: "haram", reference: "TX-30771", status: "REJECTED", hours: 30, reason: "amount_short" },
 ];
 
 const toPayment = (seed: Seed): AdminPayment => ({
@@ -95,7 +96,7 @@ const toPayment = (seed: Seed): AdminPayment => ({
   amount_syp: seed.syp,
   method: seed.method,
   reference: seed.reference,
-  proof_url: proofImage(seed.method === "syriatel_cash" ? "Syriatel Cash" : "Bank transfer"),
+  proof_url: proofImage(seed.method === "sham_cash" ? "Sham Cash" : "Al Haram"),
   status: seed.status,
   rejection_reason: seed.reason ?? null,
   created_at: hoursAgo(seed.hours),
@@ -146,8 +147,10 @@ const freshProofUrl = () => `/dev/proof-sample.svg?sig=${++proofSignature}`;
 const PAGE_SIZE = 3; // small on purpose, so "load more" shows up in the preview
 const LATENCY_MS = 350;
 
+// A copy, like JSON from a real server: the stores mutate their objects, and handing out the same reference would let
+// React Query see "no change" after a refetch
 const respond = <T,>(config: InternalAxiosRequestConfig, data: T): AxiosResponse<T> => ({
-  data,
+  data: structuredClone(data),
   status: 200,
   statusText: "OK",
   headers: {},
@@ -176,6 +179,9 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
   const merchants = createMerchantStore();
   const customers = createCustomerStore();
   const packages = createPackageStore();
+  const settings = createSettingsStore();
+  // Only the super admin has `manage-settings`, like the real server
+  const canManageSettings = scenario === "super_admin";
   // Only the super admin has `manage-packages`, like the real server
   const canManagePackages = scenario === "super_admin";
   // The roles with `manage-lookups`; the others get 403 on the business types, like the real server
@@ -226,6 +232,34 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
     if (url === "/admin/business-types" && method === "get") {
       if (!canManageLookups) throw failure(config, 403, "FORBIDDEN");
       return respond(config, { data: businessTypes });
+    }
+
+    const methodRoute = /^\/admin\/settings\/payment-methods\/(sham_cash|haram)(\/qr)?$/.exec(url);
+    if (methodRoute) {
+      if (!canManageSettings) throw failure(config, 403, "FORBIDDEN");
+      const key = methodRoute[1] as "sham_cash" | "haram";
+      const answer = (result: MethodResult) => {
+        if (result.ok) return respond(config, { data: result.data });
+        if ("fields" in result) throw failure(config, 422, "VALIDATION_FAILED", { fields: result.fields });
+        throw failure(config, 404, "NOT_FOUND");
+      };
+      if (!methodRoute[2] && method === "patch") return answer(settings.updateMethod(key, bodyOf(config)));
+      if (methodRoute[2] && method === "post") {
+        return answer(settings.uploadQr(key, config.data instanceof FormData ? config.data.get("qr") : null));
+      }
+      if (methodRoute[2] && method === "delete") return answer(settings.removeQr(key));
+    }
+
+    const settingsRoute = /^\/admin\/settings\/(billing|app)$/.exec(url);
+    if (settingsRoute) {
+      if (!canManageSettings) throw failure(config, 403, "FORBIDDEN");
+      const billing = settingsRoute[1] === "billing";
+      if (method === "get") return respond(config, { data: billing ? settings.billing() : settings.app() });
+      if (method === "patch") {
+        const result = billing ? settings.updateBilling(bodyOf(config)) : settings.updateApp(bodyOf(config));
+        if (!result.ok) throw failure(config, 422, "VALIDATION_FAILED", { fields: result.fields });
+        return respond(config, { data: result.data });
+      }
     }
 
     const packageRoute = /^\/admin\/packages(?:\/(\d+))?$/.exec(url);

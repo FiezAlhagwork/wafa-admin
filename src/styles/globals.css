@@ -56,10 +56,11 @@
   --color-border-input: var(--color-neutral-500); /* ≈ 3.4:1 on white (WCAG 3:1 for field boundaries) */
   --color-focus: var(--color-brand);
 
-  /* The dark sidebar (ink) and what sits on it */
-  --color-sidebar: var(--color-ink);
-  --color-sidebar-fg: rgb(255 255 255 / 0.78);
-  --color-sidebar-muted: rgb(255 255 255 / 0.55);
+  /* The sidebar, in the brand navy (same as the primary button), and what sits on it.
+     Muted text is 65% white: at least 4.5:1 on the brand navy for the small group titles. */
+  --color-sidebar: var(--color-brand);
+  --color-sidebar-fg: rgb(255 255 255 / 0.8);
+  --color-sidebar-muted: rgb(255 255 255 / 0.65);
   --color-sidebar-hover: rgb(255 255 255 / 0.05);
   --color-sidebar-active: rgb(255 255 255 / 0.09);
 

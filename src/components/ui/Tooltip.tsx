@@ -13,11 +13,13 @@ type TooltipProps = {
   side?: TooltipSide;
   /** The element that shows the tooltip on hover/focus (e.g. an IconButton). */
   children: ReactElement;
+  /** Keeps the trigger in place but shows nothing (e.g. a sidebar link while its label is visible). */
+  disabled?: boolean;
 };
 
-export function Tooltip({ content, side = "top", children }: TooltipProps) {
+export function Tooltip({ content, side = "top", children, disabled = false }: TooltipProps) {
   return (
-    <BaseTooltip.Root>
+    <BaseTooltip.Root disabled={disabled}>
       <BaseTooltip.Trigger render={children} />
       <BaseTooltip.Portal>
         <BaseTooltip.Positioner side={side} sideOffset={8} className="z-50">

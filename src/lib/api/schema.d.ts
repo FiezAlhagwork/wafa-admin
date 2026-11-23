@@ -886,7 +886,7 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * تعديل الهاتف والعنوان واسم المالك
+         * تعديل الهاتف والعنوان واسم المالك وروابط المحل
          * @description اسم النشاط ونوعه والمحافظة ما بيتعدّلوا من التطبيق. ابعت الحقول يلي بدك تغيّرها بس.
          */
         patch: operations["merchantUpdateProfile"];
@@ -1510,6 +1510,27 @@ export interface paths {
         patch: operations["adminUpdateMerchantIdentity"];
         trace?: never;
     };
+    "/admin/merchants/{id}/links/{link}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * شيل رابط من صفحة المحل
+         * @description الصلاحية `edit-business-identity`. السبب إلزامي، وبينكتب بسجل التدقيق (`merchant.link_removed`) مع الرابط القديم.
+         *     التكرار ما بيسجّل شي.
+         */
+        delete: operations["adminRemoveMerchantLink"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/merchants/{id}/cover": {
         parameters: {
             query?: never;
@@ -1757,6 +1778,55 @@ export interface paths {
          * @description ما في حذف، لأنو في بيانات قديمة بتأشّر عليه. ابعت الحقول يلي بدك تغيّرها بس.
          */
         patch: operations["adminUpdateIcon"];
+        trace?: never;
+    };
+    "/admin/settings/payment-methods/{method}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                method: components["schemas"]["PaymentMethod"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * تعديل طريقة دفع
+         * @description الصلاحية `manage-settings`. ابعت الحقول يلي بدك تغيّرها بس، و`null` بيمسح النص. ما بتتفعّل بلا `account`
+         *     (`422`، `fields.account: ["invalid"]`). بتنكتب بسجل التدقيق (`settings.payment_method_updated`).
+         */
+        patch: operations["adminUpdatePaymentMethod"];
+        trace?: never;
+    };
+    "/admin/settings/payment-methods/{method}/qr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                method: components["schemas"]["PaymentMethod"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * رفع صورة QR لطريقة دفع
+         * @description الصلاحية `manage-settings`. الصورة القديمة بتنمسح.
+         */
+        post: operations["adminUploadPaymentMethodQr"];
+        /**
+         * شيل صورة QR
+         * @description `qr_url` بيرجع `null`. التكرار ما بيغيّر شي.
+         */
+        delete: operations["adminRemovePaymentMethodQr"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/admin/settings/app": {
@@ -2018,7 +2088,7 @@ export interface components {
         CustomerConfig: {
             /** @example 60 */
             qr_period_seconds: number;
-            /** @example 1.2 */
+            /** @example 1.0 */
             privacy_policy_version: string;
             /** Format: uri */
             privacy_policy_url: string;
@@ -2026,8 +2096,8 @@ export interface components {
             customer_terms_url: string;
             /**
              * Format: uri
-             * @description رابط «تواصل مع الدعم». `""` لحد ما ينحط من اللوحة
-             * @example https://wa.me/9639XXXXXXXX
+             * @description رابط «تواصل مع الدعم». ممكن يكون `""` إذا انمسح من اللوحة
+             * @example https://wa.me/963991734151
              */
             support_url: string;
             governorates: components["schemas"]["Lookup"][];
@@ -2048,7 +2118,7 @@ export interface components {
             /** @description إيقاف عروض كل التجار */
             campaigns_muted: boolean;
             profile_complete: boolean;
-            /** @example 1.2 */
+            /** @example 1.0 */
             consented_policy_version: string | null;
             registered_at: components["schemas"]["DateTime"];
         };
@@ -2213,6 +2283,12 @@ export interface components {
             /** @description الرقم المنشور للزبائن */
             contact_phone: string | null;
             /** Format: uri */
+            instagram_url: string | null;
+            /** Format: uri */
+            facebook_url: string | null;
+            /** Format: uri */
+            maps_url: string | null;
+            /** Format: uri */
             logo_url: string | null;
             cover_url: components["schemas"]["CoverUrl"];
             created_at: components["schemas"]["DateTime"];
@@ -2272,7 +2348,8 @@ export interface components {
         };
         /**
          * @description `TRIAL_ENDING` / `SUBSCRIPTION_ENDING`: باقي 3 أيام أو أقل (`warning`). `GRACE`: مهلة السماح (`danger`).
-         *     `EXPIRED` · `SUSPENDED` · `PENDING_DELETION`: الحالة نفسها (`danger`، بدون `params`).
+         *     `EXPIRED` · `SUSPENDED`: الحالة نفسها (`danger`، `params` فاضي). `PENDING_DELETION`: `danger`، و`params.ends_at`
+         *     هو موعد الحذف.
          */
         Banner: {
             /** @enum {string} */
@@ -2346,10 +2423,10 @@ export interface components {
             })[];
             payment: {
                 exchange_rate_syp: components["schemas"]["Money"];
-                syriatel_cash_number: string;
-                bank_transfer_details: string;
                 /** @example 24 */
                 review_sla_hours: number;
+                /** @description الطرق الفعّالة بس، بالترتيب يلي بتحدده الإدارة */
+                methods: components["schemas"]["PaymentAccount"][];
             };
             limits: {
                 /** @example 3 */
@@ -2459,6 +2536,15 @@ export interface components {
             /** @description `null` = ما في صفحات بعد */
             next_cursor: string | null;
         };
+        CustomersMeta: {
+            /** @description `null` = ما في صفحات بعد */
+            next_cursor: string | null;
+            /**
+             * @description عدد كل زبائن المحل حتى المعلّقين. نفسه بكل صفحة، و`q` ما بيأثر عليه
+             * @example 412
+             */
+            total: number;
+        };
         DirectoryMerchant: components["schemas"]["MerchantSummary"] & {
             address: string | null;
             active_cards_count: number;
@@ -2474,6 +2560,21 @@ export interface components {
             /** @description `false` للمنتهي أو الموقوف أو بانتظار الحذف */
             accepting_stamps: boolean;
             muted: boolean;
+            /**
+             * Format: uri
+             * @description بينفتح برا التطبيق
+             */
+            instagram_url: string | null;
+            /**
+             * Format: uri
+             * @description بينفتح برا التطبيق
+             */
+            facebook_url: string | null;
+            /**
+             * Format: uri
+             * @description رابط Google Maps جاهز، بينفتح برا التطبيق
+             */
+            maps_url: string | null;
             /** @description البطاقات الفعّالة بس */
             cards: components["schemas"]["CardSummary"][];
         };
@@ -2528,8 +2629,32 @@ export interface components {
             recipients_count: number;
             sent_at: components["schemas"]["DateTime"] | null;
         };
-        /** @enum {string} */
-        PaymentMethod: "syriatel_cash" | "transfer";
+        /**
+         * @description `sham_cash` شام كاش · `haram` الهرم
+         * @enum {string}
+         */
+        PaymentMethod: "sham_cash" | "haram";
+        PaymentAccount: {
+            key: components["schemas"]["PaymentMethod"];
+            /** @description الهرم: اسم المستلم */
+            recipient_name: string | null;
+            /** @description شام كاش: رمز الحساب · الهرم: رقم المستلم */
+            account: string | null;
+            /**
+             * Format: uri
+             * @description شام كاش: صورة رمز QR
+             */
+            qr_url: string | null;
+            /** @description تعليمات قصيرة اختيارية */
+            note: string | null;
+        };
+        AdminPaymentAccount: components["schemas"]["PaymentAccount"] & {
+            /** @example شام كاش */
+            name: string;
+            /** @description `true` = ظاهرة بتطبيق التاجر */
+            is_active: boolean;
+            sort_order: number;
+        };
         /** @enum {string} */
         PaymentRejectionReason: "transfer_not_received" | "amount_short" | "unclear_image" | "invalid_proof";
         PackageInput: {
@@ -2632,6 +2757,14 @@ export interface components {
             cover_url: components["schemas"]["CoverUrl"];
             address: string | null;
             last_login_at: components["schemas"]["DateTime"] | null;
+            links: {
+                /** Format: uri */
+                instagram_url: string | null;
+                /** Format: uri */
+                facebook_url: string | null;
+                /** Format: uri */
+                maps_url: string | null;
+            };
             /** @description `null` لحد ما يختار باقة */
             subscription: components["schemas"]["Subscription"] | null;
             /** @description كل الفترات، الأحدث أول */
@@ -2774,8 +2907,7 @@ export interface components {
                 };
             } & components["schemas"]["RevenueTotals"])[];
             by_method: ({
-                /** @enum {string} */
-                method: "syriatel_cash" | "transfer";
+                method: components["schemas"]["PaymentMethod"];
             } & components["schemas"]["RevenueTotals"])[];
         };
         AdminOverview: {
@@ -3172,6 +3304,17 @@ export interface components {
                 };
             };
         };
+        /** @description طريقة الدفع */
+        AdminPaymentAccountData: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    data: components["schemas"]["AdminPaymentAccount"];
+                };
+            };
+        };
         /** @description الإعدادات */
         BillingSettingsData: {
             headers: {
@@ -3181,11 +3324,11 @@ export interface components {
                 "application/json": {
                     data: {
                         exchange_rate_syp: components["schemas"]["Money"];
-                        syriatel_cash_number: string;
-                        bank_transfer_details: string;
                         payment_review_sla_hours: number;
                         trial_days: number;
                         grace_days: number;
+                        /** @description بـ`GET` بس، كل الطرق حتى الموقوفة. بتتعدّل بـ`PATCH /admin/settings/payment-methods/{method}` */
+                        payment_methods?: components["schemas"]["AdminPaymentAccount"][];
                     };
                 };
             };
@@ -3470,7 +3613,7 @@ export interface operations {
                     code: string;
                     /**
                      * @description الإصدار يلي شافه الزبون، من `config`
-                     * @example 1.2
+                     * @example 1.0
                      */
                     policy_version: string;
                 };
@@ -3636,7 +3779,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @example 1.2 */
+                    /** @example 1.0 */
                     policy_version: string;
                 };
             };
@@ -4695,7 +4838,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["MerchantCustomer"][];
-                        meta: components["schemas"]["CursorMeta"];
+                        meta: components["schemas"]["CustomersMeta"];
                     };
                 };
             };
@@ -4728,6 +4871,18 @@ export interface operations {
                      * @example 011 222 3344
                      */
                     contact_phone?: string | null;
+                    /**
+                     * @description `https://` على `instagram.com` أو `www.instagram.com`. `null` بيمسحه
+                     * @example https://instagram.com/yasmin.cafe
+                     */
+                    instagram_url?: string | null;
+                    /** @description `https://` على `facebook.com` · `www.facebook.com` · `m.facebook.com` · `fb.com` · `www.fb.com` · `fb.me`. `null` بيمسحه */
+                    facebook_url?: string | null;
+                    /**
+                     * @description `https://` على `maps.app.goo.gl` · `maps.google.com`، أو `goo.gl` و`google.com` و`www.google.com` بمسار بيبلش بـ`/maps`. `null` بيمسحه
+                     * @example https://maps.app.goo.gl/AbC123xyz
+                     */
+                    maps_url?: string | null;
                 };
             };
         };
@@ -5201,7 +5356,7 @@ export interface operations {
         parameters: {
             query?: {
                 status?: "PENDING" | "APPROVED" | "REJECTED";
-                method?: "syriatel_cash" | "transfer";
+                method?: components["schemas"]["PaymentMethod"];
                 merchant_id?: number;
                 from?: string;
                 to?: string;
@@ -5515,8 +5670,6 @@ export interface operations {
             content: {
                 "application/json": {
                     exchange_rate_syp?: number;
-                    syriatel_cash_number?: string | null;
-                    bank_transfer_details?: string | null;
                     payment_review_sla_hours?: number;
                     trial_days?: number;
                     grace_days?: number;
@@ -5745,6 +5898,31 @@ export interface operations {
                 "application/json": {
                     business_name?: string;
                     business_type_id?: number;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: components["responses"]["AdminMerchantDetailData"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationFailed"];
+        };
+    };
+    adminRemoveMerchantLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                link: "instagram" | "facebook" | "maps";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
                     reason: string;
                 };
             };
@@ -6148,6 +6326,79 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             422: components["responses"]["ValidationFailed"];
+        };
+    };
+    adminUpdatePaymentMethod: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                method: components["schemas"]["PaymentMethod"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    is_active?: boolean;
+                    sort_order?: number;
+                    recipient_name?: string | null;
+                    account?: string | null;
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: components["responses"]["AdminPaymentAccountData"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationFailed"];
+        };
+    };
+    adminUploadPaymentMethodQr: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                method: components["schemas"]["PaymentMethod"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description JPEG أو PNG أو WebP لحد 2 MB
+                     */
+                    qr: string;
+                };
+            };
+        };
+        responses: {
+            200: components["responses"]["AdminPaymentAccountData"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationFailed"];
+        };
+    };
+    adminRemovePaymentMethodQr: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                method: components["schemas"]["PaymentMethod"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["AdminPaymentAccountData"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     adminGetAppSettings: {

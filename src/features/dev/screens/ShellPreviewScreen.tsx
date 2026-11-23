@@ -13,12 +13,13 @@ import { MerchantsScreen } from "@/features/merchants/screens/MerchantsScreen";
 import { OverviewScreen } from "@/features/overview/screens/OverviewScreen";
 import { PackagesScreen } from "@/features/packages/screens/PackagesScreen";
 import { PaymentsScreen } from "@/features/payments/screens/PaymentsScreen";
+import { SettingsScreen } from "@/features/settings/screens/SettingsScreen";
 import type { AdminPermission, AdminRole, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
 import { createQueryClient } from "@/lib/query-client";
 import { createMockApi, getMockFaults, setMockFault, subscribeMockFaults, type MockScenario } from "../mock-api";
 
-type Page = "overview" | "payments" | "merchants" | "customers" | "packages" | "admin-users";
+type Page = "overview" | "payments" | "merchants" | "customers" | "packages" | "settings" | "admin-users";
 
 const pages: { id: Page; label: string; path: string }[] = [
   { id: "overview", label: "الرئيسية", path: "/admin" },
@@ -26,6 +27,7 @@ const pages: { id: Page; label: string; path: string }[] = [
   { id: "merchants", label: "التجار", path: "/admin/merchants" },
   { id: "customers", label: "الزبائن", path: "/admin/customers" },
   { id: "packages", label: "الباقات", path: "/admin/packages" },
+  { id: "settings", label: "الإعدادات", path: "/admin/settings" },
   { id: "admin-users", label: "الحسابات", path: "/admin/admin-users" },
 ];
 
@@ -236,6 +238,12 @@ function PreviewPage({ page }: { page: Page }) {
       return (
         <PermissionGate permission="manage-packages">
           <PackagesScreen />
+        </PermissionGate>
+      );
+    case "settings":
+      return (
+        <PermissionGate permission="manage-settings">
+          <SettingsScreen />
         </PermissionGate>
       );
     case "admin-users":
