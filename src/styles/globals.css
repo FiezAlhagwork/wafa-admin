@@ -285,3 +285,20 @@
     transition: none;
   }
 }
+
+/* Website hero: on first load the text comes in line by line, then the card (each sets its own --enter-delay). */
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+.hero-enter {
+  animation: hero-enter 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter {
+    animation: none;
+  }
+}

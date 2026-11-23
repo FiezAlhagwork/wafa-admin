@@ -1,5 +1,6 @@
 import { AppleLogo, DownloadSimple, GooglePlayLogo } from "@phosphor-icons/react/ssr";
 import { getTranslations } from "next-intl/server";
+import type { CSSProperties } from "react";
 import { Link } from "@/i18n/navigation";
 import { HeroShowcase, type ShowcaseCard } from "./HeroShowcase";
 import { StampsBackdrop } from "./StampsBackdrop";
@@ -40,7 +41,7 @@ export async function Hero() {
         giftLabel={t("card.gift")}
         intro={
           <>
-            <h1 className="text-4xl leading-tight font-black text-fg sm:text-5xl lg:text-6xl">
+            <h1 className="hero-enter text-4xl leading-tight font-black text-fg sm:text-5xl lg:text-6xl">
               {t("title")}
               <svg
                 aria-hidden
@@ -55,12 +56,14 @@ export async function Hero() {
                 />
               </svg>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-fg-muted">{t("lead")}</p>
+            <p className="hero-enter mt-6 max-w-xl text-lg leading-8 text-fg-muted" style={{ "--enter-delay": "150ms" } as CSSProperties}>
+              {t("lead")}
+            </p>
           </>
         }
         actions={
           <>
-            <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <div className="hero-enter mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row" style={{ "--enter-delay": "450ms" } as CSSProperties}>
               <Link href={{ pathname: "/", hash: "download" }} className={ctaButton("accent")}>
                 <DownloadSimple aria-hidden weight="bold" />
                 {t("downloadCta")}
@@ -70,7 +73,7 @@ export async function Hero() {
               </Link>
             </div>
 
-            <p className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-fg-muted">
+            <p className="hero-enter mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-fg-muted" style={{ "--enter-delay": "600ms" } as CSSProperties}>
               <span>{t("stores")}</span>
               <span className="inline-flex items-center gap-2 text-fg" dir="ltr">
                 <GooglePlayLogo aria-hidden weight="fill" className="size-5" />

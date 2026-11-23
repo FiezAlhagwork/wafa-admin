@@ -53,7 +53,11 @@ export function HeroShowcase({ cards, pickerLabel, giftLabel, intro, actions }: 
       <div className="flex flex-col items-start">
         {intro}
 
-        <div role="group" aria-label={pickerLabel} className="mt-7 inline-flex max-w-full gap-1 rounded-full border border-border-strong bg-surface p-1">
+        <div
+          role="group"
+          aria-label={pickerLabel}
+          style={{ "--enter-delay": "300ms" } as CSSProperties}
+          className="hero-enter mt-7 inline-flex max-w-full gap-1 rounded-full border border-border-strong bg-surface p-1">
           {cards.map((item, index) => {
             const ItemIcon = icons[item.key] ?? Coffee;
             const active = index === selected;
@@ -80,7 +84,11 @@ export function HeroShowcase({ cards, pickerLabel, giftLabel, intro, actions }: 
       </div>
 
       {/* The example card, the same design as the customer app, swaying in 3D above a soft floor shadow */}
-      <div className="relative mx-auto w-full max-w-[21rem] [perspective:1200px]">
+      {/* The card comes in last, after the text */}
+      <div
+        className="hero-enter relative mx-auto w-full max-w-[21rem] [perspective:1200px]"
+        style={{ "--enter-delay": "700ms" } as CSSProperties}
+      >
         <div aria-hidden className="absolute -top-10 -end-8 size-44 rounded-full bg-amber/20 blur-2xl" />
         <div aria-hidden className="absolute -bottom-6 -start-10 size-52 rounded-full bg-teal/20 blur-2xl" />
         <div aria-hidden className="absolute inset-x-12 -bottom-12 h-6 hero-card-shadow rounded-[50%] bg-ink blur-xl" />
