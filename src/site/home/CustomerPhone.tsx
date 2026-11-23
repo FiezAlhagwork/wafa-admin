@@ -12,7 +12,7 @@ const tones = ["bg-amber", "bg-teal", "bg-neutral-0"];
 export function CustomerPhone({ title, cards }: { title: string; cards: PhoneCard[] }) {
   return (
     <div aria-hidden className="mx-auto w-full max-w-60 -rotate-3">
-      <div className="rounded-[2.25rem] border-8 border-neutral-800 bg-brand-deep p-4 shadow-dialog">
+      <div className="rounded-[2.25rem] border-8 border-neutral-800 bg-ink p-4 shadow-dialog">
         <div className="mx-auto mb-4 h-1.5 w-16 rounded-full bg-neutral-0/25" />
         <p className="text-sm text-neutral-0/75">{title}</p>
         <ul className="mt-3 flex flex-col gap-2.5">

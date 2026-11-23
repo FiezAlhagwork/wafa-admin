@@ -41,7 +41,7 @@ export async function Features() {
         </div>
 
         {/* Customers: the app on a phone beside what it does for them */}
-        <div className="grid items-center gap-10 rounded-3xl bg-ink p-6 text-neutral-0 sm:p-10 lg:grid-cols-[2fr_3fr] lg:gap-14">
+        <div className="grid items-center gap-10 rounded-3xl bg-brand-deep p-6 text-neutral-0 sm:p-10 lg:grid-cols-[2fr_3fr] lg:gap-14">
           <CustomerPhone title={t("customers.phone.title")} cards={phoneCards} />
 
           <div className="flex flex-col gap-6">
