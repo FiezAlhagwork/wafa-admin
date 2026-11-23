@@ -4,6 +4,7 @@
 import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { api } from "@/lib/api/client";
 import { createCustomerStore } from "./mock-customers";
+import { createPackageStore, type PackageResult } from "./mock-packages";
 import { businessTypes, createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
 
@@ -174,6 +175,9 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
     (typeof config.data === "string" ? JSON.parse(config.data) : {}) as T;
   const merchants = createMerchantStore();
   const customers = createCustomerStore();
+  const packages = createPackageStore();
+  // Only the super admin has `manage-packages`, like the real server
+  const canManagePackages = scenario === "super_admin";
   // The roles with `manage-lookups`; the others get 403 on the business types, like the real server
   const canManageLookups = scenario === "super_admin" || scenario === "admin";
   // Merchant 105 is "suspended by someone else a moment ago" on the first try: shows the conflict path
@@ -222,6 +226,19 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
     if (url === "/admin/business-types" && method === "get") {
       if (!canManageLookups) throw failure(config, 403, "FORBIDDEN");
       return respond(config, { data: businessTypes });
+    }
+
+    const packageRoute = /^\/admin\/packages(?:\/(\d+))?$/.exec(url);
+    if (packageRoute) {
+      if (!canManagePackages) throw failure(config, 403, "FORBIDDEN");
+      const answer = (result: PackageResult, status = 200) => {
+        if ("data" in result) return { ...respond(config, { data: result.data }), status };
+        if ("fields" in result) throw failure(config, 422, "VALIDATION_FAILED", { fields: result.fields });
+        throw failure(config, 404, "NOT_FOUND");
+      };
+      if (!packageRoute[1] && method === "get") return respond(config, { data: packages.list() });
+      if (!packageRoute[1] && method === "post") return answer(packages.create(bodyOf(config)), 201);
+      if (packageRoute[1] && method === "patch") return answer(packages.update(Number(packageRoute[1]), bodyOf(config)));
     }
 
     const merchantRoute = /^\/admin\/merchants\/(\d+)(?:\/(suspend|reactivate|trial-extension|cover))?$/.exec(url);
