@@ -11,6 +11,7 @@ import { getTranslations } from "next-intl/server";
 import { CustomerPhone, type PhoneCard } from "./CustomerPhone";
 import { MerchantFeatures, type VisualText } from "./MerchantFeatures";
 import { SectionHeading } from "./SectionHeading";
+import { StampsBackdrop } from "./StampsBackdrop";
 
 type Item = { title: string; text: string };
 
@@ -25,8 +26,9 @@ export async function Features() {
   const phoneCards = t.raw("customers.phone.cards") as PhoneCard[];
 
   return (
-    <section id="features" aria-labelledby="features-title" className="scroll-mt-20 py-16 sm:py-24">
-      <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 sm:px-6">
+    <section id="features" aria-labelledby="features-title" className="relative scroll-mt-20 overflow-hidden py-16 sm:py-24">
+      <StampsBackdrop variant="features" />
+      <div className="relative mx-auto flex max-w-6xl flex-col gap-12 px-4 sm:px-6">
         <SectionHeading id="features-title" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
 
         {/* Merchants */}

@@ -1,6 +1,7 @@
 import { Gift, Palette, QrCode, type Icon } from "@phosphor-icons/react/ssr";
 import { getTranslations } from "next-intl/server";
 import { SectionHeading } from "./SectionHeading";
+import { StampsBackdrop } from "./StampsBackdrop";
 
 type Step = { title: string; text: string };
 
@@ -13,8 +14,9 @@ export async function HowItWorks() {
   const steps = t.raw("steps") as Step[];
 
   return (
-    <section id="how" aria-labelledby="how-title" className="scroll-mt-20 py-16 sm:py-24">
-      <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 sm:px-6">
+    <section id="how" aria-labelledby="how-title" className="relative scroll-mt-20 overflow-hidden py-16 sm:py-24">
+      <StampsBackdrop variant="how" />
+      <div className="relative mx-auto flex max-w-6xl flex-col gap-12 px-4 sm:px-6">
         <SectionHeading id="how-title" eyebrow={t("eyebrow")} title={t("title")} />
 
         <ol className="relative grid gap-10 sm:grid-cols-3 sm:gap-6">
