@@ -5,6 +5,7 @@ import { routing } from "@/i18n/routing";
 import { About } from "@/site/home/About";
 import { Features } from "@/site/home/Features";
 import { Hero } from "@/site/home/Hero";
+import { HowItWorks } from "@/site/home/HowItWorks";
 import { homeMetadata } from "@/site/home/metadata";
 import { SiteFooter } from "@/site/layout/SiteFooter";
 import { SiteHeader } from "@/site/layout/SiteHeader";
@@ -26,6 +27,7 @@ export default async function SiteHomePage({ params }: PageProps<"/[locale]">) {
         <Hero />
         <About />
         <Features />
+        <HowItWorks />
       </main>
       <SiteFooter />
     </>
