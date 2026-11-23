@@ -56,21 +56,21 @@ export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardT
       </ol>
 
       {/* The sample card at the chosen step */}
-      <div aria-hidden className="mx-auto w-full max-w-xs -rotate-3">
-        <div className="flex flex-col gap-4 rounded-3xl bg-brand-deep p-6 text-neutral-0 shadow-dialog">
+      <div aria-hidden className="mx-auto w-full max-w-64 -rotate-3">
+        <div className="flex flex-col gap-4 rounded-3xl bg-brand-deep p-5 text-neutral-0 shadow-dialog">
           <div className="flex items-center gap-3">
-            <span className="grid size-11 place-items-center rounded-full bg-neutral-0">
-              <Coffee weight="fill" className="size-6 text-amber-pressed" />
+            <span className="grid size-10 place-items-center rounded-full bg-neutral-0">
+              <Coffee weight="fill" className="size-5 text-amber-pressed" />
             </span>
-            <span className="text-lg font-bold">{card.shop}</span>
+            <span className="font-bold">{card.shop}</span>
           </div>
 
           <p className="flex items-baseline gap-2">
-            <span className="text-5xl leading-none font-black tabular-nums">{filled}</span>
+            <span className="text-4xl leading-none font-black tabular-nums">{filled}</span>
             <span>{card.of}</span>
           </p>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 justify-items-center gap-2.5">
             {Array.from({ length: total + 1 }, (_, index) => {
               const gift = index === total;
               const stamped = !gift && index < filled;
@@ -78,7 +78,7 @@ export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardT
                 <span
                   key={index}
                   className={cn(
-                    "grid aspect-square place-items-center rounded-full transition-colors duration-300",
+                    "grid size-14 place-items-center rounded-full transition-colors duration-300",
                     gift
                       ? done
                         ? "bg-amber text-ink"
@@ -89,16 +89,16 @@ export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardT
                   )}
                 >
                   {gift ? (
-                    <Gift weight="fill" className="size-6" />
+                    <Gift weight="fill" className="size-5" />
                   ) : (
-                    stamped && <Coffee weight="fill" className="size-6" />
+                    stamped && <Coffee weight="fill" className="size-5" />
                   )}
                 </span>
               );
             })}
           </div>
 
-          <p key={selected} className="animate-enter rounded-full bg-amber px-4 py-2 text-center font-bold text-ink">
+          <p key={selected} className="animate-enter rounded-full bg-amber px-4 py-2 text-center text-sm font-bold text-ink">
             {card.status[selected]}
           </p>
         </div>
