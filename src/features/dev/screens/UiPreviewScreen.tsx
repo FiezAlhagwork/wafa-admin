@@ -30,6 +30,7 @@ import {
   OtpField,
   Skeleton,
   Spinner,
+  Switch,
   StatCard,
   StatusBadge,
   Textarea,
@@ -131,6 +132,10 @@ export function UiPreviewScreen() {
           <Spinner size="md" />
           <Spinner size="lg" label="جارٍ التحميل" className="text-brand" />
         </Row>
+      </Section>
+
+      <Section title="Switch">
+        <SwitchDemo />
       </Section>
 
       <Section title="Field · Input · Textarea">
@@ -261,5 +266,44 @@ export function UiPreviewScreen() {
       </header>
       <ListsPreview />
     </main>
+  );
+}
+
+/** On, off, saving and disabled; the saving one turns back on its own after a moment. */
+function SwitchDemo() {
+  const [on, setOn] = useState(true);
+  const [off, setOff] = useState(false);
+  const [saving, setSaving] = useState(false);
+  return (
+    <Row label="الحالات">
+      <span className="flex items-center gap-2 text-sm">
+        <Switch checked={on} onCheckedChange={setOn} label="شام كاش" />
+        {on ? "فعّالة" : "موقوفة"}
+      </span>
+      <span className="flex items-center gap-2 text-sm">
+        <Switch checked={off} onCheckedChange={setOff} label="الهرم" />
+        {off ? "فعّالة" : "موقوفة"}
+      </span>
+      <span className="flex items-center gap-2 text-sm">
+        <Switch
+          checked={saving}
+          loading={saving}
+          onCheckedChange={() => {
+            setSaving(true);
+            setTimeout(() => setSaving(false), 1500);
+          }}
+          label="يحفظ"
+        />
+        جارٍ الحفظ
+      </span>
+      <span className="flex items-center gap-2 text-sm text-fg-muted">
+        <Switch checked={false} onCheckedChange={() => {}} label="معطّل" disabled />
+        معطّل
+      </span>
+      <span className="flex items-center gap-2 text-sm text-fg-muted">
+        <Switch checked onCheckedChange={() => {}} label="معطّل ومفعّل" disabled />
+        معطّل ومفعّل
+      </span>
+    </Row>
   );
 }

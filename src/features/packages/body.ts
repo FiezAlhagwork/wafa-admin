@@ -1,21 +1,16 @@
+import { normalizeAmount } from "@/lib/format";
 import type { AdminPackage, CreatePackageBody, PackageDuration, UpdatePackageBody } from "@/lib/api/types";
 import { durations } from "./labels";
 import { priceField, type PackageFormValues } from "./schemas";
 
 type PriceChange = { duration_months: PackageDuration; price_usd: number | null };
 
-/** "18" and "18.5" as the server writes them ("18.00", "18.50"), by text only: amounts are never parsed to floats. */
-export function normalizePrice(value: string): string {
-  const [whole, fraction = ""] = value.trim().split(".");
-  return `${whole.replace(/^0+(?=\d)/, "")}.${fraction.padEnd(2, "0")}`;
-}
-
 /** The form's text for a stored price: "18.00" stays, so the field shows what the app shows. */
 export const priceText = (pkg: AdminPackage | null, months: PackageDuration) =>
   pkg?.prices.find((item) => item.duration_months === months)?.price_usd ?? "";
 
 // The API takes numbers. `Number` here converts the validated text for the request; no math is done on it.
-const toNumber = (text: string) => Number(normalizePrice(text));
+const toNumber = (text: string) => Number(normalizeAmount(text));
 
 export function toCreateBody(values: PackageFormValues): CreatePackageBody {
   const prices = durations
@@ -50,7 +45,7 @@ export function toUpdateBody(pkg: AdminPackage, values: PackageFormValues): Upda
     const before = priceText(pkg, months);
     const after = values[priceField(months)].trim();
     if (after === "" && before !== "") prices.push({ duration_months: months, price_usd: null });
-    else if (after !== "" && (before === "" || normalizePrice(after) !== normalizePrice(before))) {
+    else if (after !== "" && (before === "" || normalizeAmount(after) !== normalizeAmount(before))) {
       prices.push({ duration_months: months, price_usd: toNumber(after) });
     }
   }
