@@ -120,7 +120,21 @@
             "title": "محلك في دليل المحلات",
             "text": "يظهر محلك بشعاره وغلافه وبطاقاته لكل مستخدمي تطبيق الزبون."
           }
-        ]
+        ],
+        "visuals": {
+          "stamp": "الطابع 4 من 6",
+          "campaignLabel": "إشعار على موبايل الزبون",
+          "campaignText": "عرض اليوم: طابعان مع كل طلب",
+          "birthdayMonth": "تشرين الثاني",
+          "birthdayDay": "24",
+          "birthdayBadge": "3 أعياد ميلاد اليوم",
+          "statsStamps": "84",
+          "statsStampsLabel": "طابع هذا الشهر",
+          "statsRewards": "12",
+          "statsRewardsLabel": "هدية استُلمت",
+          "shopName": "مقهى الياسمين",
+          "shopMeta": "مقهى · دمشق"
+        }
       },
       "customers": {
         "title": "للزبائن",

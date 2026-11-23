@@ -120,7 +120,21 @@
             "title": "Your shop in the directory",
             "text": "Your shop appears with its logo, cover and cards to every customer app user."
           }
-        ]
+        ],
+        "visuals": {
+          "stamp": "Stamp 4 of 6",
+          "campaignLabel": "A notification on your customer's phone",
+          "campaignText": "Today's offer: two stamps with every order",
+          "birthdayMonth": "November",
+          "birthdayDay": "24",
+          "birthdayBadge": "3 birthdays today",
+          "statsStamps": "84",
+          "statsStampsLabel": "stamps this month",
+          "statsRewards": "12",
+          "statsRewardsLabel": "rewards redeemed",
+          "shopName": "Yasmine Café",
+          "shopMeta": "Café · Damascus"
+        }
       },
       "customers": {
         "title": "For customers",

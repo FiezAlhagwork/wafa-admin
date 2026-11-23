@@ -8,7 +8,7 @@ import {
   User,
 } from "@phosphor-icons/react/ssr";
 import { getTranslations } from "next-intl/server";
-import { MerchantFeatures } from "./MerchantFeatures";
+import { MerchantFeatures, type VisualText } from "./MerchantFeatures";
 import { SectionHeading } from "./SectionHeading";
 
 type Item = { title: string; text: string };
@@ -19,6 +19,7 @@ const customerIcons = [DeviceMobile, QrCode, MagnifyingGlass, BellSimpleSlash];
 export async function Features() {
   const t = await getTranslations("home.features");
   const merchantItems = t.raw("merchants.items") as Item[];
+  const merchantVisuals = t.raw("merchants.visuals") as VisualText;
   const customerItems = t.raw("customers.items") as Item[];
 
   return (
@@ -32,7 +33,7 @@ export async function Features() {
             <Storefront aria-hidden weight="duotone" className="size-6 text-brand" />
             {t("merchants.title")}
           </h3>
-          <MerchantFeatures items={merchantItems} />
+          <MerchantFeatures items={merchantItems} visuals={merchantVisuals} />
         </div>
 
         {/* Customers: the same dark card as the stamp card in the hero */}
