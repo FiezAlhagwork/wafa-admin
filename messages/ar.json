@@ -162,15 +162,18 @@
           "cards": [
             {
               "name": "مقهى الياسمين",
-              "progress": "4/6"
+              "filled": 4,
+              "total": 6
             },
             {
               "name": "مخبز السنابل",
-              "progress": "7/8"
+              "filled": 7,
+              "total": 8
             },
             {
               "name": "صالون لمسة",
-              "progress": "2/10"
+              "filled": 2,
+              "total": 10
             }
           ]
         },
