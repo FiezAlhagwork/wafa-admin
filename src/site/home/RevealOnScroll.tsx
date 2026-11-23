@@ -2,8 +2,11 @@
 
 import { useEffect } from "react";
 
-/** Where a block comes in from: below, above, the reading start or end side (mirrors in Arabic), or a small zoom. */
-export type Reveal = "up" | "down" | "start" | "end" | "zoom";
+/**
+ * Where a block comes in from: below, above, the reading start or end side (mirrors in Arabic), a zoom,
+ * or tilt (swings in from the end side, turned, and straightens up).
+ */
+export type Reveal = "up" | "down" | "start" | "end" | "zoom" | "tilt";
 
 /**
  * Reveals the blocks marked data-reveal the first time each one scrolls into view, then stops watching it,

@@ -1,7 +1,7 @@
 "use client";
 
 import { Coffee, Gift } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { focusRing } from "@/components/ui/styles";
 import { cn } from "@/lib/cn";
 
@@ -25,7 +25,7 @@ export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardT
         {steps.map((step, index) => {
           const active = index === selected;
           return (
-            <li key={index}>
+            <li key={index} data-reveal="start" style={{ "--reveal-delay": `${index * 120}ms` } as CSSProperties}>
               <button
                 type="button"
                 aria-pressed={active}
@@ -56,7 +56,12 @@ export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardT
       </ol>
 
       {/* The sample card at the chosen step */}
-      <div aria-hidden className="mx-auto w-full max-w-64 -rotate-3">
+      <div
+        aria-hidden
+        data-reveal="tilt"
+        style={{ "--reveal-delay": "250ms" } as CSSProperties}
+        className="mx-auto w-full max-w-64 -rotate-3"
+      >
         <div className="flex flex-col gap-4 rounded-3xl bg-brand p-5 text-neutral-0 shadow-dialog">
           <div className="flex items-center gap-3">
             <span className="grid size-10 place-items-center rounded-full bg-neutral-0">

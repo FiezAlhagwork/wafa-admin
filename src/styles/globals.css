@@ -264,7 +264,8 @@
 
 /*
  * Website: blocks marked data-reveal come in the first time they scroll into view (RevealOnScroll), each from
- * its own side: up (default), down, start, end (the reading sides, so they mirror in Arabic) or zoom.
+ * its own side: up (default), down, start, end (the reading sides, so they mirror in Arabic), zoom or tilt.
+ * Lists set a growing --reveal-delay on their items, so they come in one after another.
  * The hiding only applies once that script has run (.reveal-ready), so without JavaScript everything shows.
  */
 :root {
@@ -275,23 +276,26 @@
 }
 .reveal-ready [data-reveal] {
   opacity: 0;
-  transform: translateY(32px);
+  transform: translateY(64px);
   transition:
-    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0ms);
 }
 .reveal-ready [data-reveal="down"] {
-  transform: translateY(-32px);
+  transform: translateY(-64px);
 }
 .reveal-ready [data-reveal="start"] {
-  transform: translateX(calc(56px * var(--reveal-dir)));
+  transform: translateX(calc(120px * var(--reveal-dir)));
 }
 .reveal-ready [data-reveal="end"] {
-  transform: translateX(calc(-56px * var(--reveal-dir)));
+  transform: translateX(calc(-120px * var(--reveal-dir)));
 }
 .reveal-ready [data-reveal="zoom"] {
-  transform: scale(0.9);
+  transform: scale(0.8);
+}
+.reveal-ready [data-reveal="tilt"] {
+  transform: translateX(calc(-140px * var(--reveal-dir))) rotate(calc(-12deg * var(--reveal-dir)));
 }
 .reveal-ready [data-reveal][data-revealed] {
   opacity: 1;

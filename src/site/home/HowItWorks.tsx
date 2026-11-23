@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import type { CSSProperties } from "react";
 import { HowItWorksShowcase, type CardText, type Step } from "./HowItWorksShowcase";
 import { SectionHeading } from "./SectionHeading";
 import { StampsBackdrop } from "./StampsBackdrop";
@@ -13,9 +12,7 @@ export async function HowItWorks() {
       <StampsBackdrop variant="how" />
       <div className="relative mx-auto flex max-w-6xl flex-col gap-12 px-4 sm:px-6">
         <SectionHeading id="how-title" eyebrow={t("eyebrow")} title={t("title")} reveal="down" />
-        <div data-reveal="end" style={{ "--reveal-delay": "120ms" } as CSSProperties}>
-          <HowItWorksShowcase steps={t.raw("steps") as Step[]} card={t.raw("card") as CardText} />
-        </div>
+        <HowItWorksShowcase steps={t.raw("steps") as Step[]} card={t.raw("card") as CardText} />
       </div>
     </section>
   );

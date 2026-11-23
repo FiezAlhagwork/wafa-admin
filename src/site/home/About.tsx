@@ -23,14 +23,22 @@ export async function About() {
         />
 
         {/* Paper card turning into the digital one */}
-        <div data-reveal="end" style={{ "--reveal-delay": "150ms" } as CSSProperties} aria-hidden className="flex items-center justify-center gap-4 sm:gap-6">
-          <div className="flex w-36 -rotate-3 flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-border-strong bg-surface p-5 text-center sm:w-40">
+        <div aria-hidden className="flex items-center justify-center gap-4 sm:gap-6">
+          <div
+            data-reveal="start"
+            style={{ "--reveal-delay": "150ms" } as CSSProperties}
+            className="flex w-36 -rotate-3 flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-border-strong bg-surface p-5 text-center sm:w-40">
             <Notepad weight="duotone" className="size-10 text-neutral-500" />
             <span className="font-bold text-fg">{t("paper.label")}</span>
             <span className="text-sm text-fg-muted">{t("paper.note")}</span>
           </div>
-          <ArrowRight weight="bold" className="size-7 shrink-0 text-amber rtl:-scale-x-100" />
-          <div className="flex w-36 rotate-3 flex-col items-center gap-2 rounded-2xl bg-brand p-5 text-center text-neutral-0 shadow-dialog sm:w-40">
+          <span data-reveal="zoom" style={{ "--reveal-delay": "450ms" } as CSSProperties} className="shrink-0">
+            <ArrowRight weight="bold" className="size-7 text-amber rtl:-scale-x-100" />
+          </span>
+          <div
+            data-reveal="end"
+            style={{ "--reveal-delay": "300ms" } as CSSProperties}
+            className="flex w-36 rotate-3 flex-col items-center gap-2 rounded-2xl bg-brand p-5 text-center text-neutral-0 shadow-dialog sm:w-40">
             <DeviceMobile weight="duotone" className="size-10 text-amber" />
             <span className="font-bold">{t("digital.label")}</span>
             <span className="text-sm text-neutral-0/80">{t("digital.note")}</span>

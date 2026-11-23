@@ -14,7 +14,7 @@ import {
   Storefront,
   type Icon,
 } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { focusRing } from "@/components/ui/styles";
 import { cn } from "@/lib/cn";
 
@@ -161,7 +161,7 @@ export function MerchantFeatures({ items, visuals }: { items: Item[]; visuals: V
           const ItemIcon = icons[index] ?? Palette;
           const active = index === selected;
           return (
-            <li key={index}>
+            <li key={index} data-reveal="up" style={{ "--reveal-delay": `${index * 80}ms` } as CSSProperties}>
               <button
                 type="button"
                 aria-pressed={active}
@@ -191,6 +191,8 @@ export function MerchantFeatures({ items, visuals }: { items: Item[]; visuals: V
 
       <div
         aria-live="polite"
+        data-reveal="end"
+        style={{ "--reveal-delay": "200ms" } as CSSProperties}
         className="flex min-h-72 flex-col gap-4 rounded-3xl bg-brand p-7 text-neutral-0 sm:p-9"
       >
         <div key={selected} className="flex animate-enter flex-col gap-4">

@@ -31,7 +31,7 @@ export function FaqShowcase({ intro, groupsLabel, groups }: FaqShowcaseProps) {
           style={{ "--reveal-delay": "200ms" } as CSSProperties}
           role="group"
           aria-label={groupsLabel}
-          className="mt-8 flex gap-2 lg:flex-col lg:self-stretch"
+          className="mt-8 inline-flex max-w-full gap-1 rounded-full border border-border-strong bg-surface p-1"
         >
           {groups.map((group, index) => {
             const active = index === selected;
@@ -42,10 +42,8 @@ export function FaqShowcase({ intro, groupsLabel, groups }: FaqShowcaseProps) {
                 aria-pressed={active}
                 onClick={() => setSelected(index)}
                 className={cn(
-                  "rounded-xl border px-5 py-3 text-start font-bold transition-colors",
-                  active
-                    ? "border-brand bg-surface text-fg"
-                    : "border-transparent text-fg-muted hover:bg-surface/60 hover:text-fg",
+                  "h-10 rounded-full px-5 font-bold transition-colors",
+                  active ? "bg-brand text-brand-on" : "text-fg-muted hover:bg-neutral-50 hover:text-fg",
                   focusRing,
                 )}
               >
@@ -56,12 +54,14 @@ export function FaqShowcase({ intro, groupsLabel, groups }: FaqShowcaseProps) {
         </div>
       </div>
 
-      <div data-reveal="end" style={{ "--reveal-delay": "150ms" } as CSSProperties}>
+      <div>
         {groups.map((group, index) => (
           <div key={index} hidden={index !== selected} className="flex flex-col gap-3">
             {group.items.map((item, itemIndex) => (
               <details
                 key={itemIndex}
+                data-reveal="end"
+                style={{ "--reveal-delay": `${itemIndex * 80}ms` } as CSSProperties}
                 className="group rounded-2xl border border-border bg-surface transition-colors open:border-brand"
               >
                 <summary

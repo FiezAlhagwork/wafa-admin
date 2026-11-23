@@ -32,8 +32,8 @@ export async function Features() {
         <SectionHeading id="features-title" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} reveal="zoom" />
 
         {/* Merchants */}
-        <div data-reveal="up" className="flex flex-col gap-6">
-          <h3 className="flex items-center gap-2 text-xl font-bold text-fg">
+        <div className="flex flex-col gap-6">
+          <h3 data-reveal="start" className="flex items-center gap-2 text-xl font-bold text-fg">
             <Storefront aria-hidden weight="duotone" className="size-6 text-brand" />
             {t("merchants.title")}
           </h3>
