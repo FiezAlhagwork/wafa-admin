@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="640" viewBox="0 0 480 640">
+  <rect width="480" height="640" fill="#F7F7F5"/>
+  <rect x="40" y="48" width="400" height="544" rx="16" fill="#FFFFFF" stroke="#D7D9DB"/>
+  <circle cx="240" cy="132" r="36" fill="#17A398"/>
+  <path d="M222 132l12 12 24-26" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="240" y="216" font-family="sans-serif" font-size="22" text-anchor="middle" fill="#14213D">Transfer completed</text>
+  <text x="240" y="252" font-family="sans-serif" font-size="16" text-anchor="middle" fill="#6A7283">Sample proof (dev preview)</text>
+  <rect x="72" y="300" width="336" height="2" fill="#E7E8E8"/>
+  <text x="72" y="344" font-family="sans-serif" font-size="14" fill="#6A7283">Amount</text>
+  <text x="408" y="344" font-family="sans-serif" font-size="16" text-anchor="end" fill="#14213D">591,500 SYP</text>
+  <text x="72" y="388" font-family="sans-serif" font-size="14" fill="#6A7283">Reference</text>
+  <text x="408" y="388" font-family="sans-serif" font-size="16" text-anchor="end" fill="#14213D">TX-84721903</text>
+</svg>

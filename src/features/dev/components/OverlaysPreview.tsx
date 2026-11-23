@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import {
   CaretDown,
   CheckCircle,
@@ -21,10 +21,14 @@ import {
   DialogClose,
   Field,
   IconButton,
+  Input,
   Menu,
   MenuGroup,
   MenuItem,
   MenuSeparator,
+  Notice,
+  ReasonDialog,
+  REASON_MIN,
   Textarea,
   toast,
   Tooltip,
@@ -140,6 +144,10 @@ export function OverlaysPreview() {
         />
       </PreviewSection>
 
+      <PreviewSection title="ReasonDialog">
+        <ReasonDialogPreview />
+      </PreviewSection>
+
       <PreviewSection title="Toast">
         <PreviewRow label="type">
           <Button variant="secondary" onClick={() => toast.success("تم حفظ التغييرات")}>
@@ -227,6 +235,90 @@ export function OverlaysPreview() {
           </Tooltip>
         </PreviewRow>
       </PreviewSection>
+    </>
+  );
+}
+
+type ReasonDemo = "plain" | "extra" | "server-error" | "loading";
+
+/** Every state of the shared reason dialog: empty, the rule's error, the server's error, sending, an extra field. */
+function ReasonDialogPreview() {
+  const [demo, setDemo] = useState<ReasonDemo | null>(null);
+  const [reason, setReason] = useState("");
+  const [error, setError] = useState<string | undefined>();
+  const [sending, setSending] = useState(false);
+
+  const open = (next: ReasonDemo) => {
+    setReason("");
+    setError(next === "server-error" ? "هذا الحقل مطلوب" : undefined);
+    setSending(next === "loading");
+    setDemo(next);
+  };
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (reason.trim().length < REASON_MIN) {
+      setError(`اكتب السبب (${REASON_MIN} أحرف على الأقل)`);
+      return;
+    }
+    setSending(true);
+    setTimeout(() => {
+      setSending(false);
+      setDemo(null);
+      toast.success("تم إيقاف التاجر");
+    }, 1200);
+  };
+
+  return (
+    <>
+      <PreviewRow label="الحالات">
+        <Button variant="secondary" onClick={() => open("plain")}>
+          سبب فقط (جرّب حرفين)
+        </Button>
+        <Button variant="secondary" onClick={() => open("extra")}>
+          مع حقل إضافي
+        </Button>
+        <Button variant="secondary" onClick={() => open("server-error")}>
+          خطأ من الخادم
+        </Button>
+        <Button variant="secondary" onClick={() => open("loading")}>
+          أثناء الإرسال
+        </Button>
+      </PreviewRow>
+
+      <PreviewRow label="Notice">
+        <div className="flex w-full max-w-lg flex-col gap-2">
+          <Notice>إذا كان هذا الطابع هو الذي أكمل البطاقة، تعود الدورة لجمع الأختام.</Notice>
+          <Notice tone="warning">لا أختام ولا زبائن جدد ولا حملات. تسليم الهدايا الجاهزة يبقى شغّالاً.</Notice>
+        </div>
+      </PreviewRow>
+
+      {demo && (
+        <ReasonDialog
+          title={demo === "extra" ? "تمديد التجربة" : "إيقاف مقهى الياسمين؟"}
+          description={demo === "extra" ? "تُضاف الأيام بعد نهاية التجربة." : "للاحتيال أو مخالفة الشروط."}
+          confirmLabel={demo === "extra" ? "تمديد" : "إيقاف التاجر"}
+          tone={demo === "extra" ? "primary" : "danger"}
+          loading={sending}
+          onClose={() => setDemo(null)}
+          onSubmit={submit}
+          reasonProps={{
+            value: reason,
+            onChange: (event) => {
+              setReason(event.target.value);
+              setError(undefined);
+            },
+          }}
+          reasonLength={reason.length}
+          reasonError={error}
+        >
+          {demo === "extra" && (
+            <Field label="عدد الأيام" required hint="من 1 إلى 90 يوماً." disabled={sending}>
+              <Input dir="ltr" inputMode="numeric" defaultValue="14" className="w-28 text-center" />
+            </Field>
+          )}
+        </ReasonDialog>
+      )}
     </>
   );
 }

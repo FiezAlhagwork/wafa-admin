@@ -18,6 +18,9 @@ const statuses = {
   pending: { label: "بانتظار التنفيذ", tone: "neutral" },
   executed: { label: "منفّذ", tone: "success" },
   cancelled: { label: "ملغى", tone: "neutral" },
+  // Admin account (active uses ACTIVE)
+  admin_inactive: { label: "معطّل", tone: "neutral" },
+  admin_invited: { label: "بانتظار أول دخول", tone: "info" },
   // Alerts
   overdue: { label: "متأخر", tone: "warning" },
   duplicate_reference: { label: "مرجع مكرر", tone: "warning" },
@@ -30,6 +33,11 @@ type StatusBadgeProps = {
   status: Status | null;
   className?: string;
 };
+
+/** The Arabic name of a status, for places that need it as text (a tooltip, an aria-label). */
+export function statusLabel(status: Status | null): string {
+  return status === null ? "قيد التسجيل" : statuses[status].label;
+}
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   const { label, tone } = status === null ? { label: "قيد التسجيل", tone: "neutral" as const } : statuses[status];

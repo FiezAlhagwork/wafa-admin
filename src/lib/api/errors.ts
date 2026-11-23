@@ -1,4 +1,11 @@
 import { isAxiosError } from "axios";
+import type { FieldValues, Path, UseFormSetError } from "react-hook-form";
+import {
+  errorMessages,
+  FALLBACK_ERROR_MESSAGE,
+  FALLBACK_FIELD_MESSAGE,
+  fieldRuleMessages,
+} from "./error-messages";
 import type { ErrorCode, ErrorResponse } from "./types";
 
 /** Codes the client produces itself, when the server never answered with an error body. */
@@ -46,4 +53,34 @@ export function toApiError(error: unknown): ApiError {
   }
 
   return new ApiError(0, "UNKNOWN_ERROR", {}, error instanceof Error ? error.message : String(error));
+}
+
+/** The Arabic text to show for any failure. Never show `error.message`. */
+export function getErrorMessage(error: unknown): string {
+  const { code, details } = toApiError(error);
+  const text = errorMessages[code];
+  if (text === undefined) return FALLBACK_ERROR_MESSAGE;
+  return typeof text === "function" ? text(details) : text;
+}
+
+/**
+ * Maps a `422 VALIDATION_FAILED` onto the form: each field gets the Arabic text of its first failed rule.
+ * Returns whether it applied anything; when false, show `getErrorMessage(error)` as a toast instead.
+ */
+export function applyFieldErrors<T extends FieldValues>(error: unknown, setError: UseFormSetError<T>): boolean {
+  const { code, details } = toApiError(error);
+  if (code !== "VALIDATION_FAILED") return false;
+
+  const { fields } = details;
+  if (typeof fields !== "object" || fields === null) return false;
+
+  let applied = false;
+  for (const [name, rules] of Object.entries(fields)) {
+    const rule: unknown = Array.isArray(rules) ? rules[0] : undefined;
+    const message = (typeof rule === "string" && fieldRuleMessages[rule]) || FALLBACK_FIELD_MESSAGE;
+    // The server names the field; we can't prove at compile time that it is one of this form's paths.
+    setError(name as Path<T>, { type: "server", message });
+    applied = true;
+  }
+  return applied;
 }

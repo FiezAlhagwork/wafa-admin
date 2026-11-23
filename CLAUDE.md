@@ -297,7 +297,8 @@ All defined in `@theme` in `styles/globals.css`. **Never use hex colors in compo
 | `GRACE` · `overdue` · `duplicate_reference` | `warning` |
 | `EXPIRED` · `PENDING` · `pending` | `neutral` |
 | `SUSPENDED` · `REJECTED` · `PENDING_DELETION` · `DELETED` | `danger` |
-| `cancelled` · registration in progress (`status: null`) | `neutral` |
+| `cancelled` · admin account deactivated · registration in progress (`status: null`) | `neutral` |
+| admin account not yet linked (waiting for the first sign-in) | `info` |
 
 ### Rules
 
@@ -308,7 +309,17 @@ All defined in `@theme` in `styles/globals.css`. **Never use hex colors in compo
 
 ### Components
 
-- **Fully ours:** Button, IconButton, Input, Textarea, Field (label + error + hint), Badge, StatusBadge (all merchant, payment and request statuses), Card, StatCard, Table, PageHeader, Sidebar, Skeleton, EmptyState, ErrorState, LoadMore, Spinner.
+- **Fully ours:** Button, IconButton, Input, Textarea, Field (label + error + hint), Badge, StatusBadge (all merchant, payment and request statuses), Card, IconTile (section icon on a soft colored square), StatCard, Avatar (logo or initials, color from the record id), Table, PageHeader, Sidebar, Skeleton, EmptyState, ErrorState, LoadMore, Spinner.
+
+### Visual direction ("براند جريء")
+
+Approved by the owner on 2026-11-17 (the earlier plain white look was rejected as generic). Keep every new screen in it:
+- **Sidebar on ink** (`bg-sidebar`), the active item with an amber marker and amber icon, alert counts as amber badges, the account at the bottom.
+- **Cards** float: `rounded-2xl`, faint `border-ink/6`, `shadow-card`; inner dividers use `divider`. Card sections get an `IconTile` in the header.
+- **Big headings** (`PageHeader` 30px black), headline numbers in `font-black`; the one headline figure is `StatCard tone="accent"` (ink card, amber number).
+- **Records have faces:** every merchant/admin/payment row starts with an `Avatar`; whole rows/cards open the record (no "عرض" button).
+- **Only real data:** a design element without an API field behind it is left out (no fake search, counts or trends).
+- **One scrollbar:** thin and gray, set once in `globals.css`. Where scrolling is obvious without a bar (the sidebar, tab rows, chip rows) use `scrollbar-none`; tables keep the bar (it shows there are more columns).
 - **Ours on top of Base UI:** Dialog, ConfirmDialog, ReasonDialog, Menu, Select, Combobox (for long filters), Popover, Tooltip, Toast, Checkbox, Switch, Tabs.
 
 Every new component in `components/ui` is built before it's used in a screen, with all its states (default, hover, focus, disabled, loading, error).

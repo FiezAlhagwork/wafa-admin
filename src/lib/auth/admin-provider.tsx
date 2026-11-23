@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { SignOut } from "@phosphor-icons/react";
@@ -12,7 +13,8 @@ import { setTokenGetter } from "@/lib/api/client";
 import { isApiError } from "@/lib/api/errors";
 import { authKeys, getMe, type Me } from "./me";
 
-const AdminContext = createContext<Me | null>(null);
+// Exported only for the development preview (/dev/shell), which renders the Shell with a fake admin. Use `useAdmin()`.
+export const AdminContext = createContext<Me | null>(null);
 
 /** The signed-in admin and their permissions. Only usable under /admin (inside AdminProvider). */
 export function useAdmin() {
@@ -28,11 +30,21 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   // first request below fires (an effect could run after the query starts and send it without a token).
   setTokenGetter(getToken);
 
+  // Signed out, here or in another tab (Clerk syncs the session across tabs): back to the sign-in page. Based on
+  // Clerk's own state, not on an API 401, so it can't loop when the origin is missing on the backend.
+  const router = useRouter();
+  const signedOut = isLoaded && !isSignedIn;
+  useEffect(() => {
+    if (signedOut) router.replace("/sign-in");
+  }, [signedOut, router]);
+
   const me = useQuery({
     queryKey: authKeys.me,
     queryFn: getMe,
     enabled: isLoaded && isSignedIn,
     staleTime: 5 * 60_000,
+    // A 403 here is the "no access" screen below, not a toast
+    meta: { skipSharedError: true },
   });
 
   if (me.isSuccess) return <AdminContext value={me.data}>{children}</AdminContext>;

@@ -21,8 +21,8 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <div role="alert" className={cn("flex flex-col items-center justify-center gap-4 px-6 py-12 text-center", className)}>
-      <span aria-hidden className="flex size-12 items-center justify-center rounded-full bg-danger-soft text-danger">
-        <WarningOctagon className="size-6" />
+      <span aria-hidden className="flex size-14 items-center justify-center rounded-2xl bg-danger-soft text-danger">
+        <WarningOctagon className="size-7" />
       </span>
       <div className="flex max-w-sm flex-col gap-1">
         <p className="font-bold text-fg">{title}</p>

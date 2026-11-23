@@ -6,20 +6,26 @@ import { X } from "@phosphor-icons/react/ssr";
 import { cn } from "@/lib/cn";
 import { Button, type ButtonProps } from "./Button";
 import { IconButton } from "./IconButton";
-import { popupMotion } from "./styles";
+import { popupMotion, sheetMotion } from "./styles";
 
-type DialogSize = "sm" | "md" | "lg";
+type DialogSize = "sm" | "md" | "lg" | "xl";
 
 const sizes: Record<DialogSize, string> = {
   sm: "max-w-sm",
   md: "max-w-lg",
   lg: "max-w-2xl",
+  xl: "max-w-3xl",
 };
 
 type DialogShellProps = {
   title: ReactNode;
   description?: ReactNode;
   size?: DialogSize;
+  /**
+   * On small screens the dialog becomes a sheet sliding up from the bottom (at most 88% of the height, so the page
+   * stays visible above it) instead of a centered box; from `sm` up it is the usual centered dialog.
+   */
+  sheet?: boolean;
   /** Buttons, laid out on the end side. */
   footer?: ReactNode;
   closeButton?: boolean;
@@ -35,6 +41,7 @@ export function DialogShell({
   title,
   description,
   size = "md",
+  sheet = false,
   footer,
   closeButton = true,
   className,
@@ -42,17 +49,20 @@ export function DialogShell({
 }: DialogShellProps) {
   return (
     <BaseDialog.Portal>
-      <BaseDialog.Backdrop className="fixed inset-0 bg-ink/40 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
-      <BaseDialog.Viewport className="fixed inset-0 flex items-center justify-center p-4">
+      <BaseDialog.Backdrop className="fixed inset-0 z-50 bg-ink/40 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+      <BaseDialog.Viewport
+        className={cn("fixed inset-0 z-50 flex justify-center", sheet ? "items-end sm:items-center sm:p-4" : "items-center p-4")}
+      >
         <BaseDialog.Popup
           className={cn(
             "flex max-h-full w-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-dialog outline-none",
-            popupMotion,
+            sheet ? [sheetMotion, "max-h-[88dvh] max-sm:rounded-b-none max-sm:border-b-0 sm:max-h-full"] : popupMotion,
             sizes[size],
             className,
           )}
         >
-          <div className="flex items-start gap-4 px-6 pt-6 pb-4">
+          {sheet && <div aria-hidden className="mx-auto mt-2.5 h-1 w-10 shrink-0 rounded-full bg-neutral-300 sm:hidden" />}
+          <div className={cn("flex items-start gap-4 px-6 pt-6 pb-4", sheet && "max-sm:pt-3")}>
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               <BaseDialog.Title className="text-lg font-bold text-fg">{title}</BaseDialog.Title>
               {description && (
@@ -69,7 +79,13 @@ export function DialogShell({
           {children && <div className="min-h-0 overflow-y-auto px-6 pb-5">{children}</div>}
 
           {footer && (
-            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border bg-neutral-50 px-6 py-4">
+            <div
+              className={cn(
+                "flex flex-wrap items-center justify-end gap-2 border-t border-border bg-neutral-50 px-6 py-4",
+                // Keep the buttons clear of the phone's home indicator
+                sheet && "max-sm:pb-[max(1rem,env(safe-area-inset-bottom))]",
+              )}
+            >
               {footer}
             </div>
           )}
