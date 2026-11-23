@@ -89,25 +89,33 @@
       "paper": { "label": "Paper", "note": "Gets lost, gets wet" },
       "digital": { "label": "Digital", "note": "Always with you" }
     },
-      "how": {
-        "eyebrow": "How it works",
-        "title": "Three steps, no paper cards",
-        "step": "Step {number}",
-        "steps": [
-          {
-            "title": "The merchant creates a card",
-            "text": "They set the number of stamps and the reward, pick a colour and an icon, and the card is live for their customers."
-          },
-          {
-            "title": "The customer collects stamps",
-            "text": "On every visit they show their code in the app, and the merchant scans it to add a stamp."
-          },
-          {
-            "title": "A reward when it's full",
-            "text": "When the card is complete, the customer collects the reward from the shop and starts a new one."
-          }
+    "how": {
+      "eyebrow": "How it works",
+      "title": "Three steps, no paper cards",
+      "steps": [
+        {
+          "title": "The merchant creates a card",
+          "text": "They set the number of stamps and the reward, pick a colour and an icon, and the card is live for their customers."
+        },
+        {
+          "title": "The customer collects stamps",
+          "text": "On every visit they show their code in the app, and the merchant scans it to add a stamp."
+        },
+        {
+          "title": "A reward when it's full",
+          "text": "When the card is complete, the customer collects the reward from the shop and starts a new one."
+        }
+      ],
+      "card": {
+        "shop": "Yasmine Café",
+        "of": "of 5 stamps",
+        "status": [
+          "A new card, ready to fill",
+          "2 more stamps to your reward",
+          "Your reward is ready!"
         ]
-      },
+      }
+    },
     "features": {
       "eyebrow": "Features",
       "title": "Everything a shop and its customers need",

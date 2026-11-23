@@ -28,10 +28,10 @@ const layouts = {
     { place: "end-[6%] bottom-[3%]", look: "size-6 bg-amber/30", delay: "-5s", duration: "6s", mobile: true },
   ],
   how: [
-    { place: "start-[4%] top-[12%]", look: "size-12 border-2 border-dashed border-brand/40", delay: "-2s", duration: "8s", mobile: true },
-    { place: "end-[5%] top-[18%]", look: "size-10 bg-amber/25", delay: "0s", duration: "7s", mobile: true },
-    { place: "start-[30%] bottom-[8%]", look: "size-7 bg-teal/25", delay: "-4s", duration: "9s" },
-    { place: "end-[25%] bottom-[12%]", look: "size-9 border-2 border-dashed border-teal/60", delay: "-1s", duration: "6s" },
+    { place: "start-[1%] top-[8%]", look: "size-12 border-2 border-dashed border-brand/40", delay: "-2s", duration: "8s", mobile: true },
+    { place: "end-[1%] top-[14%]", look: "size-10 bg-amber/25", delay: "0s", duration: "7s", mobile: true },
+    { place: "start-[1%] bottom-[6%]", look: "size-8 bg-teal/25", delay: "-4s", duration: "9s" },
+    { place: "end-[2%] bottom-[4%]", look: "size-9 border-2 border-dashed border-teal/60", delay: "-1s", duration: "6s" },
   ],
 } satisfies Record<string, Stamp[]>;
 
