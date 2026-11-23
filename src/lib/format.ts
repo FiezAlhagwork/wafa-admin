@@ -46,6 +46,15 @@ const withGrouping = (amount: string) => amount.replace(/^(-?\d+)/, (integer) =>
 /** A decimal string with grouping and its decimals kept ("13000.50" → "13,000.50"): for rates and similar. */
 export const formatDecimal = withGrouping;
 
+/**
+ * A typed amount as the server writes it: "18" → "18.00", "18.5" → "18.50". By text only, to compare a form value
+ * with a stored one: amounts are never parsed to floats.
+ */
+export function normalizeAmount(value: string): string {
+  const [whole, fraction = ""] = value.trim().split(".");
+  return `${whole.replace(/^0+(?=\d)/, "")}.${fraction.padEnd(2, "0")}`;
+}
+
 export const formatUsd = (amount: string) => `$${withGrouping(amount)}`;
 
 /** Syrian pounds, without the decimals ("591500.00" → "591,500 ل.س"): the cents of a pound mean nothing. */

@@ -25,6 +25,7 @@ export { Skeleton } from "./Skeleton";
 export { Spinner } from "./Spinner";
 export { StatCard } from "./StatCard";
 export { StatusBadge, statusLabel, type Status } from "./StatusBadge";
+export { Switch } from "./Switch";
 export { focusRing } from "./styles";
 export { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, TableSkeletonRows } from "./Table";
 export { Tabs } from "./Tabs";

@@ -1,8 +1,8 @@
 import type { PaymentMethod, PaymentRejectionReason, PaymentStatus } from "@/lib/api/types";
 
 export const methodLabels: Record<PaymentMethod, string> = {
-  syriatel_cash: "سيريتل كاش",
-  transfer: "حوالة",
+  sham_cash: "شام كاش",
+  haram: "الهرم",
 };
 
 export const rejectionReasonLabels: Record<PaymentRejectionReason, string> = {

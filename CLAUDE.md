@@ -314,7 +314,7 @@ All defined in `@theme` in `styles/globals.css`. **Never use hex colors in compo
 ### Visual direction ("براند جريء")
 
 Approved by the owner on 2026-11-17 (the earlier plain white look was rejected as generic). Keep every new screen in it:
-- **Sidebar on ink** (`bg-sidebar`), the active item with an amber marker and amber icon, alert counts as amber badges, the account at the bottom.
+- **Sidebar on brand navy** (`bg-sidebar` = `brand`, same as the primary button; changed from ink by the owner on 2026-11-23), the active item with an amber marker and amber icon, alert counts as amber badges, the account at the bottom.
 - **Cards** float: `rounded-2xl`, faint `border-ink/6`, `shadow-card`; inner dividers use `divider`. Card sections get an `IconTile` in the header.
 - **Big headings** (`PageHeader` 30px black), headline numbers in `font-black`; the one headline figure is `StatCard tone="accent"` (ink card, amber number).
 - **Records have faces:** every merchant/admin/payment row starts with an `Avatar`; whole rows/cards open the record (no "عرض" button).

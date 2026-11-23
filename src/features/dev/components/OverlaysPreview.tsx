@@ -77,7 +77,7 @@ export function OverlaysPreview() {
           open={dialogOpen}
           onOpenChange={setDialogOpen}
           title="تفاصيل الدفعة"
-          description="أُرسلت قبل ساعتين عبر سيريتل كاش."
+          description="أُرسلت قبل ساعتين عبر شام كاش."
           footer={<DialogClose>إغلاق</DialogClose>}
         >
           <p className="text-sm leading-relaxed text-fg-muted">

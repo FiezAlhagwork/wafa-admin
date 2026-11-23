@@ -6,6 +6,7 @@ import { CaretLeft, List, SidebarSimple } from "@phosphor-icons/react";
 import { Drawer, IconButton, Tooltip } from "@/components/ui";
 import { findNavGroupItem } from "@/config/navigation";
 import { cn } from "@/lib/cn";
+import { railMotion } from "./rail";
 import { Sidebar } from "./Sidebar";
 
 const STORAGE_KEY = "wafa-admin:sidebar-collapsed";
@@ -65,14 +66,13 @@ export function Shell({ children, pathname: pathnameOverride }: ShellProps) {
     // content (on its far side), never as a light strip beside the dark sidebar. Small screens keep the window
     // scroll (the mobile address bar collapses with it).
     <div className="min-h-dvh lg:flex lg:h-dvh lg:overflow-hidden">
+      {/* The column only clips its fixed-width content as it folds, so the menu never re-lays itself out */}
       <aside
-        className={cn(
-          "z-30 hidden shrink-0 lg:block",
-          "transition-[width] duration-200 ease-out motion-reduce:transition-none",
-          collapsed ? "w-18" : "w-66",
-        )}
+        className={cn("z-30 hidden shrink-0 overflow-hidden lg:block", "transition-[width]", railMotion, collapsed ? "w-18" : "w-66")}
       >
-        <Sidebar collapsed={collapsed} pathname={pathname} />
+        <div className="h-full w-66">
+          <Sidebar collapsed={collapsed} pathname={pathname} />
+        </div>
       </aside>
 
       <Drawer open={menuOpen} onOpenChange={setMenuOpen} label="القائمة الرئيسية" className="bg-sidebar">

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Icon } from "@phosphor-icons/react";
-import { Bank, DeviceMobile } from "@phosphor-icons/react/ssr";
+import { HandCoins, Wallet } from "@phosphor-icons/react/ssr";
 import { Avatar, Latin, StatusBadge } from "@/components/ui";
 import type { AdminPayment, PaymentMethod as Method } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
@@ -39,11 +39,12 @@ export function PaymentAmount({ payment, className }: PaymentProps) {
 }
 
 /** The icon of each payment method (the review dialog shows it in a badge). */
-export const MethodIcon: Record<Method, Icon> = { syriatel_cash: DeviceMobile, transfer: Bank };
+// Sham Cash is a mobile wallet; Al Haram is a money transfer office
+export const MethodIcon: Record<Method, Icon> = { sham_cash: Wallet, haram: HandCoins };
 
 const methodIcons: Record<Method, ReactNode> = {
-  syriatel_cash: <DeviceMobile aria-hidden className="size-4 shrink-0 text-fg-muted" />,
-  transfer: <Bank aria-hidden className="size-4 shrink-0 text-fg-muted" />,
+  sham_cash: <Wallet aria-hidden className="size-4 shrink-0 text-fg-muted" />,
+  haram: <HandCoins aria-hidden className="size-4 shrink-0 text-fg-muted" />,
 };
 
 /** How it was paid, with the reference under it. */
@@ -59,7 +60,7 @@ export function PaymentMethod({ payment, className }: PaymentProps) {
   );
 }
 
-/** The same facts in one wrapping line, for the card: "🏦 حوالة · TX-30771". */
+/** The same facts in one wrapping line, for the card: "الهرم · TX-30771" (with its icon). */
 export function PaymentMethodInline({ payment, className }: PaymentProps) {
   return (
     <span className={cn("inline-flex flex-wrap items-center gap-x-2 gap-y-0.5", className)}>

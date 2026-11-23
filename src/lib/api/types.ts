@@ -44,3 +44,12 @@ type PackageInput = Schemas["PackageInput"];
 export type CreatePackageBody = Required<Pick<PackageInput, "name" | "cards_limit" | "weekly_campaigns_limit" | "prices">> &
   Pick<PackageInput, "is_active" | "sort_order">;
 export type UpdatePackageBody = operations["adminUpdatePackage"]["requestBody"]["content"]["application/json"];
+
+export type BillingSettings = operations["adminGetBillingSettings"]["responses"][200]["content"]["application/json"]["data"];
+export type UpdateBillingSettingsBody =
+  operations["adminUpdateBillingSettings"]["requestBody"]["content"]["application/json"];
+export type AppSettings = Schemas["AppSettings"];
+export type UpdateAppSettingsBody = operations["adminUpdateAppSettings"]["requestBody"]["content"]["application/json"];
+export type AdminPaymentAccount = Schemas["AdminPaymentAccount"];
+export type UpdatePaymentMethodBody =
+  operations["adminUpdatePaymentMethod"]["requestBody"]["content"]["application/json"];
