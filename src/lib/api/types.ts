@@ -35,3 +35,12 @@ export type AdminCardCycle = Schemas["AdminCardCycle"];
 export type CycleStamp = AdminCardCycle["stamps"][number];
 export type UpdateCustomerBirthdateBody =
   operations["adminUpdateCustomerBirthdate"]["requestBody"]["content"]["application/json"];
+
+export type AdminPackage = Schemas["AdminPackage"];
+export type PackageDuration = AdminPackage["prices"][number]["duration_months"];
+type PackageInput = Schemas["PackageInput"];
+// Written by hand: the generated create body is `PackageInput & Record<string, never>` (openapi.yaml's required list
+// on POST /admin/packages comes out as an empty object), which no value can satisfy. Required fields per the guide §5.8.
+export type CreatePackageBody = Required<Pick<PackageInput, "name" | "cards_limit" | "weekly_campaigns_limit" | "prices">> &
+  Pick<PackageInput, "is_active" | "sort_order">;
+export type UpdatePackageBody = operations["adminUpdatePackage"]["requestBody"]["content"]["application/json"];
