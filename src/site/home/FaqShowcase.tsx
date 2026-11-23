@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "@phosphor-icons/react";
+import { Check, Plus } from "@phosphor-icons/react";
 import { useState, type ReactNode } from "react";
 import { focusRing } from "@/components/ui/styles";
 import { cn } from "@/lib/cn";
@@ -65,11 +65,14 @@ export function FaqShowcase({ intro, groupsLabel, groups }: FaqShowcaseProps) {
                   )}
                 >
                   {item.question}
-                  <Plus
+                  {/* A stamp: empty (dashed) while closed, stamped (filled) once open */}
+                  <span
                     aria-hidden
-                    weight="bold"
-                    className="size-5 shrink-0 text-fg-subtle transition-transform group-open:rotate-45 group-open:text-brand"
-                  />
+                    className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-dashed border-amber text-amber transition-colors group-open:border-solid group-open:bg-amber group-open:text-ink"
+                  >
+                    <Plus weight="bold" className="size-4 group-open:hidden" />
+                    <Check weight="bold" className="hidden size-4 group-open:block" />
+                  </span>
                 </summary>
                 <p className="px-5 pb-5 leading-8 text-fg-muted">{item.answer}</p>
               </details>
