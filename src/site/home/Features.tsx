@@ -1,35 +1,20 @@
 import {
   BellSimpleSlash,
-  Cake,
-  ChartLineUp,
   DeviceMobile,
   MagnifyingGlass,
-  Megaphone,
-  Palette,
   QrCode,
   ShieldCheck,
   Storefront,
   User,
 } from "@phosphor-icons/react/ssr";
 import { getTranslations } from "next-intl/server";
-import { cn } from "@/lib/cn";
+import { MerchantFeatures } from "./MerchantFeatures";
 import { SectionHeading } from "./SectionHeading";
 
 type Item = { title: string; text: string };
 
-/** One icon per item, in the same order as home.features.merchants.items / customers.items. */
-const merchantIcons = [Palette, QrCode, Megaphone, Cake, ChartLineUp, Storefront];
+/** One icon per customer item, in the same order as home.features.customers.items. */
 const customerIcons = [DeviceMobile, QrCode, MagnifyingGlass, BellSimpleSlash];
-
-/** Icon box colors for the merchant cards, cycling through the brand's soft tints. */
-const merchantTints = [
-  "bg-amber-soft text-ink",
-  "bg-teal-soft text-success",
-  "bg-brand-soft text-brand",
-  "bg-info-soft text-info",
-  "bg-amber-soft text-ink",
-  "bg-teal-soft text-success",
-];
 
 export async function Features() {
   const t = await getTranslations("home.features");
@@ -47,28 +32,7 @@ export async function Features() {
             <Storefront aria-hidden weight="duotone" className="size-6 text-brand" />
             {t("merchants.title")}
           </h3>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {merchantItems.map((item, index) => {
-              const Icon = merchantIcons[index];
-              return (
-                <li
-                  key={index}
-                  className="flex flex-col gap-3 rounded-xl border-2 border-ink bg-surface p-6 shadow-[4px_4px_0_var(--color-ink)]"
-                >
-                  <span
-                    className={cn(
-                      "grid size-12 place-items-center rounded-xl border-2 border-ink",
-                      merchantTints[index % merchantTints.length],
-                    )}
-                  >
-                    {Icon && <Icon aria-hidden weight="duotone" className="size-6" />}
-                  </span>
-                  <h4 className="text-lg font-bold text-fg">{item.title}</h4>
-                  <p className="leading-7 text-fg-muted">{item.text}</p>
-                </li>
-              );
-            })}
-          </ul>
+          <MerchantFeatures items={merchantItems} />
         </div>
 
         {/* Customers: the same dark card as the stamp card in the hero */}
