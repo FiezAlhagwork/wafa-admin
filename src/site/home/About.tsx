@@ -28,7 +28,7 @@ export async function About() {
             <span className="text-sm text-fg-muted">{t("paper.note")}</span>
           </div>
           <ArrowRight weight="bold" className="size-7 shrink-0 text-amber rtl:-scale-x-100" />
-          <div className="flex w-36 rotate-3 flex-col items-center gap-2 rounded-2xl bg-brand-deep p-5 text-center text-neutral-0 shadow-dialog sm:w-40">
+          <div className="flex w-36 rotate-3 flex-col items-center gap-2 rounded-2xl bg-brand p-5 text-center text-neutral-0 shadow-dialog sm:w-40">
             <DeviceMobile weight="duotone" className="size-10 text-amber" />
             <span className="font-bold">{t("digital.label")}</span>
             <span className="text-sm text-neutral-0/80">{t("digital.note")}</span>

@@ -91,7 +91,7 @@ export function HeroShowcase({ cards, pickerLabel, giftLabel, intro, actions }: 
             <div
               role="img"
               aria-label={card.ariaLabel}
-              className="relative flex flex-col gap-4 overflow-hidden rounded-3xl bg-brand-deep p-5 text-neutral-0 shadow-dialog ring-1 ring-neutral-0/15 sm:p-6"
+              className="relative flex flex-col gap-4 overflow-hidden rounded-3xl bg-brand p-5 text-neutral-0 shadow-dialog ring-1 ring-neutral-0/15 sm:p-6"
             >
               {/* Dotted pattern, as on the app's card */}
               <span aria-hidden className="hero-card-dots pointer-events-none absolute inset-0" />
@@ -132,7 +132,7 @@ export function HeroShowcase({ cards, pickerLabel, giftLabel, intro, actions }: 
                       <span
                         className={cn(
                           "grid aspect-square w-full place-items-center rounded-full",
-                          kind === "filled" && "bg-neutral-0 text-brand-deep",
+                          kind === "filled" && "bg-neutral-0 text-brand",
                           kind === "empty" && "border border-dashed border-neutral-0/50",
                           kind === "gift" && "border-2 border-dashed border-amber text-amber",
                         )}

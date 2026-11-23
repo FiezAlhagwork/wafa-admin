@@ -44,7 +44,7 @@ const cardChoices: { Shop: Icon; tone: string }[] = [
   { Shop: Coffee, tone: "bg-amber text-ink" },
   { Shop: Cake, tone: "bg-teal text-ink" },
   { Shop: Scissors, tone: "bg-info text-neutral-0" },
-  { Shop: ForkKnife, tone: "bg-neutral-0 text-brand-deep" },
+  { Shop: ForkKnife, tone: "bg-neutral-0 text-brand" },
 ];
 
 /** Bar heights of the sample chart in the stats illustration. */
@@ -191,7 +191,7 @@ export function MerchantFeatures({ items, visuals }: { items: Item[]; visuals: V
 
       <div
         aria-live="polite"
-        className="flex min-h-72 flex-col gap-4 rounded-3xl bg-brand-deep p-7 text-neutral-0 sm:p-9"
+        className="flex min-h-72 flex-col gap-4 rounded-3xl bg-brand p-7 text-neutral-0 sm:p-9"
       >
         <div key={selected} className="flex animate-enter flex-col gap-4">
           <span className="grid size-14 place-items-center rounded-full bg-amber text-ink">

@@ -29,7 +29,7 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
       >
         {t("skipToContent")}
       </a>
-      <div className="pointer-events-auto relative mx-auto max-w-6xl rounded-2xl bg-brand-deep text-neutral-0 shadow-popup print:rounded-none print:shadow-none">
+      <div className="pointer-events-auto relative mx-auto max-w-6xl rounded-2xl bg-brand text-neutral-0 shadow-popup print:rounded-none print:shadow-none">
         <div className="flex h-20 items-center gap-4 px-5 sm:px-8">
           {/*
             The transparent logo, painted with two masks of the same image: all of it white, then the two dots
@@ -38,11 +38,11 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
           <Link href="/" aria-label={t("brand")} className={cn("flex shrink-0 items-center rounded-2xl", focusRingOnBlue)}>
             <span aria-hidden className="relative block size-16">
               <span
-                className="absolute inset-0 bg-neutral-0 mask-contain mask-center mask-no-repeat print:bg-brand-deep"
+                className="absolute inset-0 bg-neutral-0 mask-contain mask-center mask-no-repeat print:bg-brand"
                 style={{ maskImage: "url(/brand/wafa-logo.png)", WebkitMaskImage: "url(/brand/wafa-logo.png)" }}
               />
               <span
-                className="absolute inset-0 bg-amber mask-contain mask-center mask-no-repeat print:bg-brand-deep"
+                className="absolute inset-0 bg-amber mask-contain mask-center mask-no-repeat print:bg-brand"
                 style={{
                   maskImage: "url(/brand/wafa-logo.png)",
                   WebkitMaskImage: "url(/brand/wafa-logo.png)",

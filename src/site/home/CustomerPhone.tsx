@@ -18,7 +18,7 @@ export type PhoneCard = { name: string; filled: number; total: number };
 const looks: { Shop: Icon; tone: string }[] = [
   { Shop: Coffee, tone: "bg-amber text-ink" },
   { Shop: Bread, tone: "bg-teal text-ink" },
-  { Shop: Scissors, tone: "bg-neutral-0 text-brand-deep" },
+  { Shop: Scissors, tone: "bg-neutral-0 text-brand" },
 ];
 
 /** The app's bottom tabs; the first one (cards) is the screen shown. */

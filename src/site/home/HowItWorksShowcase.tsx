@@ -57,7 +57,7 @@ export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardT
 
       {/* The sample card at the chosen step */}
       <div aria-hidden className="mx-auto w-full max-w-64 -rotate-3">
-        <div className="flex flex-col gap-4 rounded-3xl bg-brand-deep p-5 text-neutral-0 shadow-dialog">
+        <div className="flex flex-col gap-4 rounded-3xl bg-brand p-5 text-neutral-0 shadow-dialog">
           <div className="flex items-center gap-3">
             <span className="grid size-10 place-items-center rounded-full bg-neutral-0">
               <Coffee weight="fill" className="size-5 text-amber-pressed" />
@@ -84,7 +84,7 @@ export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardT
                         ? "bg-amber text-ink"
                         : "border-2 border-dashed border-amber text-amber"
                       : stamped
-                        ? "bg-neutral-0 text-brand-deep"
+                        ? "bg-neutral-0 text-brand"
                         : "border-2 border-dashed border-neutral-0/40",
                   )}
                 >
