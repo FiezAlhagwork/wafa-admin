@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import type { Reveal } from "./RevealOnScroll";
 
 type SectionHeadingProps = {
   /** id of the heading, for the section's aria-labelledby. */
@@ -10,13 +11,15 @@ type SectionHeadingProps = {
   className?: string;
   /** Overrides the title size, for sections where the default is too large. */
   titleClassName?: string;
+  /** Where the heading comes in from the first time it scrolls into view. */
+  reveal?: Reveal;
 };
 
 /** Small label, title and optional lead at the top of a home page section. */
-export function SectionHeading({ id, eyebrow, title, lead, align = "center", className, titleClassName }: SectionHeadingProps) {
+export function SectionHeading({ id, eyebrow, title, lead, align = "center", className, titleClassName, reveal = "up" }: SectionHeadingProps) {
   return (
-    // data-reveal: fades up the first time it scrolls into view (RevealOnScroll)
-    <div data-reveal className={cn("flex max-w-2xl flex-col", align === "center" ? "mx-auto items-center text-center" : "items-start", className)}>
+    // data-reveal: comes in from the given side the first time it scrolls into view (RevealOnScroll)
+    <div data-reveal={reveal} className={cn("flex max-w-2xl flex-col", align === "center" ? "mx-auto items-center text-center" : "items-start", className)}>
       <p className="text-sm font-bold text-brand">{eyebrow}</p>
       <h2 id={id} className={cn("mt-2 text-3xl font-black text-fg sm:text-4xl", titleClassName)}>
         {title}

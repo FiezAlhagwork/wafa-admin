@@ -27,7 +27,7 @@ export function FaqShowcase({ intro, groupsLabel, groups }: FaqShowcaseProps) {
         {intro}
 
         <div
-          data-reveal
+          data-reveal="up"
           style={{ "--reveal-delay": "200ms" } as CSSProperties}
           role="group"
           aria-label={groupsLabel}
@@ -56,7 +56,7 @@ export function FaqShowcase({ intro, groupsLabel, groups }: FaqShowcaseProps) {
         </div>
       </div>
 
-      <div data-reveal style={{ "--reveal-delay": "150ms" } as CSSProperties}>
+      <div data-reveal="end" style={{ "--reveal-delay": "150ms" } as CSSProperties}>
         {groups.map((group, index) => (
           <div key={index} hidden={index !== selected} className="flex flex-col gap-3">
             {group.items.map((item, itemIndex) => (

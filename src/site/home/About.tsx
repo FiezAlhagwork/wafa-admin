@@ -19,10 +19,11 @@ export async function About() {
           lead={t("lead")}
           align="start"
           titleClassName="text-2xl sm:text-3xl"
+          reveal="start"
         />
 
         {/* Paper card turning into the digital one */}
-        <div data-reveal style={{ "--reveal-delay": "150ms" } as CSSProperties} aria-hidden className="flex items-center justify-center gap-4 sm:gap-6">
+        <div data-reveal="end" style={{ "--reveal-delay": "150ms" } as CSSProperties} aria-hidden className="flex items-center justify-center gap-4 sm:gap-6">
           <div className="flex w-36 -rotate-3 flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-border-strong bg-surface p-5 text-center sm:w-40">
             <Notepad weight="duotone" className="size-10 text-neutral-500" />
             <span className="font-bold text-fg">{t("paper.label")}</span>

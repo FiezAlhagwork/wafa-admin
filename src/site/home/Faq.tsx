@@ -22,10 +22,10 @@ export async function Faq() {
           groups={[t.raw("merchants") as FaqGroup, t.raw("customers") as FaqGroup]}
           intro={
             <>
-              <SectionHeading id="faq-title" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} align="start" />
+              <SectionHeading id="faq-title" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} align="start" reveal="start" />
               {whatsapp && (
                 // The reveal sits on a wrapper: on the link itself it would override the button's own press effect
-                <div data-reveal style={{ "--reveal-delay": "120ms" } as CSSProperties} className="mt-6">
+                <div data-reveal="up" style={{ "--reveal-delay": "120ms" } as CSSProperties} className="mt-6">
                   <a
                     href={`https://wa.me/${whatsapp}`}
                     target="_blank"

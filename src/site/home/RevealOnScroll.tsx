@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 
+/** Where a block comes in from: below, above, the reading start or end side (mirrors in Arabic), or a small zoom. */
+export type Reveal = "up" | "down" | "start" | "end" | "zoom";
+
 /**
  * Reveals the blocks marked data-reveal the first time each one scrolls into view, then stops watching it,
  * so every block animates once. Renders nothing; the styles are in globals.css.
