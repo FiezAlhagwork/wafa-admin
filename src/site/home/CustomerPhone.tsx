@@ -8,8 +8,8 @@ import {
   Scissors,
   User,
   WifiHigh,
-  type Icon,
 } from "@phosphor-icons/react/ssr";
+import type { Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 
 export type PhoneCard = { name: string; filled: number; total: number };
