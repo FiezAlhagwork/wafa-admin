@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { About } from "@/site/home/About";
+import { Faq } from "@/site/home/Faq";
 import { Features } from "@/site/home/Features";
 import { Hero } from "@/site/home/Hero";
 import { HowItWorks } from "@/site/home/HowItWorks";
@@ -28,6 +29,7 @@ export default async function SiteHomePage({ params }: PageProps<"/[locale]">) {
         <About />
         <Features />
         <HowItWorks />
+        <Faq />
       </main>
       <SiteFooter />
     </>

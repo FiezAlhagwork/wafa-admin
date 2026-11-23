@@ -33,6 +33,12 @@ const layouts = {
     { place: "start-[1%] bottom-[6%]", look: "size-8 bg-teal/25", delay: "-4s", duration: "9s" },
     { place: "end-[2%] bottom-[4%]", look: "size-9 border-2 border-dashed border-teal/60", delay: "-1s", duration: "6s" },
   ],
+  faq: [
+    { place: "start-[1%] top-[10%]", look: "size-10 bg-teal/25", delay: "-3s", duration: "8s", mobile: true },
+    { place: "end-[1%] top-[6%]", look: "size-12 border-2 border-dashed border-amber", delay: "0s", duration: "7s", mobile: true },
+    { place: "start-[2%] bottom-[8%]", look: "size-8 border-2 border-dashed border-brand/40", delay: "-5s", duration: "9s" },
+    { place: "end-[2%] bottom-[10%]", look: "size-9 bg-amber/25", delay: "-1s", duration: "6s" },
+  ],
 } satisfies Record<string, Stamp[]>;
 
 /** Faint stamps drifting behind a section, echoing the stamps on the card. Purely decorative. */

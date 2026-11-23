@@ -206,6 +206,67 @@
         ],
         "note": "No shop can message you unless you hold its card."
       }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Got a question?",
+      "lead": "Didn't find your answer here? Talk to us directly.",
+      "whatsapp": "Message us on WhatsApp",
+      "groupsLabel": "Questions by type of user",
+      "merchants": {
+        "label": "For merchants",
+        "items": [
+          {
+            "question": "How do I join Wafa?",
+            "answer": "Contact us, and we'll send you the merchant app and activate your shop's account."
+          },
+          {
+            "question": "Is the merchant app on iPhone?",
+            "answer": "For now it's Android only, and we send it to you directly: it isn't published on the stores."
+          },
+          {
+            "question": "Is there a free trial?",
+            "answer": "Yes, every new shop starts with a free trial before subscribing."
+          },
+          {
+            "question": "How do I pay the subscription?",
+            "answer": "By transfer through Sham Cash or Al-Haram. Then upload the proof of payment in the app, and we activate your subscription once it's reviewed."
+          },
+          {
+            "question": "What if my customer doesn't have the app?",
+            "answer": "Add their stamp with their phone number. When they install the app and sign up with the same number, their stamps are there."
+          },
+          {
+            "question": "Can I publish more than one card?",
+            "answer": "Yes, publish as many cards as you like for your shop, each with its own number of stamps and reward."
+          }
+        ]
+      },
+      "customers": {
+        "label": "For customers",
+        "items": [
+          {
+            "question": "Is the app free?",
+            "answer": "Yes, completely free, with no payments in it."
+          },
+          {
+            "question": "Where do I get the app?",
+            "answer": "On Google Play and the App Store."
+          },
+          {
+            "question": "How do I sign up?",
+            "answer": "With your mobile number and a code sent to you on WhatsApp. No password."
+          },
+          {
+            "question": "Will every shop send me messages?",
+            "answer": "No, only the shops whose cards you hold, and you can turn off any shop's offers."
+          },
+          {
+            "question": "What happens to my stamps if I delete my account?",
+            "answer": "They're deleted along with any rewards you haven't collected, and can't be restored, so collect your rewards first."
+          }
+        ]
+      }
     }
   },
   "privacy": {
