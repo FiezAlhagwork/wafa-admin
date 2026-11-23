@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BackToTop } from "./BackToTop";
 
 const linkClass =
   "rounded text-fg-muted underline-offset-4 outline-none hover:text-fg hover:underline focus-visible:ring-2 focus-visible:ring-focus";
@@ -23,6 +24,7 @@ export async function SiteFooter() {
           </Link>
         </nav>
       </div>
+      <BackToTop label={t("backToTop")} />
     </footer>
   );
 }

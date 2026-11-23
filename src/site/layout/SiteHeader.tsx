@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { cn } from "@/lib/cn";
+import { AutoHideHeader } from "./AutoHideHeader";
 import { MobileMenu } from "./MobileMenu";
 import { NavLinks } from "./NavLinks";
 import { siteNav } from "./site-nav";
@@ -22,7 +23,8 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
   return (
     // The header floats: a brand-blue box (white logo and links) the width of the content, a little below the top edge.
     // The page stays visible around it and scrolls behind it, so only the box takes clicks.
-    <header className="pointer-events-none sticky top-0 z-20 px-3 pt-3 sm:px-6 sm:pt-5 print:static print:p-0">
+    // It slides away while scrolling down and comes back on the way up (AutoHideHeader).
+    <AutoHideHeader className="pointer-events-none sticky top-0 z-20 px-3 pt-3 sm:px-6 sm:pt-5 print:static print:p-0">
       <a
         href="#content"
         className="sr-only rounded-md bg-brand px-3 py-2 text-sm text-brand-on focus:not-sr-only focus:absolute focus:start-4 focus:top-3"
@@ -80,6 +82,6 @@ export async function SiteHeader({ pathname }: SiteHeaderProps) {
           </div>
         </div>
       </div>
-    </header>
+    </AutoHideHeader>
   );
 }
