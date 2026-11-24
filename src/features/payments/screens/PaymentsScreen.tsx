@@ -38,7 +38,7 @@ export function PaymentsScreen() {
 
   let body;
   if (query.isPending) {
-    body = <ByWidth cards={<PaymentCardsSkeleton />} table={<PaymentsTableSkeleton status={status} />} />;
+    body = <ByWidth cards={<PaymentCardsSkeleton />} table={<PaymentsTableSkeleton queue={status === "PENDING"} />} />;
   } else if (query.isError && !query.data) {
     body = (
       <Card>
@@ -63,8 +63,8 @@ export function PaymentsScreen() {
     body = (
       <>
         <ByWidth
-          cards={<PaymentCards payments={payments} status={status} onOpen={setReviewing} />}
-          table={<PaymentsTable payments={payments} status={status} onOpen={setReviewing} />}
+          cards={<PaymentCards payments={payments} queue={status === "PENDING"} onOpen={setReviewing} />}
+          table={<PaymentsTable payments={payments} queue={status === "PENDING"} onOpen={setReviewing} />}
         />
         <LoadMore
           hasNextPage={query.hasNextPage}

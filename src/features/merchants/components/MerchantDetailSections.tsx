@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   ArrowsOut,
   Calendar,
+  CaretLeft,
   ClockCounterClockwise,
   Envelope,
   FacebookLogo,
@@ -27,6 +29,7 @@ import {
 import { Avatar, Button, Card, CardHeader, EmptyState, IconButton, Latin, MetaPill, StatusBadge } from "@/components/ui";
 import { formatDuration, methodLabels } from "@/features/payments/labels";
 import type { AdminMerchantDetail, MerchantCard, MerchantLink } from "@/lib/api/types";
+import { usePermission } from "@/lib/auth/can";
 import { cn } from "@/lib/cn";
 import { formatDate, formatDateTime, formatDayCount, formatNumber, formatRelativeDays, formatSyp, formatUsd } from "@/lib/format";
 import { cardStatusLabels, periodTypeLabels, registrationStepLabels } from "../labels";
@@ -519,6 +522,8 @@ export function CardsList({ merchant, onSuspendCard }: MerchantProps & { onSuspe
 
 export function RecentPayments({ merchant }: MerchantProps) {
   const { payments } = merchant;
+  // The full history lives in the finance screen, for those who may see it
+  const canSeeAll = usePermission("view-financials");
 
   return (
     <Card className="overflow-hidden">
@@ -526,7 +531,19 @@ export function RecentPayments({ merchant }: MerchantProps) {
         icon={<ClockCounterClockwise />}
         iconTone="teal"
         title="آخر الدفعات"
-        description="آخر 10 دفعات، والباقي في سجل المالية."
+        description={canSeeAll ? "آخر 10 دفعات، والباقي في سجل المالية." : "آخر 10 دفعات."}
+        actions={
+          canSeeAll &&
+          payments.length > 0 && (
+            <Link
+              href={`/admin/finance?view=payments&merchant_id=${merchant.id}`}
+              className="inline-flex items-center gap-1 rounded-md text-sm font-bold whitespace-nowrap text-brand outline-none hover:text-brand-hover focus-visible:ring-2 focus-visible:ring-focus"
+            >
+              كل الدفعات
+              <CaretLeft aria-hidden className="size-4" />
+            </Link>
+          )
+        }
       />
       {payments.length === 0 ? (
         <EmptyState className="py-8" icon={<Receipt />} title="لا توجد دفعات" />

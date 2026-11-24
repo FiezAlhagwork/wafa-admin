@@ -31,11 +31,11 @@ export function formatNumber(value: number): string {
   return numberFormat.format(value);
 }
 
-/** "2026-10" → "تشرين الأول 2026". */
-export function formatMonth(yearMonth: string): string {
+/** "2026-10" → "تشرين الأول 2026", or without the year ("تشرين الأول") for a chart axis within one year. */
+export function formatMonth(yearMonth: string, { year: withYear = true }: { year?: boolean } = {}): string {
   const [year, month] = yearMonth.split("-").map(Number);
   // Noon UTC on the 15th: far enough from midnight that the zone can never move it to another month
-  return new Intl.DateTimeFormat(LOCALE, { timeZone: TIME_ZONE, month: "long", year: "numeric" }).format(
+  return new Intl.DateTimeFormat(LOCALE, { timeZone: TIME_ZONE, month: "long", year: withYear ? "numeric" : undefined }).format(
     new Date(Date.UTC(year, month - 1, 15, 12)),
   );
 }

@@ -10,7 +10,7 @@ import {
   TableRow,
   TableSkeletonRows,
 } from "@/components/ui";
-import type { AdminPayment, PaymentStatus } from "@/lib/api/types";
+import type { AdminPayment } from "@/lib/api/types";
 import { formatDuration } from "../labels";
 import { PaymentAmount, PaymentBadges, PaymentMerchant, PaymentMethod, PaymentSentAt } from "./PaymentParts";
 
@@ -19,7 +19,7 @@ import { PaymentAmount, PaymentBadges, PaymentMerchant, PaymentMethod, PaymentSe
 const COLUMNS = 6;
 const cell = "px-3";
 
-function Head({ status }: { status: PaymentStatus }) {
+function Head({ queue }: { queue: boolean }) {
   return (
     <TableHead>
       <tr>
@@ -27,7 +27,7 @@ function Head({ status }: { status: PaymentStatus }) {
         <TableHeaderCell className={cell}>الباقة</TableHeaderCell>
         <TableHeaderCell className={cell}>المبلغ</TableHeaderCell>
         <TableHeaderCell className={cell}>الطريقة · الإرسال</TableHeaderCell>
-        <TableHeaderCell className={cell}>{status === "PENDING" ? "تنبيهات" : "الحالة"}</TableHeaderCell>
+        <TableHeaderCell className={cell}>{queue ? "تنبيهات" : "الحالة"}</TableHeaderCell>
         <TableHeaderCell className={cell}>
           <span className="sr-only">فتح</span>
         </TableHeaderCell>
@@ -36,10 +36,10 @@ function Head({ status }: { status: PaymentStatus }) {
   );
 }
 
-export function PaymentsTableSkeleton({ status }: { status: PaymentStatus }) {
+export function PaymentsTableSkeleton({ queue }: { queue: boolean }) {
   return (
     <Table>
-      <Head status={status} />
+      <Head queue={queue} />
       <TableBody>
         <TableSkeletonRows rows={6} columns={COLUMNS} />
       </TableBody>
@@ -49,17 +49,15 @@ export function PaymentsTableSkeleton({ status }: { status: PaymentStatus }) {
 
 type PaymentsTableProps = {
   payments: AdminPayment[];
-  /** The tab: it decides the alerts/status column. */
-  status: PaymentStatus;
+  /** The review queue shows the alerts; anywhere else, the outcome. */
+  queue: boolean;
   onOpen: (payment: AdminPayment) => void;
 };
 
-export function PaymentsTable({ payments, status, onOpen }: PaymentsTableProps) {
-  const queue = status === "PENDING";
-
+export function PaymentsTable({ payments, queue, onOpen }: PaymentsTableProps) {
   return (
     <Table>
-      <Head status={status} />
+      <Head queue={queue} />
       <TableBody>
         {payments.map((payment) => (
           <TableRow key={payment.id} className="relative cursor-pointer has-focus-visible:bg-neutral-50 has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-focus">

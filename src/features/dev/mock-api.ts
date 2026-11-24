@@ -7,6 +7,7 @@ import { createCustomerStore } from "./mock-customers";
 import { createPackageStore, type PackageResult } from "./mock-packages";
 import { createSettingsStore, type MethodResult } from "./mock-settings";
 import { createDeletionStore } from "./mock-deletions";
+import { createFinanceStore } from "./mock-finance";
 import { createLookupStore, type LookupResult } from "./mock-lookups";
 import { createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
@@ -89,6 +90,17 @@ const seeds: Seed[] = [
   { id: 8, name: "مكتبة الأفق", email: "ufuq@example.com", packageName: "المتوسطة", months: 1, usd: "18.00", syp: "234000.00", method: "haram", reference: "TX-30771", status: "REJECTED", hours: 30, reason: "amount_short" },
 ];
 
+// The merchants of the merchant store (mock-merchants), so a payment's merchant opens the right page
+const merchantIds: Record<string, number> = {
+  "مقهى الياسمين": 101,
+  "مخبز الشام": 102,
+  "صالون لمسة للتجميل": 103,
+  "مطعم الفرات": 104,
+  "عيادة الشفاء": 105,
+  "متجر النور": 106,
+  "مكتبة الأفق": 107,
+};
+
 const toPayment = (seed: Seed): AdminPayment => ({
   id: seed.id,
   package: { id: 1, name: seed.packageName, cards_limit: 5, weekly_campaigns_limit: 2 },
@@ -103,7 +115,7 @@ const toPayment = (seed: Seed): AdminPayment => ({
   rejection_reason: seed.reason ?? null,
   created_at: hoursAgo(seed.hours),
   reviewed_at: seed.status === "PENDING" ? null : hoursAgo(seed.hours - 2),
-  merchant: seed.name ? { id: seed.id, business_name: seed.name, email: seed.email ?? null, status: "TRIAL" } : null,
+  merchant: seed.name ? { id: merchantIds[seed.name] ?? seed.id, business_name: seed.name, email: seed.email ?? null, status: "TRIAL" } : null,
   overdue: seed.overdue ?? false,
   duplicate_reference: seed.duplicate ?? false,
   reviewed_by: seed.status === "PENDING" ? null : { id: 1, name: "سامر الحلبي" },
@@ -183,6 +195,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
   const packages = createPackageStore();
   const lookups = createLookupStore();
   const deletions = createDeletionStore();
+  const finance = createFinanceStore(payments);
   // The roles with `execute-deletion-requests`, and who the preview acts as (shown as "by" on a request)
   const canDelete = scenario === "super_admin" || scenario === "admin";
   const actor = scenario === "admin" ? { id: 4, name: "هالة المدير" } : { id: 1, name: "سامر الحلبي" };
@@ -226,6 +239,20 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
         data: all.slice(start, next),
         meta: { next_cursor: next < all.length ? String(next) : null },
       });
+    }
+
+    if (url.startsWith("/admin/finance/") && method === "get") {
+      // Only the roles with `view-financials`, like the real server
+      if (!canSeeFinance) throw failure(config, 403, "FORBIDDEN");
+      const params = (config.params ?? {}) as Record<string, string | undefined>;
+      if (params.from && params.to && params.from > params.to) {
+        throw failure(config, 422, "VALIDATION_FAILED", { fields: { to: ["after_or_equal"] } });
+      }
+      if (url === "/admin/finance/report") return respond(config, { data: finance.report(params) });
+      const start = Number(params.cursor ?? 0);
+      const all = finance.history(params);
+      const next = start + PAGE_SIZE;
+      return respond(config, { data: all.slice(start, next), meta: { next_cursor: next < all.length ? String(next) : null } });
     }
 
     if (url === "/admin/merchants" && method === "get") {

@@ -127,16 +127,24 @@ function Headline({ data }: { data: AdminOverview | undefined }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {canSeeFinance ? (
-        <StatCard
-          tone="accent"
-          label={data?.finance ? `دخل ${formatMonth(data.finance.month)}` : "دخل الشهر"}
-          value={data?.finance ? formatSyp(data.finance.amount_syp) : "—"}
-          hint={
-            data?.finance &&
-            `${formatUsd(data.finance.price_usd)} · ${formatNumber(data.finance.count)} دفعة مقبولة`
-          }
-          loading={loading}
-        />
+        // The whole card opens the finance report (this month is its default period)
+        <Link
+          href="/admin/finance"
+          aria-label="فتح التقرير المالي"
+          className="group rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+        >
+          <StatCard
+            tone="accent"
+            className="h-full transition-transform group-hover:-translate-y-0.5 motion-reduce:transition-none"
+            label={data?.finance ? `دخل ${formatMonth(data.finance.month)}` : "دخل الشهر"}
+            value={data?.finance ? formatSyp(data.finance.amount_syp) : "—"}
+            hint={
+              data?.finance &&
+              `${formatUsd(data.finance.price_usd)} · ${formatNumber(data.finance.count)} دفعة مقبولة`
+            }
+            loading={loading}
+          />
+        </Link>
       ) : (
         <StatCard
           tone="accent"

@@ -15,6 +15,8 @@ export type AdminPayment = Schemas["AdminPayment"];
 export type PaymentStatus = AdminPayment["status"];
 export type PaymentMethod = Schemas["PaymentMethod"];
 export type PaymentRejectionReason = Schemas["PaymentRejectionReason"];
+export type RevenueReport = Schemas["RevenueReport"];
+export type RevenueTotals = Schemas["RevenueTotals"];
 
 export type CreateAdminUserBody = operations["adminCreateAdminUser"]["requestBody"]["content"]["application/json"];
 export type UpdateAdminUserBody = operations["adminUpdateAdminUser"]["requestBody"]["content"]["application/json"];
