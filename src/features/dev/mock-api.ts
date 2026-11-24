@@ -6,7 +6,8 @@ import { api } from "@/lib/api/client";
 import { createCustomerStore } from "./mock-customers";
 import { createPackageStore, type PackageResult } from "./mock-packages";
 import { createSettingsStore, type MethodResult } from "./mock-settings";
-import { businessTypes, createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
+import { createLookupStore, type LookupResult } from "./mock-lookups";
+import { createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
 
 export type MockScenario = "super_admin" | "admin" | "reviewer" | "support" | "loading" | "error";
@@ -179,6 +180,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
   const merchants = createMerchantStore();
   const customers = createCustomerStore();
   const packages = createPackageStore();
+  const lookups = createLookupStore();
   const settings = createSettingsStore();
   // Only the super admin has `manage-settings`, like the real server
   const canManageSettings = scenario === "super_admin";
@@ -229,9 +231,23 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       return respond(config, { data: all.slice(start, next).map(toMerchant), meta: { next_cursor: next < all.length ? String(next) : null } });
     }
 
-    if (url === "/admin/business-types" && method === "get") {
+    const lookupRoute = /^\/admin\/(business-types|icons)(?:\/(\d+))?$/.exec(url);
+    if (lookupRoute) {
       if (!canManageLookups) throw failure(config, 403, "FORBIDDEN");
-      return respond(config, { data: businessTypes });
+      const kind = lookupRoute[1] === "icons" ? "icons" : "types";
+      const answer = (result: LookupResult, status = 200) => {
+        if (result.ok) return { ...respond(config, { data: result.data }), status };
+        if ("fields" in result) throw failure(config, 422, "VALIDATION_FAILED", { fields: result.fields });
+        throw failure(config, 404, "NOT_FOUND");
+      };
+      if (!lookupRoute[2] && method === "get") return respond(config, { data: lookups.list(kind) });
+      if (!lookupRoute[2] && method === "post") {
+        const body = bodyOf<{ name: string; key?: string; sort_order?: number; is_active?: boolean }>(config);
+        // The server checks the key against Phosphor; the preview asks the same library the screen uses
+        const { iconByKey } = await import("@/features/lookups/phosphor");
+        return answer(lookups.create(kind, body, iconByKey(body.key ?? "") !== null), 201);
+      }
+      if (lookupRoute[2] && method === "patch") return answer(lookups.update(kind, Number(lookupRoute[2]), bodyOf(config)));
     }
 
     const methodRoute = /^\/admin\/settings\/payment-methods\/(sham_cash|haram)(\/qr)?$/.exec(url);
@@ -275,7 +291,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       if (packageRoute[1] && method === "patch") return answer(packages.update(Number(packageRoute[1]), bodyOf(config)));
     }
 
-    const merchantRoute = /^\/admin\/merchants\/(\d+)(?:\/(suspend|reactivate|trial-extension|cover))?$/.exec(url);
+    const merchantRoute = /^\/admin\/merchants\/(\d+)(?:\/(suspend|reactivate|trial-extension|cover|links\/(?:instagram|facebook|maps)))?$/.exec(url);
     if (merchantRoute) {
       const seed = merchants.find((item) => item.id === Number(merchantRoute[1]));
       if (!seed) throw failure(config, 404, "NOT_FOUND");
@@ -295,7 +311,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       }
       if (
         body.business_type_id !== undefined &&
-        !businessTypes.some((type) => type.id === body.business_type_id && type.is_active)
+        !lookups.types().some((type) => type.id === body.business_type_id && type.is_active)
       ) {
         fields.business_type_id = ["exists"];
       }
@@ -344,6 +360,13 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
         return respond(config, { data: toMerchantDetail(seed).subscription });
       }
 
+      if (route?.startsWith("links/") && method === "delete") {
+        const field = `${route.slice("links/".length)}_url` as "instagram_url" | "facebook_url" | "maps_url";
+        if (!seed.links?.[field]) throw failure(config, 404, "NOT_FOUND");
+        seed.links = { ...seed.links, [field]: null };
+        return respond(config, { data: toMerchantDetail(seed) });
+      }
+
       if (route === "cover" && method === "delete") {
         seed.hasCover = false;
         return respond(config, { data: toMerchantDetail(seed) });
@@ -351,7 +374,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
 
       if (!route && method === "patch") {
         if (body.business_name !== undefined) seed.name = body.business_name.trim();
-        const type = businessTypes.find((item) => item.id === body.business_type_id);
+        const type = lookups.types().find((item) => item.id === body.business_type_id);
         if (type) seed.type = type.name;
         return respond(config, { data: toMerchantDetail(seed) });
       }
