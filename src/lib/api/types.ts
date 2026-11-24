@@ -28,6 +28,8 @@ export type UpdateMerchantIdentityBody =
 export type ExtendTrialBody = operations["adminExtendTrial"]["requestBody"]["content"]["application/json"];
 export type MerchantCard = AdminMerchantDetail["cards"][number];
 export type MerchantLink = operations["adminRemoveMerchantLink"]["parameters"]["path"]["link"];
+export type DeletionRequest = Schemas["DeletionRequest"];
+export type DeletionRequestInput = Schemas["DeletionRequestInput"];
 export type AdminLookup = Schemas["AdminLookup"];
 export type CreateBusinessTypeBody =
   operations["adminCreateBusinessType"]["requestBody"]["content"]["application/json"];

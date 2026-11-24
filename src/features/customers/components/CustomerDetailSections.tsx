@@ -51,7 +51,7 @@ export function CustomerHero({ customer, now, actions }: CustomerHeroProps) {
             {customer.campaigns_muted && <MetaPill icon={<BellSlash />}>أوقف العروض</MetaPill>}
           </div>
         </div>
-        {actions && <div className="shrink-0 sm:self-start">{actions}</div>}
+        {actions && <div className="flex shrink-0 flex-wrap gap-2 sm:self-start">{actions}</div>}
       </div>
     </Card>
   );

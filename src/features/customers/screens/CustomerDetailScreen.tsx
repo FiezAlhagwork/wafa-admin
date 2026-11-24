@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Cake } from "@phosphor-icons/react";
+import { useRouter } from "next/navigation";
+import { Cake, Trash } from "@phosphor-icons/react";
 import { BackLink } from "@/components/layout/BackLink";
 import { Button, Card, ErrorState, Skeleton } from "@/components/ui";
 import { getErrorMessage } from "@/lib/api/errors";
 import type { CustomerCycle } from "@/lib/api/types";
 import { Can } from "@/lib/auth/can";
+import { DeleteCustomerDialog } from "@/features/deletion-requests/components/DeletionDialogs";
 import { BirthdateDialog } from "../components/BirthdateDialog";
 import { CustomerHero, CyclesList } from "../components/CustomerDetailSections";
 import { CycleDialog } from "../components/CycleDialog";
@@ -24,6 +26,8 @@ export function CustomerDetailScreen({ id, onBack }: CustomerDetailScreenProps) 
   const query = useCustomer(id);
   const [openCycle, setOpenCycle] = useState<CustomerCycle | null>(null);
   const [editingBirthdate, setEditingBirthdate] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const router = useRouter();
   // The age is counted on the day the page opened: read once, so a re-render never changes it
   const [now] = useState(() => new Date());
 
@@ -65,11 +69,23 @@ export function CustomerDetailScreen({ id, onBack }: CustomerDetailScreenProps) 
           customer={customer}
           now={now}
           actions={
-            <Can permission="edit-customer-birthdate">
-              <Button variant="secondary" icon={<Cake className="size-4.5" />} onClick={() => setEditingBirthdate(true)}>
-                تعديل تاريخ الميلاد
-              </Button>
-            </Can>
+            <>
+              <Can permission="edit-customer-birthdate">
+                <Button variant="secondary" icon={<Cake className="size-4.5" />} onClick={() => setEditingBirthdate(true)}>
+                  تعديل تاريخ الميلاد
+                </Button>
+              </Can>
+              <Can permission="execute-deletion-requests">
+                <Button
+                  variant="secondary"
+                  icon={<Trash className="size-4.5" />}
+                  className="text-danger"
+                  onClick={() => setDeleting(true)}
+                >
+                  حذف الحساب
+                </Button>
+              </Can>
+            </>
           }
         />
         <CyclesList customer={customer} onOpen={setOpenCycle} />
@@ -81,6 +97,14 @@ export function CustomerDetailScreen({ id, onBack }: CustomerDetailScreenProps) 
           />
         )}
         {editingBirthdate && <BirthdateDialog customer={customer} onClose={() => setEditingBirthdate(false)} />}
+        {deleting && (
+          <DeleteCustomerDialog
+            customer={customer}
+            onClose={() => setDeleting(false)}
+            // Nothing left to show here: back to the search
+            onDeleted={() => (onBack ? onBack() : router.replace("/admin/customers"))}
+          />
+        )}
       </>
     );
   }
