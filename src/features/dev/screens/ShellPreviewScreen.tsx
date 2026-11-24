@@ -16,6 +16,7 @@ import { PaymentsScreen } from "@/features/payments/screens/PaymentsScreen";
 import { SettingsScreen } from "@/features/settings/screens/SettingsScreen";
 import { LookupsScreen } from "@/features/lookups/screens/LookupsScreen";
 import { DeletionRequestsScreen } from "@/features/deletion-requests/screens/DeletionRequestsScreen";
+import { FinanceScreen } from "@/features/finance/screens/FinanceScreen";
 import type { AdminPermission, AdminRole, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
 import { createQueryClient } from "@/lib/query-client";
@@ -30,6 +31,7 @@ type Page =
   | "settings"
   | "lookups"
   | "deletions"
+  | "finance"
   | "admin-users";
 
 const pages: { id: Page; label: string; path: string }[] = [
@@ -41,6 +43,7 @@ const pages: { id: Page; label: string; path: string }[] = [
   { id: "settings", label: "الإعدادات", path: "/admin/settings" },
   { id: "lookups", label: "الأنواع", path: "/admin/lookups" },
   { id: "deletions", label: "الحذف", path: "/admin/deletion-requests" },
+  { id: "finance", label: "المالية", path: "/admin/finance" },
   { id: "admin-users", label: "الحسابات", path: "/admin/admin-users" },
 ];
 
@@ -279,6 +282,17 @@ function PreviewPage({ page }: { page: Page }) {
                 request.subject_type === "merchant" ? setMerchantId(request.subject_id) : setCustomerId(request.subject_id)
               }
             />
+          )}
+        </PermissionGate>
+      );
+    case "finance":
+      // A payment's merchant opens inside the preview, with a way back to the history
+      return (
+        <PermissionGate permission="view-financials">
+          {merchantId !== null ? (
+            <MerchantDetailScreen id={merchantId} onBack={() => setMerchantId(null)} />
+          ) : (
+            <FinanceScreen onOpenMerchant={setMerchantId} />
           )}
         </PermissionGate>
       );
