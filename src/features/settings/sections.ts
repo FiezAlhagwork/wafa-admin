@@ -8,23 +8,8 @@ import {
   type Icon,
 } from "@phosphor-icons/react";
 import type { IconTone } from "@/components/ui";
-import { formatDayCount } from "@/lib/format";
+import { formatCount, formatDayCount, type CountForms } from "@/lib/format";
 import type { AppSettings, BillingSettings } from "@/lib/api/types";
-
-/**
- * Arabic count forms: [one, two, 3–10, 11–99, hundreds]. The noun follows the last two digits:
- * "5 دقائق" · "60 دقيقة" · "300 حرف" · "60 حرفاً".
- */
-type CountForms = readonly [string, string, string, string, string];
-
-export function formatCount(value: number, [one, two, few, many, hundreds]: CountForms): string {
-  if (value === 1) return one;
-  if (value === 2) return two;
-  const lastTwo = value % 100;
-  if (lastTwo >= 3 && lastTwo <= 10) return `${value} ${few}`;
-  if (lastTwo >= 11) return `${value} ${many}`;
-  return `${value} ${hundreds}`;
-}
 
 const minutes: CountForms = ["دقيقة واحدة", "دقيقتان", "دقائق", "دقيقة", "دقيقة"];
 const hours: CountForms = ["ساعة واحدة", "ساعتان", "ساعات", "ساعة", "ساعة"];

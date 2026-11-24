@@ -192,6 +192,12 @@ export function createCustomerStore() {
       return seed ? toCustomer(seed, true) : null;
     },
     phoneOf: (id: number) => customers.find((item) => item.id === id)?.phone ?? null,
+    /** Deleted at once, like the server: the customer and their cycles are gone. */
+    remove: (id: number) => {
+      const index = customers.findIndex((item) => item.id === id);
+      if (index >= 0) customers.splice(index, 1);
+      for (let i = cycles.length - 1; i >= 0; i--) if (cycles[i]!.customer_id === id) cycles.splice(i, 1);
+    },
     setBirthdate: (id: number, birthdate: string) => {
       const seed = customers.find((item) => item.id === id);
       if (seed) seed.birthdate = birthdate;

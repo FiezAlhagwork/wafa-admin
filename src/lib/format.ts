@@ -117,3 +117,18 @@ export function formatDay(day: string): string {
 export function todayKey(now: Date = new Date()): string {
   return dayKeyFormat.format(now);
 }
+
+/**
+ * Arabic count forms: [one, two, 3–10, 11–99, hundreds]. The noun follows the last two digits:
+ * "5 دقائق" · "60 دقيقة" · "300 حرف" · "60 حرفاً".
+ */
+export type CountForms = readonly [string, string, string, string, string];
+
+export function formatCount(value: number, [one, two, few, many, hundreds]: CountForms): string {
+  if (value === 1) return one;
+  if (value === 2) return two;
+  const lastTwo = value % 100;
+  if (lastTwo >= 3 && lastTwo <= 10) return `${value} ${few}`;
+  if (lastTwo >= 11) return `${value} ${many}`;
+  return `${value} ${hundreds}`;
+}

@@ -25,6 +25,10 @@ export type MerchantSeed = {
   /** The status before a suspension: reactivating goes back to it (or EXPIRED if the dates ran out) */
   statusBeforeSuspension?: MerchantSeed["status"];
   pendingDeletion?: boolean;
+  /** The open deletion request (set by the store for `pendingDeletion`, and by scheduling one in the preview) */
+  deletion?: { id: number; requested_at: string; executes_at: string };
+  /** The status before the deletion was scheduled: cancelling goes back to it */
+  statusBeforeDeletion?: MerchantSeed["status"];
   /** An expired trial that never paid: the one EXPIRED merchant whose trial can still be extended */
   neverPaid?: boolean;
   type: string;
@@ -142,7 +146,7 @@ export function toMerchantDetail(seed: MerchantSeed) {
       seed.status === null
         ? { customers_total: 0, stamps_total: 0, stamps_via_phone_total: 0, rewards_ready: 0, rewards_redeemed_total: 0, campaigns_total: 0 }
         : { customers_total: 59, stamps_total: 310, stamps_via_phone_total: 25, rewards_ready: 3, rewards_redeemed_total: 51, campaigns_total: 4 },
-    deletion: seed.pendingDeletion ? { id: 7, requested_at: daysAgo(2), executes_at: inDays(5) } : null,
+    deletion: seed.deletion ?? null,
   };
 }
 
@@ -151,6 +155,9 @@ export function createMerchantStore(): MerchantSeed[] {
   return seeds.map((seed) => ({
     ...seed,
     hasCover: seed.id === 104,
+    // The same request as in the deletion list (mock-deletions.ts, id 7): 25 of its 30 days gone
+    deletion: seed.pendingDeletion ? { id: 7, requested_at: daysAgo(25), executes_at: inDays(5) } : undefined,
+    statusBeforeDeletion: seed.pendingDeletion ? "ACTIVE" : undefined,
     // 104 has all three links, 101 only Instagram, the others none
     links:
       seed.id === 104

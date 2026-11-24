@@ -44,6 +44,7 @@ export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) 
   const query = useMerchant(id);
   const [action, setAction] = useState<MerchantAction | null>(null);
   const canEditIdentity = usePermission("edit-business-identity");
+  const canDelete = usePermission("execute-deletion-requests");
   const canSuspend = usePermission("suspend-merchants");
 
   let body;
@@ -79,7 +80,10 @@ export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) 
     body = (
       <>
         <MerchantHero merchant={merchant} actions={<MerchantActions merchant={merchant} onAction={setAction} />} />
-        <MerchantAlerts merchant={merchant} />
+        <MerchantAlerts
+          merchant={merchant}
+          onCancelDeletion={canDelete ? () => setAction({ type: "cancel-deletion" }) : undefined}
+        />
         <div className="grid items-start gap-5 lg:grid-cols-3">
           <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
             <SubscriptionCard merchant={merchant} />

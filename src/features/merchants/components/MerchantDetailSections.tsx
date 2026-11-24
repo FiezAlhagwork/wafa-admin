@@ -24,7 +24,7 @@ import {
   User,
   WarningCircle,
 } from "@phosphor-icons/react/ssr";
-import { Avatar, Card, CardHeader, EmptyState, IconButton, Latin, MetaPill, StatusBadge } from "@/components/ui";
+import { Avatar, Button, Card, CardHeader, EmptyState, IconButton, Latin, MetaPill, StatusBadge } from "@/components/ui";
 import { formatDuration, methodLabels } from "@/features/payments/labels";
 import type { AdminMerchantDetail, MerchantCard, MerchantLink } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
@@ -97,20 +97,21 @@ export function MerchantHero({ merchant, actions }: MerchantProps & { actions?: 
   );
 }
 
-function Alert({ title, children }: { title: string; children: ReactNode }) {
+function Alert({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
   return (
-    <div role="status" className="flex items-start gap-3 rounded-2xl border border-danger/25 bg-danger-soft p-4 text-danger">
+    <div role="status" className="flex flex-wrap items-start gap-3 rounded-2xl border border-danger/25 bg-danger-soft p-4 text-danger">
       <WarningCircle aria-hidden weight="fill" className="mt-0.5 size-5.5 shrink-0" />
-      <div className="flex min-w-0 flex-col gap-0.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="font-bold">{title}</p>
         <div className="text-sm text-fg">{children}</div>
       </div>
+      {action && <div className="ms-auto shrink-0">{action}</div>}
     </div>
   );
 }
 
 /** A suspended merchant and a pending deletion: the two states that change what anyone should do next. */
-export function MerchantAlerts({ merchant }: MerchantProps) {
+export function MerchantAlerts({ merchant, onCancelDeletion }: MerchantProps & { onCancelDeletion?: () => void }) {
   const { suspended_at, suspension_reason, deletion, stats } = merchant;
   if (!suspended_at && !deletion) return null;
 
@@ -122,7 +123,16 @@ export function MerchantAlerts({ merchant }: MerchantProps) {
         </Alert>
       )}
       {deletion && (
-        <Alert title="طلب حذف بانتظار التنفيذ">
+        <Alert
+          title="طلب حذف بانتظار التنفيذ"
+          action={
+            onCancelDeletion && (
+              <Button variant="secondary" size="sm" onClick={onCancelDeletion}>
+                إلغاء الحذف
+              </Button>
+            )
+          }
+        >
           طُلب في {formatDate(deletion.requested_at)}، ويُنفَّذ {formatRelativeDays(deletion.executes_at)} (
           {formatDate(deletion.executes_at)}). الهدايا الجاهزة غير المُسلَّمة: {formatNumber(stats.rewards_ready)}.
         </Alert>

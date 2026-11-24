@@ -4,6 +4,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch, type FieldValues, type UseFormSetError } from "react-hook-form";
 import { Button, Field, Input, Latin, Notice, ReasonDialog, ReasonOnlyDialog, Select, toast } from "@/components/ui";
+import { CancelDeletionDialog, ScheduleMerchantDeletionDialog } from "@/features/deletion-requests/components/DeletionDialogs";
 import { useBusinessTypes } from "@/features/lookups/hooks";
 import { handleActionError } from "@/lib/api/action-errors";
 import type { AdminMerchantDetail, MerchantCard, MerchantLink, UpdateMerchantIdentityBody } from "@/lib/api/types";
@@ -35,6 +36,8 @@ export type MerchantAction =
   | { type: "reactivate" }
   | { type: "remove-cover" }
   | { type: "remove-link"; link: MerchantLink }
+  | { type: "delete" }
+  | { type: "cancel-deletion" }
   | { type: "suspend-card"; card: MerchantCard };
 
 type DialogProps = { merchant: AdminMerchantDetail; onClose: () => void };
@@ -387,6 +390,12 @@ export function MerchantActionDialog({ action, ...props }: DialogProps & { actio
       return <ReactivateMerchantDialog {...props} />;
     case "remove-cover":
       return <RemoveCoverDialog {...props} />;
+    case "delete":
+      return <ScheduleMerchantDeletionDialog {...props} />;
+    case "cancel-deletion":
+      return props.merchant.deletion ? (
+        <CancelDeletionDialog requestId={props.merchant.deletion.id} name={props.merchant.business_name} onClose={props.onClose} />
+      ) : null;
     case "remove-link":
       return <RemoveLinkDialog {...props} link={action.link} />;
     case "suspend-card":
