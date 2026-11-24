@@ -12,6 +12,7 @@ import {
   listMerchants,
   reactivateMerchant,
   removeMerchantCover,
+  removeMerchantLink,
   suspendCard,
   suspendMerchant,
   updateMerchantIdentity,
@@ -79,6 +80,12 @@ export function useRemoveMerchantCover() {
   const refresh = useRefreshAfterAction();
   const show = useShowReturnedMerchant();
   return useMutation({ mutationFn: removeMerchantCover, onSuccess: show, onSettled: refresh });
+}
+
+export function useRemoveMerchantLink() {
+  const refresh = useRefreshAfterAction();
+  const show = useShowReturnedMerchant();
+  return useMutation({ mutationFn: removeMerchantLink, onSuccess: show, onSettled: refresh });
 }
 
 export function useSuspendCard() {

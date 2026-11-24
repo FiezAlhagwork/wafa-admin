@@ -93,6 +93,7 @@ export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) 
             <IdentityCard
               merchant={merchant}
               onRemoveCover={canEditIdentity ? () => setAction({ type: "remove-cover" }) : undefined}
+              onRemoveLink={canEditIdentity ? (link) => setAction({ type: "remove-link", link }) : undefined}
             />
           </div>
         </div>

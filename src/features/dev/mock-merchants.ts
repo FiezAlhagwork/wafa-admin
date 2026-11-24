@@ -31,8 +31,11 @@ export type MerchantSeed = {
   governorate: string;
   /** Set by the actions */
   hasCover?: boolean;
+  links?: { instagram_url: string | null; facebook_url: string | null; maps_url: string | null };
   suspendedCardIds?: number[];
 };
+
+const noLinks = { instagram_url: null, facebook_url: null, maps_url: null };
 
 /** The business types (`GET /admin/business-types`), one inactive. */
 export const businessTypes: AdminLookup[] = [
@@ -97,6 +100,7 @@ export function toMerchantDetail(seed: MerchantSeed) {
     ...toMerchant(seed),
     cover_url: seed.hasCover ? cover : null,
     address: seed.owner ? "شارع الحمرا، بناء 12" : null,
+    links: { ...(seed.links ?? noLinks) },
     last_login_at: seed.status === null ? null : hoursAgo(seed.id % 48),
     subscription: hasSubscription
       ? {
@@ -147,6 +151,17 @@ export function createMerchantStore(): MerchantSeed[] {
   return seeds.map((seed) => ({
     ...seed,
     hasCover: seed.id === 104,
+    // 104 has all three links, 101 only Instagram, the others none
+    links:
+      seed.id === 104
+        ? {
+            instagram_url: "https://www.instagram.com/alfurat.restaurant/",
+            facebook_url: "https://www.facebook.com/alfurat.deirezzor",
+            maps_url: "https://maps.app.goo.gl/x7Kq2mVb9Rt3",
+          }
+        : seed.id === 101
+          ? { ...noLinks, instagram_url: "https://instagram.com/yasmin.cafe" }
+          : { ...noLinks },
     // A suspended merchant's second card was paused too
     suspendedCardIds: seed.status === "SUSPENDED" ? [seed.id * 10 + 2] : [],
   }));
