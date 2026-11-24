@@ -6,6 +6,7 @@ import { api } from "@/lib/api/client";
 import { createCustomerStore } from "./mock-customers";
 import { createPackageStore, type PackageResult } from "./mock-packages";
 import { createSettingsStore, type MethodResult } from "./mock-settings";
+import { createDeletionStore } from "./mock-deletions";
 import { createLookupStore, type LookupResult } from "./mock-lookups";
 import { createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
@@ -181,6 +182,10 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
   const customers = createCustomerStore();
   const packages = createPackageStore();
   const lookups = createLookupStore();
+  const deletions = createDeletionStore();
+  // The roles with `execute-deletion-requests`, and who the preview acts as (shown as "by" on a request)
+  const canDelete = scenario === "super_admin" || scenario === "admin";
+  const actor = scenario === "admin" ? { id: 4, name: "هالة المدير" } : { id: 1, name: "سامر الحلبي" };
   const settings = createSettingsStore();
   // Only the super admin has `manage-settings`, like the real server
   const canManageSettings = scenario === "super_admin";
@@ -289,6 +294,60 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       if (!packageRoute[1] && method === "get") return respond(config, { data: packages.list() });
       if (!packageRoute[1] && method === "post") return answer(packages.create(bodyOf(config)), 201);
       if (packageRoute[1] && method === "patch") return answer(packages.update(Number(packageRoute[1]), bodyOf(config)));
+    }
+
+    // Deletion requests: the list, cancelling a merchant's, and the two ways one is made (merchant, customer)
+    if (url === "/admin/deletion-requests" && method === "get") {
+      if (!canDelete) throw failure(config, 403, "FORBIDDEN");
+      const start = Number(config.params?.cursor ?? 0);
+      const all = deletions.list((config.params ?? {}) as Record<string, string | undefined>);
+      const next = start + PAGE_SIZE;
+      return respond(config, { data: all.slice(start, next), meta: { next_cursor: next < all.length ? String(next) : null } });
+    }
+    const cancelRoute = /^\/admin\/deletion-requests\/(\d+)\/cancel$/.exec(url);
+    if (cancelRoute && method === "post") {
+      if (!canDelete) throw failure(config, 403, "FORBIDDEN");
+      const result = deletions.cancel(Number(cancelRoute[1]));
+      if (!result.ok) throw failure(config, result.code === "NOT_FOUND" ? 404 : 409, result.code);
+      const seed = merchants.find((item) => item.id === result.merchantId);
+      if (seed) {
+        // Back to the status its dates give, or suspended if it was before
+        const before = seed.statusBeforeDeletion ?? "ACTIVE";
+        seed.status = before === "SUSPENDED" ? before : seed.endsInDays !== null && seed.endsInDays < 0 ? "EXPIRED" : before;
+        seed.deletion = undefined;
+        seed.pendingDeletion = false;
+        seed.statusBeforeDeletion = undefined;
+      }
+      return respond(config, { data: result.data });
+    }
+    const deletionRoute = /^\/admin\/(merchants|customers)\/(\d+)\/deletion$/.exec(url);
+    if (deletionRoute && method === "post") {
+      if (!canDelete) throw failure(config, 403, "FORBIDDEN");
+      const body = bodyOf<{ source?: string; note?: string | null }>(config);
+      const fields: Record<string, string[]> = {};
+      if (!body.source) fields.source = ["required"];
+      else if (!["web", "email", "support"].includes(body.source)) fields.source = ["invalid"];
+      if ((body.note?.length ?? 0) > 255) fields.note = ["max"];
+      if (Object.keys(fields).length > 0) throw failure(config, 422, "VALIDATION_FAILED", { fields });
+      const input = { source: body.source as "web" | "email" | "support", note: body.note ?? null };
+      const id = Number(deletionRoute[2]);
+
+      if (deletionRoute[1] === "customers") {
+        if (!customers.get(id)) throw failure(config, 404, "NOT_FOUND");
+        customers.remove(id);
+        return { ...respond(config, { data: deletions.deleteCustomer(id, input, actor) }), status: 201 };
+      }
+      const seed = merchants.find((item) => item.id === id);
+      if (!seed) throw failure(config, 404, "NOT_FOUND");
+      const current: string | null = seed.status;
+      if (current === "PENDING_DELETION" || current === "DELETED") {
+        throw failure(config, 409, "MERCHANT_STATUS_CONFLICT", { status: current });
+      }
+      const created = deletions.scheduleMerchant({ id, name: seed.name }, input, actor);
+      seed.statusBeforeDeletion = seed.status;
+      seed.status = "PENDING_DELETION";
+      seed.deletion = { id: created.id, requested_at: created.requested_at, executes_at: created.executes_at! };
+      return { ...respond(config, { data: created }), status: 201 };
     }
 
     const merchantRoute = /^\/admin\/merchants\/(\d+)(?:\/(suspend|reactivate|trial-extension|cover|links\/(?:instagram|facebook|maps)))?$/.exec(url);

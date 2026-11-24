@@ -15,12 +15,22 @@ import { PackagesScreen } from "@/features/packages/screens/PackagesScreen";
 import { PaymentsScreen } from "@/features/payments/screens/PaymentsScreen";
 import { SettingsScreen } from "@/features/settings/screens/SettingsScreen";
 import { LookupsScreen } from "@/features/lookups/screens/LookupsScreen";
+import { DeletionRequestsScreen } from "@/features/deletion-requests/screens/DeletionRequestsScreen";
 import type { AdminPermission, AdminRole, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
 import { createQueryClient } from "@/lib/query-client";
 import { createMockApi, getMockFaults, setMockFault, subscribeMockFaults, type MockScenario } from "../mock-api";
 
-type Page = "overview" | "payments" | "merchants" | "customers" | "packages" | "settings" | "lookups" | "admin-users";
+type Page =
+  | "overview"
+  | "payments"
+  | "merchants"
+  | "customers"
+  | "packages"
+  | "settings"
+  | "lookups"
+  | "deletions"
+  | "admin-users";
 
 const pages: { id: Page; label: string; path: string }[] = [
   { id: "overview", label: "الرئيسية", path: "/admin" },
@@ -30,6 +40,7 @@ const pages: { id: Page; label: string; path: string }[] = [
   { id: "packages", label: "الباقات", path: "/admin/packages" },
   { id: "settings", label: "الإعدادات", path: "/admin/settings" },
   { id: "lookups", label: "الأنواع", path: "/admin/lookups" },
+  { id: "deletions", label: "الحذف", path: "/admin/deletion-requests" },
   { id: "admin-users", label: "الحسابات", path: "/admin/admin-users" },
 ];
 
@@ -252,6 +263,23 @@ function PreviewPage({ page }: { page: Page }) {
       return (
         <PermissionGate permission="manage-lookups">
           <LookupsScreen />
+        </PermissionGate>
+      );
+    case "deletions":
+      // A row opens its merchant or customer inside the preview, with a way back to the list
+      return (
+        <PermissionGate permission="execute-deletion-requests">
+          {merchantId !== null ? (
+            <MerchantDetailScreen id={merchantId} onBack={() => setMerchantId(null)} />
+          ) : customerId !== null ? (
+            <CustomerDetailScreen id={customerId} onBack={() => setCustomerId(null)} />
+          ) : (
+            <DeletionRequestsScreen
+              onOpen={(request) =>
+                request.subject_type === "merchant" ? setMerchantId(request.subject_id) : setCustomerId(request.subject_id)
+              }
+            />
+          )}
         </PermissionGate>
       );
     case "admin-users":
