@@ -5,6 +5,7 @@ export { ByWidth } from "./ByWidth";
 export { Card, CardBody, CardHeader, IconTile, type IconTone } from "./Card";
 export { ConfirmDialog } from "./ConfirmDialog";
 export { CopyValue } from "./CopyValue";
+export { DateRangePicker, formatDateRange, type DateRange } from "./DateRangePicker";
 export { Dialog, DialogClose } from "./Dialog";
 export { Drawer } from "./Drawer";
 export { EmptyState } from "./EmptyState";
