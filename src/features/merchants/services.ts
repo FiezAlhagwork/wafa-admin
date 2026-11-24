@@ -3,6 +3,7 @@ import type {
   AdminMerchant,
   AdminMerchantDetail,
   ExtendTrialBody,
+  MerchantLink,
   UpdateMerchantIdentityBody,
 } from "@/lib/api/types";
 import type { MerchantsQuery } from "./keys";
@@ -57,6 +58,18 @@ export async function extendTrial({ id, ...body }: WithId<ExtendTrialBody>): Pro
 /** DELETE /admin/merchants/{id}/cover: an unsuitable cover. The shop can upload another one. */
 export async function removeMerchantCover({ id, reason }: WithId<Reason>): Promise<AdminMerchantDetail> {
   const { data } = await api.delete<{ data: AdminMerchantDetail }>(`/admin/merchants/${id}/cover`, { data: { reason } });
+  return data.data;
+}
+
+/** DELETE /admin/merchants/{id}/links/{link}: an unsuitable or fake link, gone from the shop page. */
+export async function removeMerchantLink({
+  id,
+  link,
+  reason,
+}: WithId<Reason> & { link: MerchantLink }): Promise<AdminMerchantDetail> {
+  const { data } = await api.delete<{ data: AdminMerchantDetail }>(`/admin/merchants/${id}/links/${link}`, {
+    data: { reason },
+  });
   return data.data;
 }
 

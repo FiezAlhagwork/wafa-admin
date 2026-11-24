@@ -5,10 +5,14 @@ import {
   Calendar,
   ClockCounterClockwise,
   Envelope,
+  FacebookLogo,
   Gift,
   IdentificationCard,
   ImageSquare,
+  InstagramLogo,
+  LinkSimple,
   MapPin,
+  MapTrifold,
   Package,
   PauseCircle,
   Phone,
@@ -20,12 +24,13 @@ import {
   User,
   WarningCircle,
 } from "@phosphor-icons/react/ssr";
-import { Avatar, Card, CardHeader, EmptyState, Latin, MetaPill, StatusBadge } from "@/components/ui";
+import { Avatar, Card, CardHeader, EmptyState, IconButton, Latin, MetaPill, StatusBadge } from "@/components/ui";
 import { formatDuration, methodLabels } from "@/features/payments/labels";
-import type { AdminMerchantDetail, MerchantCard } from "@/lib/api/types";
+import type { AdminMerchantDetail, MerchantCard, MerchantLink } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatDate, formatDateTime, formatDayCount, formatNumber, formatRelativeDays, formatSyp, formatUsd } from "@/lib/format";
 import { cardStatusLabels, periodTypeLabels, registrationStepLabels } from "../labels";
+import { presentLinks, safeHref, shortUrl } from "../links";
 
 // The sections of the merchant page. They only show: the actions open dialogs through the callbacks the screen passes
 // (none when the role may not take that action).
@@ -306,7 +311,90 @@ function CoverImage({ url, onRemove }: { url: string | null; onRemove?: () => vo
   );
 }
 
-export function IdentityCard({ merchant, onRemoveCover }: MerchantProps & { onRemoveCover?: () => void }) {
+/**
+ * An address, cut at its end when it is too long ("instagram.com/alfurat.resta…"), so the site and the start of the
+ * handle stay readable. `Latin` keeps the page direction and would cut the start instead. Lined up with the Arabic.
+ */
+function LinkText({ children }: { children: string }) {
+  return (
+    <span dir="ltr" className="block truncate text-end">
+      {children}
+    </span>
+  );
+}
+
+const linkIcons: Record<MerchantLink, ReactNode> = {
+  instagram: <InstagramLogo />,
+  facebook: <FacebookLogo />,
+  maps: <MapTrifold />,
+};
+
+/**
+ * The shop's own links, as the customer app shows them. Each opens in a new tab; only an http(s) address becomes a
+ * link (see `safeHref`). An admin who may edit the identity can remove an unsuitable one.
+ */
+function LinksRow({ links, onRemove }: { links: AdminMerchantDetail["links"]; onRemove?: (link: MerchantLink) => void }) {
+  const items = presentLinks(links);
+
+  return (
+    <div className="flex gap-3 border-t border-divider py-3">
+      <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-neutral-50 text-neutral-700 [&>svg]:size-4.5">
+        <LinkSimple />
+      </span>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <dt className="text-xs text-fg-muted">الروابط</dt>
+        <dd className="text-[14.5px] font-medium text-fg">
+          {items.length === 0 ? (
+            "لا توجد روابط"
+          ) : (
+            <ul className="flex flex-col">
+              {items.map(({ key, url, label }) => {
+                const href = safeHref(url);
+                return (
+                  <li key={key} className="flex min-h-8 items-center gap-2">
+                    <span aria-hidden className="shrink-0 text-fg-muted [&>svg]:size-4">
+                      {linkIcons[key]}
+                    </span>
+                    {href ? (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={url}
+                        className="min-w-0 rounded-sm text-brand underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+                      >
+                        <span className="sr-only">{label}: </span>
+                        <LinkText>{shortUrl(url)}</LinkText>
+                      </a>
+                    ) : (
+                      <span title={url} className="min-w-0 text-fg">
+                        <span className="sr-only">{label}: </span>
+                        <LinkText>{url}</LinkText>
+                      </span>
+                    )}
+                    {onRemove && (
+                      <IconButton
+                        size="sm"
+                        label={`إزالة رابط ${label}`}
+                        icon={<Trash className="size-4" />}
+                        className="ms-auto text-danger hover:bg-danger-soft hover:text-danger"
+                        onClick={() => onRemove(key)}
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </dd>
+      </div>
+    </div>
+  );
+}
+
+type IdentityCardProps = MerchantProps & { onRemoveCover?: () => void; onRemoveLink?: (link: MerchantLink) => void };
+
+export function IdentityCard({ merchant, onRemoveCover, onRemoveLink }: IdentityCardProps) {
   return (
     <Card className="overflow-hidden">
       <CoverImage url={merchant.cover_url} onRemove={onRemoveCover} />
@@ -319,6 +407,7 @@ export function IdentityCard({ merchant, onRemoveCover }: MerchantProps & { onRe
           {merchant.governorate.name}
           {merchant.address && <span className="block text-[13px] font-normal text-fg-muted">{merchant.address}</span>}
         </InfoRow>
+        <LinksRow links={merchant.links} onRemove={onRemoveLink} />
         <InfoRow icon={<User />} label="المالك">
           {merchant.owner_name ?? dash}
         </InfoRow>
