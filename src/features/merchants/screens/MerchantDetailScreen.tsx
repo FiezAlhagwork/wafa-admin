@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { BackLink } from "@/components/layout/BackLink";
+import { AuditHistoryLink } from "@/features/audit-logs/components/AuditHistoryLink";
 import { Button, Card, ErrorState, Skeleton } from "@/components/ui";
 import { getErrorMessage } from "@/lib/api/errors";
 import { usePermission } from "@/lib/auth/can";
@@ -74,9 +75,7 @@ export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) 
     );
   } else {
     const merchant = query.data;
-    // DELETED is in the backend guide but not in the generated status type (A07)
-    const status: string | null = merchant.status;
-    const deleted = status === "DELETED";
+    const deleted = merchant.status === "DELETED";
     body = (
       <>
         <MerchantHero merchant={merchant} actions={<MerchantActions merchant={merchant} onAction={setAction} />} />
@@ -108,7 +107,10 @@ export function MerchantDetailScreen({ id, onBack }: MerchantDetailScreenProps) 
 
   return (
     <div className="flex flex-col gap-5">
-      <BackLink href="/admin/merchants" label="التجار" onBack={onBack} />
+      <div className="flex items-center justify-between gap-3">
+        <BackLink href="/admin/merchants" label="التجار" onBack={onBack} />
+        <AuditHistoryLink subjectType="merchant" subjectId={id} />
+      </div>
       {body}
     </div>
   );

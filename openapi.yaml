@@ -1,7 +1,7 @@
 openapi: 3.1.0
 
 info:
-  title: وفاء — Wafa API
+  title: وفا — Wafa API
   version: 1.0.0
   description: |
     كل endpoint شغّال حالياً بالباك إند، مطابق لـ`api.md` ولعقد Deep Code (`1.0.0-draft.1`).
@@ -44,6 +44,7 @@ tags:
   - name: الإدارة — سجل التدقيق
   - name: الإدارة — طلبات الحذف
   - name: الإدارة — النظرة العامة والمالية
+  - name: الموقع
   - name: صفحة حذف الحساب
   - name: للخادم فقط
 
@@ -205,6 +206,7 @@ paths:
       responses:
         '200': { $ref: '#/components/responses/CustomerData' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     patch:
       tags: [الزبون — الحساب]
       operationId: customerUpdateMe
@@ -2770,6 +2772,37 @@ paths:
         '422': { $ref: '#/components/responses/ValidationFailed' }
 
   # ─────────────────────── صفحة حذف الحساب (ويب) ───────────────────────
+  /public/pricing:
+    get:
+      tags: [الموقع]
+      operationId: publicPricing
+      summary: الباقات والأسعار لموقع التطبيق
+      description: |
+        نفس الباقات والأسعار يلي بيشوفها التاجر بالتطبيق (`merchant/lookups`)، الفعّالة بس وبترتيب الإدارة، مع مدة
+        التجربة المجانية. بدون تسجيل دخول. الرد فيه `Cache-Control: public, max-age=300`، فالموقع أو الـCDN بيقدر يخزّنه
+        5 دقائق.
+      security: []
+      responses:
+        '200':
+          description: الباقات
+          headers:
+            Cache-Control: { schema: { type: string, example: 'max-age=300, public' } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [trial_days, exchange_rate_syp, packages]
+                    properties:
+                      trial_days: { type: integer, example: 30 }
+                      exchange_rate_syp: { $ref: '#/components/schemas/Money' }
+                      packages:
+                        type: array
+                        items: { $ref: '#/components/schemas/PackageWithPrices' }
+
   /public/account-deletion/otp:
     post:
       tags: [صفحة حذف الحساب]
@@ -2858,8 +2891,20 @@ paths:
                 type: { type: string, examples: [user.updated, user.deleted] }
                 data: { type: object }
       responses:
-        '200': { description: انستلم أي حدث موقّع }
-        '400': { description: توقيع غلط أو أقدم من 5 دقائق }
+        '200':
+          description: انستلم أي حدث موقّع
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message]
+                properties:
+                  message: { type: string, example: Received. }
+        '400':
+          description: توقيع غلط أو أقدم من 5 دقائق
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
 
 components:
   securitySchemes:
@@ -3224,6 +3269,27 @@ components:
       type: string
       pattern: '^\d+\.\d{2}$'
       example: '10.00'
+    PackageWithPrices:
+      allOf:
+        - $ref: '#/components/schemas/PackageSummary'
+        - type: object
+          required: [prices]
+          properties:
+            prices:
+              type: array
+              description: مرتبة حسب المدة
+              items:
+                type: object
+                required: [duration_months, price_usd, amount_syp]
+                properties:
+                  duration_months: { type: integer, enum: [1, 3, 12] }
+                  price_usd: { $ref: '#/components/schemas/Money' }
+                  amount_syp: { $ref: '#/components/schemas/Money', description: بسعر الصرف الحالي، للعرض بس }
+    ExchangeRate:
+      type: string
+      pattern: '^\d+\.\d{4}$'
+      example: '13000.0000'
+      description: سعر الصرف المحفوظ مع الدفعة، بأربع خانات عشرية
     Platform:
       type: string
       enum: [android, ios]
@@ -3566,13 +3632,13 @@ components:
         grace_ends_at: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
     Payment:
       type: object
-      required: [id, package, duration_months, price_usd, exchange_rate, amount_syp, method, reference, proof_url, status, rejection_reason, created_at, reviewed_at]
+      required: [id, package, duration_months, price_usd, exchange_rate, amount_syp, method, reference, proof_url, status, rejection_reason, created_at, reviewed_at, period_starts_at]
       properties:
         id: { type: integer }
         package: { $ref: '#/components/schemas/PackageSummary' }
         duration_months: { type: integer, enum: [1, 3, 12] }
         price_usd: { $ref: '#/components/schemas/Money' }
-        exchange_rate: { $ref: '#/components/schemas/Money' }
+        exchange_rate: { $ref: '#/components/schemas/ExchangeRate' }
         amount_syp: { $ref: '#/components/schemas/Money' }
         method: { $ref: '#/components/schemas/PaymentMethod' }
         reference: { type: [string, 'null'] }
@@ -3581,6 +3647,7 @@ components:
         rejection_reason: { oneOf: [{ $ref: '#/components/schemas/PaymentRejectionReason' }, { type: 'null' }] }
         created_at: { $ref: '#/components/schemas/DateTime' }
         reviewed_at: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+        period_starts_at: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }], description: 'بداية الفترة المدفوعة يلي ولّدتها هالدفعة لما انقبلت. `null` للمعلّقة والمرفوضة' }
     Capabilities:
       type: object
       description: |
@@ -3615,8 +3682,8 @@ components:
       properties:
         status: { $ref: '#/components/schemas/MerchantStatus' }
         package:
-          allOf: [{ $ref: '#/components/schemas/PackageSummary' }]
-          description: 'الباقة الحالية. قبل أي فترة (التجربة مستعملة قبل بنفس البريد) الباقة يلي اختارها التاجر بالتسجيل'
+          oneOf: [{ $ref: '#/components/schemas/PackageSummary' }, { type: 'null' }]
+          description: 'الباقة الحالية. قبل أي فترة (التجربة مستعملة قبل بنفس البريد) الباقة يلي اختارها التاجر بالتسجيل، و`null` إذا ما اختار باقة'
         current_period: { oneOf: [{ $ref: '#/components/schemas/SubscriptionPeriod' }, { type: 'null' }] }
         trial_used: { type: boolean }
         days_remaining: { type: [integer, 'null'], description: لنهاية التجربة أو الاشتراك، أو لنهاية المهلة بـ`GRACE`. `null` بباقي الحالات }
@@ -3642,7 +3709,7 @@ components:
       required: [registration_step, email, merchant, subscription, usage]
       properties:
         registration_step: { type: string, enum: [business, package, pin, done] }
-        email: { type: string, format: email }
+        email: { type: [string, 'null'], format: email, description: '`null` إذا جلسة Clerk ما فيها بريد' }
         merchant: { oneOf: [{ $ref: '#/components/schemas/MerchantProfile' }, { type: 'null' }] }
         subscription: { oneOf: [{ $ref: '#/components/schemas/Subscription' }, { type: 'null' }] }
         usage: { oneOf: [{ $ref: '#/components/schemas/Usage' }, { type: 'null' }] }
@@ -3666,21 +3733,7 @@ components:
         trial_days: { type: integer, example: 14, description: مدة التجربة المجانية بالأيام. حقل زيادة عن العقد }
         packages:
           type: array
-          items:
-            allOf:
-              - $ref: '#/components/schemas/PackageSummary'
-              - type: object
-                required: [prices]
-                properties:
-                  prices:
-                    type: array
-                    items:
-                      type: object
-                      required: [duration_months, price_usd, amount_syp]
-                      properties:
-                        duration_months: { type: integer, enum: [1, 3, 12] }
-                        price_usd: { $ref: '#/components/schemas/Money' }
-                        amount_syp: { $ref: '#/components/schemas/Money', description: بسعر الصرف الحالي، للعرض بس }
+          items: { $ref: '#/components/schemas/PackageWithPrices' }
         payment:
           type: object
           required: [exchange_rate_syp, review_sla_hours, methods]
@@ -4034,7 +4087,9 @@ components:
         logo_url: { type: [string, 'null'], format: uri }
         business_type: { $ref: '#/components/schemas/Lookup' }
         governorate: { $ref: '#/components/schemas/Lookup' }
-        status: { oneOf: [{ $ref: '#/components/schemas/MerchantStatus' }, { type: 'null' }], description: '`null` لحد ما يختار باقة' }
+        status:
+          oneOf: [{ $ref: '#/components/schemas/MerchantStatus' }, { type: string, enum: [DELETED] }, { type: 'null' }]
+          description: '`null` لحد ما يختار باقة. `DELETED` بعد ما ينمسحوا بياناته الشخصية'
         registration_step: { type: string, enum: [package, pin, done], description: '`package`: لم يختر باقة بعد. `pin`: ما حط PIN' }
         package: { oneOf: [{ $ref: '#/components/schemas/PackageSummary' }, { type: 'null' }], description: باقة الفترة الحالية، أو آخر باقة }
         subscription_ends_at: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }], description: نهاية آخر فترة }

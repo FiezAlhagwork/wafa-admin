@@ -7,6 +7,7 @@ import { createCustomerStore } from "./mock-customers";
 import { createPackageStore, type PackageResult } from "./mock-packages";
 import { createSettingsStore, type MethodResult } from "./mock-settings";
 import { createDeletionStore } from "./mock-deletions";
+import { listAudit } from "./mock-audit";
 import { createFinanceStore } from "./mock-finance";
 import { createLookupStore, type LookupResult } from "./mock-lookups";
 import { createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
@@ -106,7 +107,7 @@ const toPayment = (seed: Seed): AdminPayment => ({
   package: { id: 1, name: seed.packageName, cards_limit: 5, weekly_campaigns_limit: 2 },
   duration_months: seed.months,
   price_usd: seed.usd,
-  exchange_rate: "13000.00",
+  exchange_rate: "13000.0000",
   amount_syp: seed.syp,
   method: seed.method,
   reference: seed.reference,
@@ -115,6 +116,7 @@ const toPayment = (seed: Seed): AdminPayment => ({
   rejection_reason: seed.reason ?? null,
   created_at: hoursAgo(seed.hours),
   reviewed_at: seed.status === "PENDING" ? null : hoursAgo(seed.hours - 2),
+  period_starts_at: seed.status === "APPROVED" ? hoursAgo(seed.hours - 2) : null,
   merchant: seed.name ? { id: merchantIds[seed.name] ?? seed.id, business_name: seed.name, email: seed.email ?? null, status: "TRIAL" } : null,
   overdue: seed.overdue ?? false,
   duplicate_reference: seed.duplicate ?? false,
@@ -239,6 +241,19 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
         data: all.slice(start, next),
         meta: { next_cursor: next < all.length ? String(next) : null },
       });
+    }
+
+    if (url === "/admin/audit-logs" && method === "get") {
+      // Only the super admin has `view-audit-log`, like the real server
+      if (scenario !== "super_admin") throw failure(config, 403, "FORBIDDEN");
+      const params = (config.params ?? {}) as Record<string, string | undefined>;
+      if (params.subject_id && !params.subject_type) {
+        throw failure(config, 422, "VALIDATION_FAILED", { fields: { subject_type: ["required"] } });
+      }
+      const start = Number(params.cursor ?? 0);
+      const all = listAudit(params);
+      const next = start + PAGE_SIZE;
+      return respond(config, { data: all.slice(start, next), meta: { next_cursor: next < all.length ? String(next) : null } });
     }
 
     if (url.startsWith("/admin/finance/") && method === "get") {

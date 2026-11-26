@@ -5,8 +5,9 @@ import { authKeys } from "@/lib/auth/me";
 import { adminUsersKeys } from "./keys";
 import { createAdminUser, deactivateAdminUser, listAdminUsers, updateAdminUser } from "./services";
 
-export function useAdminUsers() {
-  return useQuery({ queryKey: adminUsersKeys.list(), queryFn: listAdminUsers });
+/** `enabled: false` where the list is only a helper (the audit log's filter) and the role may not read it. */
+export function useAdminUsers({ enabled = true }: { enabled?: boolean } = {}) {
+  return useQuery({ queryKey: adminUsersKeys.list(), queryFn: listAdminUsers, enabled });
 }
 
 /**

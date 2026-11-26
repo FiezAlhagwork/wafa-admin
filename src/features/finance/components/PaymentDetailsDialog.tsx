@@ -8,7 +8,7 @@ import { MethodIcon } from "@/features/payments/components/PaymentParts";
 import { formatDuration, methodLabels, rejectionReasonLabels } from "@/features/payments/labels";
 import type { AdminPayment } from "@/lib/api/types";
 import { usePermission } from "@/lib/auth/can";
-import { formatDecimal, formatSyp, formatUsd } from "@/lib/format";
+import { formatRate, formatSyp, formatUsd } from "@/lib/format";
 
 type PaymentDetailsDialogProps = {
   /** The row from the history, kept current by the screen (a refetched list brings a fresh `proof_url`). */
@@ -86,7 +86,7 @@ export function PaymentDetailsDialog({
           <p className="text-xs text-fg-muted">المبلغ</p>
           <p className="text-2xl font-semibold tabular-nums text-fg">{formatSyp(payment.amount_syp)}</p>
           <p className="text-sm tabular-nums text-fg-muted">
-            {formatUsd(payment.price_usd)} · سعر الصرف {formatDecimal(payment.exchange_rate)}
+            {formatUsd(payment.price_usd)} · سعر الصرف {formatRate(payment.exchange_rate)}
           </p>
         </div>
 
@@ -121,6 +121,11 @@ export function PaymentDetailsDialog({
               {payment.rejection_reason && <Row label="سبب الرفض">{rejectionReasonLabels[payment.rejection_reason]}</Row>}
               <Row label="راجعها">{payment.reviewed_by?.name ?? "—"}</Row>
               <Row label="تاريخ المراجعة">{payment.reviewed_at ? <When iso={payment.reviewed_at} /> : "—"}</Row>
+                {payment.period_starts_at && (
+                  <Row label="بداية الفترة">
+                    <When iso={payment.period_starts_at} />
+                  </Row>
+                )}
             </>
           )}
         </dl>

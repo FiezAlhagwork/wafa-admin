@@ -1,8 +1,9 @@
 import type { ListMerchantsQuery, MerchantStatus } from "@/lib/api/types";
 
 /**
- * The filters sent to the API (without the cursor). The backend guide lists `DELETED` as a status filter, but the
- * generated `MerchantStatus` (openapi.yaml) does not have it: the guide wins, so it is added here (gap A07 in Notion).
+ * The filters sent to the API (without the cursor). A merchant's `status` may now be `DELETED`, but the `status` filter
+ * of `GET /admin/merchants` still lists only `MerchantStatus` in openapi.yaml, while the guide accepts `DELETED`: the
+ * guide wins, so it is added here (what is left of gap A07 in Notion).
  */
 export type MerchantsQuery = Pick<ListMerchantsQuery, "registration_step" | "q" | "trial_ending"> & {
   status?: MerchantStatus | "DELETED";

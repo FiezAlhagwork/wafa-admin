@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Cake, Trash } from "@phosphor-icons/react";
 import { BackLink } from "@/components/layout/BackLink";
+import { AuditHistoryLink } from "@/features/audit-logs/components/AuditHistoryLink";
 import { Button, Card, ErrorState, Skeleton } from "@/components/ui";
 import { getErrorMessage } from "@/lib/api/errors";
 import type { CustomerCycle } from "@/lib/api/types";
@@ -111,7 +112,10 @@ export function CustomerDetailScreen({ id, onBack }: CustomerDetailScreenProps) 
 
   return (
     <div className="flex flex-col gap-5">
-      <BackLink href="/admin/customers" label="الزبائن" onBack={onBack} />
+      <div className="flex items-center justify-between gap-3">
+        <BackLink href="/admin/customers" label="الزبائن" onBack={onBack} />
+        <AuditHistoryLink subjectType="customer" subjectId={id} />
+      </div>
       {body}
     </div>
   );
