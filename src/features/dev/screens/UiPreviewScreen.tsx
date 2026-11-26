@@ -22,6 +22,7 @@ import {
   Card,
   CardBody,
   CardHeader,
+  DateRangePicker,
   EmptyState,
   ErrorState,
   Field,
@@ -34,10 +35,13 @@ import {
   StatCard,
   StatusBadge,
   Textarea,
+  formatDateRange,
   toast,
   type ButtonVariant,
+  type DateRange,
   type Status,
 } from "@/components/ui";
+import { todayKey } from "@/lib/format";
 import { ListsPreview } from "../components/ListsPreview";
 import { OverlaysPreview } from "../components/OverlaysPreview";
 import { PreviewRow as Row, PreviewSection as Section } from "../components/PreviewLayout";
@@ -55,6 +59,7 @@ export function UiPreviewScreen() {
   const [loading, setLoading] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [otp, setOtp] = useState("");
+  const [range, setRange] = useState<DateRange>({ from: "", to: "" });
 
   const simulate = (set: (value: boolean) => void) => {
     set(true);
@@ -163,6 +168,20 @@ export function UiPreviewScreen() {
           </Field>
           <Field label="رمز التحقق" error="الرمز غير صحيح">
             <OtpField value="123" onValueChange={() => {}} />
+          </Field>
+        </div>
+      </Section>
+
+      <Section title="DateRangePicker">
+        <div className="grid gap-6 md:grid-cols-3">
+          <Field label="فارغ" hint={range.from ? formatDateRange(range) : "لا شيء مطبّق بعد."}>
+            <DateRangePicker value={range} onChange={setRange} max={todayKey()} />
+          </Field>
+          <Field label="مع فترة" error="تاريخ البداية بعد تاريخ النهاية">
+            <DateRangePicker value={{ from: "2026-11-20", to: "2026-11-02" }} onChange={() => {}} />
+          </Field>
+          <Field label="معطّل" disabled>
+            <DateRangePicker value={{ from: "2026-10-28", to: "2026-11-03" }} onChange={() => {}} />
           </Field>
         </div>
       </Section>

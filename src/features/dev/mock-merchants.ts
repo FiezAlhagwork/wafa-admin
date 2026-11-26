@@ -25,14 +25,21 @@ export type MerchantSeed = {
   /** The status before a suspension: reactivating goes back to it (or EXPIRED if the dates ran out) */
   statusBeforeSuspension?: MerchantSeed["status"];
   pendingDeletion?: boolean;
+  /** The open deletion request (set by the store for `pendingDeletion`, and by scheduling one in the preview) */
+  deletion?: { id: number; requested_at: string; executes_at: string };
+  /** The status before the deletion was scheduled: cancelling goes back to it */
+  statusBeforeDeletion?: MerchantSeed["status"];
   /** An expired trial that never paid: the one EXPIRED merchant whose trial can still be extended */
   neverPaid?: boolean;
   type: string;
   governorate: string;
   /** Set by the actions */
   hasCover?: boolean;
+  links?: { instagram_url: string | null; facebook_url: string | null; maps_url: string | null };
   suspendedCardIds?: number[];
 };
+
+const noLinks = { instagram_url: null, facebook_url: null, maps_url: null };
 
 /** The business types (`GET /admin/business-types`), one inactive. */
 export const businessTypes: AdminLookup[] = [
@@ -97,11 +104,13 @@ export function toMerchantDetail(seed: MerchantSeed) {
     ...toMerchant(seed),
     cover_url: seed.hasCover ? cover : null,
     address: seed.owner ? "شارع الحمرا، بناء 12" : null,
+    links: { ...(seed.links ?? noLinks) },
     last_login_at: seed.status === null ? null : hoursAgo(seed.id % 48),
     subscription: hasSubscription
       ? {
           status: seed.status,
-          package: pkg,
+          // 114 used the trial before with the same email and chose no package: the API sends `package: null`
+          package: seed.id === 114 ? null : pkg,
           current_period: null,
           trial_used: true,
           days_remaining: seed.endsInDays !== null && seed.endsInDays > 0 ? seed.endsInDays : null,
@@ -120,8 +129,8 @@ export function toMerchantDetail(seed: MerchantSeed) {
       : [],
     payments: paid
       ? [
-          { id: 901, package: pkg, duration_months: 3, price_usd: "45.50", exchange_rate: "13000.00", amount_syp: "591500.00", method: "sham_cash", reference: "94817263", proof_url: "", status: "APPROVED", rejection_reason: null, created_at: daysAgo(30), reviewed_at: daysAgo(29) },
-          { id: 902, package: pkg, duration_months: 1, price_usd: "18.00", exchange_rate: "13000.00", amount_syp: "234000.00", method: "haram", reference: "TX-30771", proof_url: "", status: "REJECTED", rejection_reason: "amount_short", created_at: daysAgo(35), reviewed_at: daysAgo(34) },
+          { id: 901, package: pkg, duration_months: 3, price_usd: "45.50", exchange_rate: "13000.0000", amount_syp: "591500.00", method: "sham_cash", reference: "94817263", proof_url: "", status: "APPROVED", rejection_reason: null, created_at: daysAgo(30), reviewed_at: daysAgo(29), period_starts_at: daysAgo(29) },
+          { id: 902, package: pkg, duration_months: 1, price_usd: "18.00", exchange_rate: "13000.0000", amount_syp: "234000.00", method: "haram", reference: "TX-30771", proof_url: "", status: "REJECTED", rejection_reason: "amount_short", created_at: daysAgo(35), reviewed_at: daysAgo(34), period_starts_at: null },
         ]
       : [],
     cards:
@@ -138,7 +147,7 @@ export function toMerchantDetail(seed: MerchantSeed) {
       seed.status === null
         ? { customers_total: 0, stamps_total: 0, stamps_via_phone_total: 0, rewards_ready: 0, rewards_redeemed_total: 0, campaigns_total: 0 }
         : { customers_total: 59, stamps_total: 310, stamps_via_phone_total: 25, rewards_ready: 3, rewards_redeemed_total: 51, campaigns_total: 4 },
-    deletion: seed.pendingDeletion ? { id: 7, requested_at: daysAgo(2), executes_at: inDays(5) } : null,
+    deletion: seed.deletion ?? null,
   };
 }
 
@@ -147,6 +156,20 @@ export function createMerchantStore(): MerchantSeed[] {
   return seeds.map((seed) => ({
     ...seed,
     hasCover: seed.id === 104,
+    // The same request as in the deletion list (mock-deletions.ts, id 7): 25 of its 30 days gone
+    deletion: seed.pendingDeletion ? { id: 7, requested_at: daysAgo(25), executes_at: inDays(5) } : undefined,
+    statusBeforeDeletion: seed.pendingDeletion ? "ACTIVE" : undefined,
+    // 104 has all three links, 101 only Instagram, the others none
+    links:
+      seed.id === 104
+        ? {
+            instagram_url: "https://www.instagram.com/alfurat.restaurant/",
+            facebook_url: "https://www.facebook.com/alfurat.deirezzor",
+            maps_url: "https://maps.app.goo.gl/x7Kq2mVb9Rt3",
+          }
+        : seed.id === 101
+          ? { ...noLinks, instagram_url: "https://instagram.com/yasmin.cafe" }
+          : { ...noLinks },
     // A suspended merchant's second card was paused too
     suspendedCardIds: seed.status === "SUSPENDED" ? [seed.id * 10 + 2] : [],
   }));

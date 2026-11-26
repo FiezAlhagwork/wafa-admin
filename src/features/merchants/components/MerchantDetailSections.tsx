@@ -1,14 +1,20 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   ArrowsOut,
   Calendar,
+  CaretLeft,
   ClockCounterClockwise,
   Envelope,
+  FacebookLogo,
   Gift,
   IdentificationCard,
   ImageSquare,
+  InstagramLogo,
+  LinkSimple,
   MapPin,
+  MapTrifold,
   Package,
   PauseCircle,
   Phone,
@@ -20,12 +26,14 @@ import {
   User,
   WarningCircle,
 } from "@phosphor-icons/react/ssr";
-import { Avatar, Card, CardHeader, EmptyState, Latin, MetaPill, StatusBadge } from "@/components/ui";
+import { Avatar, Button, Card, CardHeader, EmptyState, IconButton, Latin, MetaPill, StatusBadge } from "@/components/ui";
 import { formatDuration, methodLabels } from "@/features/payments/labels";
-import type { AdminMerchantDetail, MerchantCard } from "@/lib/api/types";
+import type { AdminMerchantDetail, MerchantCard, MerchantLink } from "@/lib/api/types";
+import { usePermission } from "@/lib/auth/can";
 import { cn } from "@/lib/cn";
 import { formatDate, formatDateTime, formatDayCount, formatNumber, formatRelativeDays, formatSyp, formatUsd } from "@/lib/format";
 import { cardStatusLabels, periodTypeLabels, registrationStepLabels } from "../labels";
+import { presentLinks, safeHref, shortUrl } from "../links";
 
 // The sections of the merchant page. They only show: the actions open dialogs through the callbacks the screen passes
 // (none when the role may not take that action).
@@ -92,20 +100,21 @@ export function MerchantHero({ merchant, actions }: MerchantProps & { actions?: 
   );
 }
 
-function Alert({ title, children }: { title: string; children: ReactNode }) {
+function Alert({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
   return (
-    <div role="status" className="flex items-start gap-3 rounded-2xl border border-danger/25 bg-danger-soft p-4 text-danger">
+    <div role="status" className="flex flex-wrap items-start gap-3 rounded-2xl border border-danger/25 bg-danger-soft p-4 text-danger">
       <WarningCircle aria-hidden weight="fill" className="mt-0.5 size-5.5 shrink-0" />
-      <div className="flex min-w-0 flex-col gap-0.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="font-bold">{title}</p>
         <div className="text-sm text-fg">{children}</div>
       </div>
+      {action && <div className="ms-auto shrink-0">{action}</div>}
     </div>
   );
 }
 
 /** A suspended merchant and a pending deletion: the two states that change what anyone should do next. */
-export function MerchantAlerts({ merchant }: MerchantProps) {
+export function MerchantAlerts({ merchant, onCancelDeletion }: MerchantProps & { onCancelDeletion?: () => void }) {
   const { suspended_at, suspension_reason, deletion, stats } = merchant;
   if (!suspended_at && !deletion) return null;
 
@@ -117,7 +126,16 @@ export function MerchantAlerts({ merchant }: MerchantProps) {
         </Alert>
       )}
       {deletion && (
-        <Alert title="طلب حذف بانتظار التنفيذ">
+        <Alert
+          title="طلب حذف بانتظار التنفيذ"
+          action={
+            onCancelDeletion && (
+              <Button variant="secondary" size="sm" onClick={onCancelDeletion}>
+                إلغاء الحذف
+              </Button>
+            )
+          }
+        >
           طُلب في {formatDate(deletion.requested_at)}، ويُنفَّذ {formatRelativeDays(deletion.executes_at)} (
           {formatDate(deletion.executes_at)}). الهدايا الجاهزة غير المُسلَّمة: {formatNumber(stats.rewards_ready)}.
         </Alert>
@@ -163,7 +181,7 @@ export function SubscriptionCard({ merchant }: MerchantProps) {
           <div className="flex flex-wrap gap-5 p-5">
             <div className="flex min-w-0 flex-1 basis-64 flex-col gap-3 rounded-xl bg-neutral-50 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xl font-black text-fg">{subscription.package.name}</span>
+                <span className="text-xl font-black text-fg">{subscription.package?.name ?? "بدون باقة"}</span>
                 <StatusBadge status={subscription.status} />
               </div>
               {progress !== null && (
@@ -196,8 +214,11 @@ export function SubscriptionCard({ merchant }: MerchantProps) {
             </div>
 
             <dl className="grid min-w-0 flex-1 basis-56 grid-cols-2 content-start gap-4">
-              <Fact label="حدود البطاقات">{formatNumber(subscription.package.cards_limit)}</Fact>
-              <Fact label="حملات أسبوعية">{formatNumber(subscription.package.weekly_campaigns_limit)}</Fact>
+              {/* No package yet (the trial was used before with the same email, and none was chosen): no limits to show */}
+              <Fact label="حدود البطاقات">{subscription.package ? formatNumber(subscription.package.cards_limit) : dash}</Fact>
+              <Fact label="حملات أسبوعية">
+                {subscription.package ? formatNumber(subscription.package.weekly_campaigns_limit) : dash}
+              </Fact>
               <Fact label="التجربة">{subscription.trial_used ? "مستعملة" : "غير مستعملة"}</Fact>
               <Fact label="دفعة معلّقة">
                 {subscription.pending_payment ? formatDate(subscription.pending_payment.created_at) : "لا يوجد"}
@@ -306,7 +327,90 @@ function CoverImage({ url, onRemove }: { url: string | null; onRemove?: () => vo
   );
 }
 
-export function IdentityCard({ merchant, onRemoveCover }: MerchantProps & { onRemoveCover?: () => void }) {
+/**
+ * An address, cut at its end when it is too long ("instagram.com/alfurat.resta…"), so the site and the start of the
+ * handle stay readable. `Latin` keeps the page direction and would cut the start instead. Lined up with the Arabic.
+ */
+function LinkText({ children }: { children: string }) {
+  return (
+    <span dir="ltr" className="block truncate text-end">
+      {children}
+    </span>
+  );
+}
+
+const linkIcons: Record<MerchantLink, ReactNode> = {
+  instagram: <InstagramLogo />,
+  facebook: <FacebookLogo />,
+  maps: <MapTrifold />,
+};
+
+/**
+ * The shop's own links, as the customer app shows them. Each opens in a new tab; only an http(s) address becomes a
+ * link (see `safeHref`). An admin who may edit the identity can remove an unsuitable one.
+ */
+function LinksRow({ links, onRemove }: { links: AdminMerchantDetail["links"]; onRemove?: (link: MerchantLink) => void }) {
+  const items = presentLinks(links);
+
+  return (
+    <div className="flex gap-3 border-t border-divider py-3">
+      <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-neutral-50 text-neutral-700 [&>svg]:size-4.5">
+        <LinkSimple />
+      </span>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <dt className="text-xs text-fg-muted">الروابط</dt>
+        <dd className="text-[14.5px] font-medium text-fg">
+          {items.length === 0 ? (
+            "لا توجد روابط"
+          ) : (
+            <ul className="flex flex-col">
+              {items.map(({ key, url, label }) => {
+                const href = safeHref(url);
+                return (
+                  <li key={key} className="flex min-h-8 items-center gap-2">
+                    <span aria-hidden className="shrink-0 text-fg-muted [&>svg]:size-4">
+                      {linkIcons[key]}
+                    </span>
+                    {href ? (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={url}
+                        className="min-w-0 rounded-sm text-brand underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+                      >
+                        <span className="sr-only">{label}: </span>
+                        <LinkText>{shortUrl(url)}</LinkText>
+                      </a>
+                    ) : (
+                      <span title={url} className="min-w-0 text-fg">
+                        <span className="sr-only">{label}: </span>
+                        <LinkText>{url}</LinkText>
+                      </span>
+                    )}
+                    {onRemove && (
+                      <IconButton
+                        size="sm"
+                        label={`إزالة رابط ${label}`}
+                        icon={<Trash className="size-4" />}
+                        className="ms-auto text-danger hover:bg-danger-soft hover:text-danger"
+                        onClick={() => onRemove(key)}
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </dd>
+      </div>
+    </div>
+  );
+}
+
+type IdentityCardProps = MerchantProps & { onRemoveCover?: () => void; onRemoveLink?: (link: MerchantLink) => void };
+
+export function IdentityCard({ merchant, onRemoveCover, onRemoveLink }: IdentityCardProps) {
   return (
     <Card className="overflow-hidden">
       <CoverImage url={merchant.cover_url} onRemove={onRemoveCover} />
@@ -319,6 +423,7 @@ export function IdentityCard({ merchant, onRemoveCover }: MerchantProps & { onRe
           {merchant.governorate.name}
           {merchant.address && <span className="block text-[13px] font-normal text-fg-muted">{merchant.address}</span>}
         </InfoRow>
+        <LinksRow links={merchant.links} onRemove={onRemoveLink} />
         <InfoRow icon={<User />} label="المالك">
           {merchant.owner_name ?? dash}
         </InfoRow>
@@ -420,6 +525,8 @@ export function CardsList({ merchant, onSuspendCard }: MerchantProps & { onSuspe
 
 export function RecentPayments({ merchant }: MerchantProps) {
   const { payments } = merchant;
+  // The full history lives in the finance screen, for those who may see it
+  const canSeeAll = usePermission("view-financials");
 
   return (
     <Card className="overflow-hidden">
@@ -427,7 +534,19 @@ export function RecentPayments({ merchant }: MerchantProps) {
         icon={<ClockCounterClockwise />}
         iconTone="teal"
         title="آخر الدفعات"
-        description="آخر 10 دفعات، والباقي في سجل المالية."
+        description={canSeeAll ? "آخر 10 دفعات، والباقي في سجل المالية." : "آخر 10 دفعات."}
+        actions={
+          canSeeAll &&
+          payments.length > 0 && (
+            <Link
+              href={`/admin/finance?view=payments&merchant_id=${merchant.id}`}
+              className="inline-flex items-center gap-1 rounded-md text-sm font-bold whitespace-nowrap text-brand outline-none hover:text-brand-hover focus-visible:ring-2 focus-visible:ring-focus"
+            >
+              كل الدفعات
+              <CaretLeft aria-hidden className="size-4" />
+            </Link>
+          )
+        }
       />
       {payments.length === 0 ? (
         <EmptyState className="py-8" icon={<Receipt />} title="لا توجد دفعات" />

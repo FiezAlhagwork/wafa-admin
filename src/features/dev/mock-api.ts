@@ -6,7 +6,11 @@ import { api } from "@/lib/api/client";
 import { createCustomerStore } from "./mock-customers";
 import { createPackageStore, type PackageResult } from "./mock-packages";
 import { createSettingsStore, type MethodResult } from "./mock-settings";
-import { businessTypes, createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
+import { createDeletionStore } from "./mock-deletions";
+import { listAudit } from "./mock-audit";
+import { createFinanceStore } from "./mock-finance";
+import { createLookupStore, type LookupResult } from "./mock-lookups";
+import { createMerchantStore, filterMerchantSeeds, toMerchant, toMerchantDetail } from "./mock-merchants";
 import type { AdminOverview, AdminPayment, AdminUser } from "@/lib/api/types";
 
 export type MockScenario = "super_admin" | "admin" | "reviewer" | "support" | "loading" | "error";
@@ -87,12 +91,23 @@ const seeds: Seed[] = [
   { id: 8, name: "مكتبة الأفق", email: "ufuq@example.com", packageName: "المتوسطة", months: 1, usd: "18.00", syp: "234000.00", method: "haram", reference: "TX-30771", status: "REJECTED", hours: 30, reason: "amount_short" },
 ];
 
+// The merchants of the merchant store (mock-merchants), so a payment's merchant opens the right page
+const merchantIds: Record<string, number> = {
+  "مقهى الياسمين": 101,
+  "مخبز الشام": 102,
+  "صالون لمسة للتجميل": 103,
+  "مطعم الفرات": 104,
+  "عيادة الشفاء": 105,
+  "متجر النور": 106,
+  "مكتبة الأفق": 107,
+};
+
 const toPayment = (seed: Seed): AdminPayment => ({
   id: seed.id,
   package: { id: 1, name: seed.packageName, cards_limit: 5, weekly_campaigns_limit: 2 },
   duration_months: seed.months,
   price_usd: seed.usd,
-  exchange_rate: "13000.00",
+  exchange_rate: "13000.0000",
   amount_syp: seed.syp,
   method: seed.method,
   reference: seed.reference,
@@ -101,7 +116,8 @@ const toPayment = (seed: Seed): AdminPayment => ({
   rejection_reason: seed.reason ?? null,
   created_at: hoursAgo(seed.hours),
   reviewed_at: seed.status === "PENDING" ? null : hoursAgo(seed.hours - 2),
-  merchant: seed.name ? { id: seed.id, business_name: seed.name, email: seed.email ?? null, status: "TRIAL" } : null,
+  period_starts_at: seed.status === "APPROVED" ? hoursAgo(seed.hours - 2) : null,
+  merchant: seed.name ? { id: merchantIds[seed.name] ?? seed.id, business_name: seed.name, email: seed.email ?? null, status: "TRIAL" } : null,
   overdue: seed.overdue ?? false,
   duplicate_reference: seed.duplicate ?? false,
   reviewed_by: seed.status === "PENDING" ? null : { id: 1, name: "سامر الحلبي" },
@@ -179,6 +195,12 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
   const merchants = createMerchantStore();
   const customers = createCustomerStore();
   const packages = createPackageStore();
+  const lookups = createLookupStore();
+  const deletions = createDeletionStore();
+  const finance = createFinanceStore(payments);
+  // The roles with `execute-deletion-requests`, and who the preview acts as (shown as "by" on a request)
+  const canDelete = scenario === "super_admin" || scenario === "admin";
+  const actor = scenario === "admin" ? { id: 4, name: "هالة المدير" } : { id: 1, name: "سامر الحلبي" };
   const settings = createSettingsStore();
   // Only the super admin has `manage-settings`, like the real server
   const canManageSettings = scenario === "super_admin";
@@ -221,6 +243,33 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       });
     }
 
+    if (url === "/admin/audit-logs" && method === "get") {
+      // Only the super admin has `view-audit-log`, like the real server
+      if (scenario !== "super_admin") throw failure(config, 403, "FORBIDDEN");
+      const params = (config.params ?? {}) as Record<string, string | undefined>;
+      if (params.subject_id && !params.subject_type) {
+        throw failure(config, 422, "VALIDATION_FAILED", { fields: { subject_type: ["required"] } });
+      }
+      const start = Number(params.cursor ?? 0);
+      const all = listAudit(params);
+      const next = start + PAGE_SIZE;
+      return respond(config, { data: all.slice(start, next), meta: { next_cursor: next < all.length ? String(next) : null } });
+    }
+
+    if (url.startsWith("/admin/finance/") && method === "get") {
+      // Only the roles with `view-financials`, like the real server
+      if (!canSeeFinance) throw failure(config, 403, "FORBIDDEN");
+      const params = (config.params ?? {}) as Record<string, string | undefined>;
+      if (params.from && params.to && params.from > params.to) {
+        throw failure(config, 422, "VALIDATION_FAILED", { fields: { to: ["after_or_equal"] } });
+      }
+      if (url === "/admin/finance/report") return respond(config, { data: finance.report(params) });
+      const start = Number(params.cursor ?? 0);
+      const all = finance.history(params);
+      const next = start + PAGE_SIZE;
+      return respond(config, { data: all.slice(start, next), meta: { next_cursor: next < all.length ? String(next) : null } });
+    }
+
     if (url === "/admin/merchants" && method === "get") {
       const params = (config.params ?? {}) as Record<string, string | undefined>;
       const start = Number(params.cursor ?? 0);
@@ -229,9 +278,23 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       return respond(config, { data: all.slice(start, next).map(toMerchant), meta: { next_cursor: next < all.length ? String(next) : null } });
     }
 
-    if (url === "/admin/business-types" && method === "get") {
+    const lookupRoute = /^\/admin\/(business-types|icons)(?:\/(\d+))?$/.exec(url);
+    if (lookupRoute) {
       if (!canManageLookups) throw failure(config, 403, "FORBIDDEN");
-      return respond(config, { data: businessTypes });
+      const kind = lookupRoute[1] === "icons" ? "icons" : "types";
+      const answer = (result: LookupResult, status = 200) => {
+        if (result.ok) return { ...respond(config, { data: result.data }), status };
+        if ("fields" in result) throw failure(config, 422, "VALIDATION_FAILED", { fields: result.fields });
+        throw failure(config, 404, "NOT_FOUND");
+      };
+      if (!lookupRoute[2] && method === "get") return respond(config, { data: lookups.list(kind) });
+      if (!lookupRoute[2] && method === "post") {
+        const body = bodyOf<{ name: string; key?: string; sort_order?: number; is_active?: boolean }>(config);
+        // The server checks the key against Phosphor; the preview asks the same library the screen uses
+        const { iconByKey } = await import("@/features/lookups/phosphor");
+        return answer(lookups.create(kind, body, iconByKey(body.key ?? "") !== null), 201);
+      }
+      if (lookupRoute[2] && method === "patch") return answer(lookups.update(kind, Number(lookupRoute[2]), bodyOf(config)));
     }
 
     const methodRoute = /^\/admin\/settings\/payment-methods\/(sham_cash|haram)(\/qr)?$/.exec(url);
@@ -275,7 +338,61 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       if (packageRoute[1] && method === "patch") return answer(packages.update(Number(packageRoute[1]), bodyOf(config)));
     }
 
-    const merchantRoute = /^\/admin\/merchants\/(\d+)(?:\/(suspend|reactivate|trial-extension|cover))?$/.exec(url);
+    // Deletion requests: the list, cancelling a merchant's, and the two ways one is made (merchant, customer)
+    if (url === "/admin/deletion-requests" && method === "get") {
+      if (!canDelete) throw failure(config, 403, "FORBIDDEN");
+      const start = Number(config.params?.cursor ?? 0);
+      const all = deletions.list((config.params ?? {}) as Record<string, string | undefined>);
+      const next = start + PAGE_SIZE;
+      return respond(config, { data: all.slice(start, next), meta: { next_cursor: next < all.length ? String(next) : null } });
+    }
+    const cancelRoute = /^\/admin\/deletion-requests\/(\d+)\/cancel$/.exec(url);
+    if (cancelRoute && method === "post") {
+      if (!canDelete) throw failure(config, 403, "FORBIDDEN");
+      const result = deletions.cancel(Number(cancelRoute[1]));
+      if (!result.ok) throw failure(config, result.code === "NOT_FOUND" ? 404 : 409, result.code);
+      const seed = merchants.find((item) => item.id === result.merchantId);
+      if (seed) {
+        // Back to the status its dates give, or suspended if it was before
+        const before = seed.statusBeforeDeletion ?? "ACTIVE";
+        seed.status = before === "SUSPENDED" ? before : seed.endsInDays !== null && seed.endsInDays < 0 ? "EXPIRED" : before;
+        seed.deletion = undefined;
+        seed.pendingDeletion = false;
+        seed.statusBeforeDeletion = undefined;
+      }
+      return respond(config, { data: result.data });
+    }
+    const deletionRoute = /^\/admin\/(merchants|customers)\/(\d+)\/deletion$/.exec(url);
+    if (deletionRoute && method === "post") {
+      if (!canDelete) throw failure(config, 403, "FORBIDDEN");
+      const body = bodyOf<{ source?: string; note?: string | null }>(config);
+      const fields: Record<string, string[]> = {};
+      if (!body.source) fields.source = ["required"];
+      else if (!["web", "email", "support"].includes(body.source)) fields.source = ["invalid"];
+      if ((body.note?.length ?? 0) > 255) fields.note = ["max"];
+      if (Object.keys(fields).length > 0) throw failure(config, 422, "VALIDATION_FAILED", { fields });
+      const input = { source: body.source as "web" | "email" | "support", note: body.note ?? null };
+      const id = Number(deletionRoute[2]);
+
+      if (deletionRoute[1] === "customers") {
+        if (!customers.get(id)) throw failure(config, 404, "NOT_FOUND");
+        customers.remove(id);
+        return { ...respond(config, { data: deletions.deleteCustomer(id, input, actor) }), status: 201 };
+      }
+      const seed = merchants.find((item) => item.id === id);
+      if (!seed) throw failure(config, 404, "NOT_FOUND");
+      const current: string | null = seed.status;
+      if (current === "PENDING_DELETION" || current === "DELETED") {
+        throw failure(config, 409, "MERCHANT_STATUS_CONFLICT", { status: current });
+      }
+      const created = deletions.scheduleMerchant({ id, name: seed.name }, input, actor);
+      seed.statusBeforeDeletion = seed.status;
+      seed.status = "PENDING_DELETION";
+      seed.deletion = { id: created.id, requested_at: created.requested_at, executes_at: created.executes_at! };
+      return { ...respond(config, { data: created }), status: 201 };
+    }
+
+    const merchantRoute = /^\/admin\/merchants\/(\d+)(?:\/(suspend|reactivate|trial-extension|cover|links\/(?:instagram|facebook|maps)))?$/.exec(url);
     if (merchantRoute) {
       const seed = merchants.find((item) => item.id === Number(merchantRoute[1]));
       if (!seed) throw failure(config, 404, "NOT_FOUND");
@@ -295,7 +412,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
       }
       if (
         body.business_type_id !== undefined &&
-        !businessTypes.some((type) => type.id === body.business_type_id && type.is_active)
+        !lookups.types().some((type) => type.id === body.business_type_id && type.is_active)
       ) {
         fields.business_type_id = ["exists"];
       }
@@ -344,6 +461,13 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
         return respond(config, { data: toMerchantDetail(seed).subscription });
       }
 
+      if (route?.startsWith("links/") && method === "delete") {
+        const field = `${route.slice("links/".length)}_url` as "instagram_url" | "facebook_url" | "maps_url";
+        if (!seed.links?.[field]) throw failure(config, 404, "NOT_FOUND");
+        seed.links = { ...seed.links, [field]: null };
+        return respond(config, { data: toMerchantDetail(seed) });
+      }
+
       if (route === "cover" && method === "delete") {
         seed.hasCover = false;
         return respond(config, { data: toMerchantDetail(seed) });
@@ -351,7 +475,7 @@ function createHandler(scenario: MockScenario): AxiosAdapter {
 
       if (!route && method === "patch") {
         if (body.business_name !== undefined) seed.name = body.business_name.trim();
-        const type = businessTypes.find((item) => item.id === body.business_type_id);
+        const type = lookups.types().find((item) => item.id === body.business_type_id);
         if (type) seed.type = type.name;
         return respond(config, { data: toMerchantDetail(seed) });
       }

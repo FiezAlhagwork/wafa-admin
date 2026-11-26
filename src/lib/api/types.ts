@@ -15,6 +15,8 @@ export type AdminPayment = Schemas["AdminPayment"];
 export type PaymentStatus = AdminPayment["status"];
 export type PaymentMethod = Schemas["PaymentMethod"];
 export type PaymentRejectionReason = Schemas["PaymentRejectionReason"];
+export type RevenueReport = Schemas["RevenueReport"];
+export type RevenueTotals = Schemas["RevenueTotals"];
 
 export type CreateAdminUserBody = operations["adminCreateAdminUser"]["requestBody"]["content"]["application/json"];
 export type UpdateAdminUserBody = operations["adminUpdateAdminUser"]["requestBody"]["content"]["application/json"];
@@ -27,7 +29,17 @@ export type UpdateMerchantIdentityBody =
   operations["adminUpdateMerchantIdentity"]["requestBody"]["content"]["application/json"];
 export type ExtendTrialBody = operations["adminExtendTrial"]["requestBody"]["content"]["application/json"];
 export type MerchantCard = AdminMerchantDetail["cards"][number];
+export type MerchantLink = operations["adminRemoveMerchantLink"]["parameters"]["path"]["link"];
+export type AuditLogEntry = Schemas["AuditLogEntry"];
+export type AuditSubjectType = NonNullable<NonNullable<operations["adminListAuditLogs"]["parameters"]["query"]>["subject_type"]>;
+export type DeletionRequest = Schemas["DeletionRequest"];
+export type DeletionRequestInput = Schemas["DeletionRequestInput"];
 export type AdminLookup = Schemas["AdminLookup"];
+export type CreateBusinessTypeBody =
+  operations["adminCreateBusinessType"]["requestBody"]["content"]["application/json"];
+export type CreateIconBody = operations["adminCreateIcon"]["requestBody"]["content"]["application/json"];
+/** The same for a business type and an icon (an icon's `key` never changes). */
+export type UpdateLookupBody = operations["adminUpdateBusinessType"]["requestBody"]["content"]["application/json"];
 
 export type AdminCustomer = Schemas["AdminCustomer"];
 export type CustomerCycle = NonNullable<AdminCustomer["cycles"]>[number];

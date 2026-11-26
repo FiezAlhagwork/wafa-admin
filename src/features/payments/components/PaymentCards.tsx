@@ -2,7 +2,7 @@
 
 import { CaretRight, Info } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui";
-import type { AdminPayment, PaymentStatus } from "@/lib/api/types";
+import type { AdminPayment } from "@/lib/api/types";
 import { formatDate, formatRelativeDays, formatSyp, formatTime, formatUsd } from "@/lib/format";
 import { formatDuration, rejectionReasonLabels } from "../labels";
 import { PaymentBadges, PaymentMerchant, PaymentMethodInline } from "./PaymentParts";
@@ -12,12 +12,12 @@ import { PaymentBadges, PaymentMerchant, PaymentMethodInline } from "./PaymentPa
 
 type PaymentCardsProps = {
   payments: AdminPayment[];
-  status: PaymentStatus;
+  /** The review queue shows the alerts; anywhere else, the outcome. */
+  queue: boolean;
   onOpen: (payment: AdminPayment) => void;
 };
 
-export function PaymentCards({ payments, status, onOpen }: PaymentCardsProps) {
-  const queue = status === "PENDING";
+export function PaymentCards({ payments, queue, onOpen }: PaymentCardsProps) {
   const action = queue ? "مراجعة" : "عرض";
 
   return (

@@ -14,12 +14,27 @@ import { OverviewScreen } from "@/features/overview/screens/OverviewScreen";
 import { PackagesScreen } from "@/features/packages/screens/PackagesScreen";
 import { PaymentsScreen } from "@/features/payments/screens/PaymentsScreen";
 import { SettingsScreen } from "@/features/settings/screens/SettingsScreen";
+import { LookupsScreen } from "@/features/lookups/screens/LookupsScreen";
+import { DeletionRequestsScreen } from "@/features/deletion-requests/screens/DeletionRequestsScreen";
+import { AuditLogScreen } from "@/features/audit-logs/screens/AuditLogScreen";
+import { FinanceScreen } from "@/features/finance/screens/FinanceScreen";
 import type { AdminPermission, AdminRole, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
 import { createQueryClient } from "@/lib/query-client";
 import { createMockApi, getMockFaults, setMockFault, subscribeMockFaults, type MockScenario } from "../mock-api";
 
-type Page = "overview" | "payments" | "merchants" | "customers" | "packages" | "settings" | "admin-users";
+type Page =
+  | "overview"
+  | "payments"
+  | "merchants"
+  | "customers"
+  | "packages"
+  | "settings"
+  | "lookups"
+  | "deletions"
+  | "finance"
+  | "audit"
+  | "admin-users";
 
 const pages: { id: Page; label: string; path: string }[] = [
   { id: "overview", label: "الرئيسية", path: "/admin" },
@@ -28,6 +43,10 @@ const pages: { id: Page; label: string; path: string }[] = [
   { id: "customers", label: "الزبائن", path: "/admin/customers" },
   { id: "packages", label: "الباقات", path: "/admin/packages" },
   { id: "settings", label: "الإعدادات", path: "/admin/settings" },
+  { id: "lookups", label: "الأنواع", path: "/admin/lookups" },
+  { id: "deletions", label: "الحذف", path: "/admin/deletion-requests" },
+  { id: "finance", label: "المالية", path: "/admin/finance" },
+  { id: "audit", label: "السجل", path: "/admin/audit-logs" },
   { id: "admin-users", label: "الحسابات", path: "/admin/admin-users" },
 ];
 
@@ -246,6 +265,59 @@ function PreviewPage({ page }: { page: Page }) {
           <SettingsScreen />
         </PermissionGate>
       );
+    case "lookups":
+      return (
+        <PermissionGate permission="manage-lookups">
+          <LookupsScreen />
+        </PermissionGate>
+      );
+    case "deletions":
+      // A row opens its merchant or customer inside the preview, with a way back to the list
+      return (
+        <PermissionGate permission="execute-deletion-requests">
+          {merchantId !== null ? (
+            <MerchantDetailScreen id={merchantId} onBack={() => setMerchantId(null)} />
+          ) : customerId !== null ? (
+            <CustomerDetailScreen id={customerId} onBack={() => setCustomerId(null)} />
+          ) : (
+            <DeletionRequestsScreen
+              onOpen={(request) =>
+                request.subject_type === "merchant" ? setMerchantId(request.subject_id) : setCustomerId(request.subject_id)
+              }
+            />
+          )}
+        </PermissionGate>
+      );
+    case "finance":
+      // A payment's merchant opens inside the preview, with a way back to the history
+      return (
+        <PermissionGate permission="view-financials">
+          {merchantId !== null ? (
+            <MerchantDetailScreen id={merchantId} onBack={() => setMerchantId(null)} />
+          ) : (
+            <FinanceScreen onOpenMerchant={setMerchantId} />
+          )}
+        </PermissionGate>
+      );
+    case "audit": {
+      // A merchant or customer opens inside the preview, with a way back to the log
+      const openSubject = (href: string) => {
+        const [, kind, id] = href.split("/").slice(1);
+        if (kind === "merchants") setMerchantId(Number(id));
+        if (kind === "customers") setCustomerId(Number(id));
+      };
+      return (
+        <PermissionGate permission="view-audit-log">
+          {merchantId !== null ? (
+            <MerchantDetailScreen id={merchantId} onBack={() => setMerchantId(null)} />
+          ) : customerId !== null ? (
+            <CustomerDetailScreen id={customerId} onBack={() => setCustomerId(null)} />
+          ) : (
+            <AuditLogScreen onOpenSubject={openSubject} />
+          )}
+        </PermissionGate>
+      );
+    }
     case "admin-users":
       return (
         <PermissionGate permission="manage-admin-accounts">

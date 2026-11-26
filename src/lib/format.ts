@@ -31,11 +31,11 @@ export function formatNumber(value: number): string {
   return numberFormat.format(value);
 }
 
-/** "2026-10" → "تشرين الأول 2026". */
-export function formatMonth(yearMonth: string): string {
+/** "2026-10" → "تشرين الأول 2026", or without the year ("تشرين الأول") for a chart axis within one year. */
+export function formatMonth(yearMonth: string, { year: withYear = true }: { year?: boolean } = {}): string {
   const [year, month] = yearMonth.split("-").map(Number);
   // Noon UTC on the 15th: far enough from midnight that the zone can never move it to another month
-  return new Intl.DateTimeFormat(LOCALE, { timeZone: TIME_ZONE, month: "long", year: "numeric" }).format(
+  return new Intl.DateTimeFormat(LOCALE, { timeZone: TIME_ZONE, month: "long", year: withYear ? "numeric" : undefined }).format(
     new Date(Date.UTC(year, month - 1, 15, 12)),
   );
 }
@@ -45,6 +45,12 @@ const withGrouping = (amount: string) => amount.replace(/^(-?\d+)/, (integer) =>
 
 /** A decimal string with grouping and its decimals kept ("13000.50" → "13,000.50"): for rates and similar. */
 export const formatDecimal = withGrouping;
+
+/**
+ * An exchange rate as stored with a payment, four decimals ("13000.0000"): the trailing zeros are dropped by text, so it
+ * reads "13,000" or "13,000.5". Nothing is parsed.
+ */
+export const formatRate = (rate: string) => withGrouping(rate.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, ""));
 
 /**
  * A typed amount as the server writes it: "18" → "18.00", "18.5" → "18.50". By text only, to compare a form value
@@ -116,4 +122,19 @@ export function formatDay(day: string): string {
 /** Today in Damascus as "YYYY-MM-DD" (the `max` of a date field). */
 export function todayKey(now: Date = new Date()): string {
   return dayKeyFormat.format(now);
+}
+
+/**
+ * Arabic count forms: [one, two, 3–10, 11–99, hundreds]. The noun follows the last two digits:
+ * "5 دقائق" · "60 دقيقة" · "300 حرف" · "60 حرفاً".
+ */
+export type CountForms = readonly [string, string, string, string, string];
+
+export function formatCount(value: number, [one, two, few, many, hundreds]: CountForms): string {
+  if (value === 1) return one;
+  if (value === 2) return two;
+  const lastTwo = value % 100;
+  if (lastTwo >= 3 && lastTwo <= 10) return `${value} ${few}`;
+  if (lastTwo >= 11) return `${value} ${many}`;
+  return `${value} ${hundreds}`;
 }

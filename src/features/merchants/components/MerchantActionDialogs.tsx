@@ -3,20 +3,23 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch, type FieldValues, type UseFormSetError } from "react-hook-form";
-import { Button, Field, Input, Notice, ReasonDialog, ReasonOnlyDialog, Select, toast } from "@/components/ui";
+import { Button, Field, Input, Latin, Notice, ReasonDialog, ReasonOnlyDialog, Select, toast } from "@/components/ui";
+import { CancelDeletionDialog, ScheduleMerchantDeletionDialog } from "@/features/deletion-requests/components/DeletionDialogs";
 import { useBusinessTypes } from "@/features/lookups/hooks";
 import { handleActionError } from "@/lib/api/action-errors";
-import type { AdminMerchantDetail, MerchantCard, UpdateMerchantIdentityBody } from "@/lib/api/types";
+import type { AdminMerchantDetail, MerchantCard, MerchantLink, UpdateMerchantIdentityBody } from "@/lib/api/types";
 import { usePermission } from "@/lib/auth/can";
 import { formatDate } from "@/lib/format";
 import {
   useExtendTrial,
   useReactivateMerchant,
   useRemoveMerchantCover,
+  useRemoveMerchantLink,
   useSuspendCard,
   useSuspendMerchant,
   useUpdateMerchantIdentity,
 } from "../hooks";
+import { merchantLinks } from "../links";
 import {
   extendTrialSchema,
   identitySchema,
@@ -32,6 +35,9 @@ export type MerchantAction =
   | { type: "suspend" }
   | { type: "reactivate" }
   | { type: "remove-cover" }
+  | { type: "remove-link"; link: MerchantLink }
+  | { type: "delete" }
+  | { type: "cancel-deletion" }
   | { type: "suspend-card"; card: MerchantCard };
 
 type DialogProps = { merchant: AdminMerchantDetail; onClose: () => void };
@@ -128,6 +134,42 @@ function RemoveCoverDialog({ merchant, onClose }: DialogProps) {
         )
       }
     />
+  );
+}
+
+function RemoveLinkDialog({ merchant, link, onClose }: DialogProps & { link: MerchantLink }) {
+  const remove = useRemoveMerchantLink();
+  const { field, label } = merchantLinks[link];
+  const url = merchant.links[field];
+
+  return (
+    <ReasonOnlyDialog
+      title={`إزالة رابط ${label}؟`}
+      description="لرابط غير لائق أو لا يخص المحل. يختفي من صفحة المحل."
+      confirmLabel="إزالة الرابط"
+      tone="danger"
+      pending={remove.isPending}
+      onClose={onClose}
+      onConfirm={(reason, setError) =>
+        remove.mutate(
+          { id: merchant.id, link, reason },
+          {
+            onSuccess: () => {
+              toast.success("تمت إزالة الرابط");
+              onClose();
+            },
+            onError: onActionError(setError, onClose),
+          },
+        )
+      }
+    >
+      {/* The exact address, so the admin knows which one goes */}
+      {url && (
+        <Notice>
+          <Latin className="block break-all">{url}</Latin>
+        </Notice>
+      )}
+    </ReasonOnlyDialog>
   );
 }
 
@@ -348,6 +390,14 @@ export function MerchantActionDialog({ action, ...props }: DialogProps & { actio
       return <ReactivateMerchantDialog {...props} />;
     case "remove-cover":
       return <RemoveCoverDialog {...props} />;
+    case "delete":
+      return <ScheduleMerchantDeletionDialog {...props} />;
+    case "cancel-deletion":
+      return props.merchant.deletion ? (
+        <CancelDeletionDialog requestId={props.merchant.deletion.id} name={props.merchant.business_name} onClose={props.onClose} />
+      ) : null;
+    case "remove-link":
+      return <RemoveLinkDialog {...props} link={action.link} />;
     case "suspend-card":
       return <SuspendCardDialog {...props} card={action.card} />;
     default:

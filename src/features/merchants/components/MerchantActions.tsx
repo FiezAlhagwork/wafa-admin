@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { CalendarPlus, DotsThreeVertical, PauseCircle, PencilSimple, PlayCircle } from "@phosphor-icons/react";
+import { CalendarPlus, DotsThreeVertical, PauseCircle, PencilSimple, PlayCircle, Trash } from "@phosphor-icons/react";
 import { Button, Menu, MenuItem } from "@/components/ui";
 import type { AdminMerchantDetail } from "@/lib/api/types";
 import { usePermission } from "@/lib/auth/can";
@@ -18,8 +18,8 @@ function useMerchantActions(merchant: AdminMerchantDetail): Item[] {
   const canEdit = usePermission("edit-business-identity");
   const canExtend = usePermission("grant-extensions");
   const canSuspend = usePermission("suspend-merchants");
-  // DELETED is in the backend guide but not in the generated status type (A07)
-  const status: string | null = merchant.status;
+  const canDelete = usePermission("execute-deletion-requests");
+  const status = merchant.status;
 
   const items: Item[] = [];
   if (canEdit && status !== "DELETED") {
@@ -32,6 +32,10 @@ function useMerchantActions(merchant: AdminMerchantDetail): Item[] {
     items.push({ action: { type: "reactivate" }, label: "إعادة التفعيل", icon: <PlayCircle /> });
   } else if (canSuspend && (status === null || !unsuspendable.has(status))) {
     items.push({ action: { type: "suspend" }, label: "إيقاف التاجر", icon: <PauseCircle />, danger: true });
+  }
+  // At the merchant's own request; already waiting or done means there is nothing to start
+  if (canDelete && status !== "PENDING_DELETION" && status !== "DELETED") {
+    items.push({ action: { type: "delete" }, label: "حذف الحساب", icon: <Trash />, danger: true });
   }
   return items;
 }
