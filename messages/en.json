@@ -4,7 +4,17 @@
     "skipToContent": "Skip to content",
     "switchLocale": "العربية",
     "switchLocaleLabel": "اعرض هذه الصفحة بالعربية",
+    "nav": {
+      "label": "Main navigation",
+      "features": "Features",
+      "how": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
     "footer": {
+      "backToTop": "Back to top",
       "rights": "© {year} Deep Code Solution, Damascus, Syria. All rights reserved.",
       "privacy": "Privacy policy",
       "terms": "Terms of use",
@@ -13,6 +23,231 @@
     "missingValues": {
       "title": "Missing values (this notice appears in development only)",
       "message": "Fill these fields in policy-config.ts before publishing: {fields}"
+    }
+  },
+  "home": {
+    "meta": {
+      "title": "Wafa · Digital stamp cards for shops in Syria",
+      "description": "Wafa turns the paper stamp card into a card on your customer's phone: they collect stamps by showing their code and get their reward from your shop. Free for customers, with a free trial for merchants."
+    },
+    "hero": {
+      "title": "Give your customers a reason to come back",
+      "lead": "A digital stamp card for your shop, with your colour, icon and reward, on your customer's phone. They get a stamp on every visit by showing their code, and collect the reward when the card is full.",
+      "pickerLabel": "Try a card for your kind of shop",
+      "downloadCta": "Get the app",
+      "howCta": "How it works",
+      "stores": "The customer app is on",
+      "card": {
+        "label": "Example {shop} card in the Wafa app: {filled} of {total} stamps.",
+        "of": "of {total} stamps",
+        "city": "Damascus",
+        "pill": "{count} more stamps to your reward",
+        "gift": "Reward"
+      },
+      "cards": [
+        {
+          "key": "cafe",
+          "label": "Café",
+          "shop": "Jasmine Café",
+          "type": "Coffee card",
+          "reward": "a free coffee",
+          "total": 10,
+          "filled": 7
+        },
+        {
+          "key": "bakery",
+          "label": "Bakery",
+          "shop": "Sanabel Bakery",
+          "type": "Pastry card",
+          "reward": "a free box of pastries",
+          "total": 8,
+          "filled": 5
+        },
+        {
+          "key": "salon",
+          "label": "Barber",
+          "shop": "Elegance Barber",
+          "type": "Haircut card",
+          "reward": "a free haircut",
+          "total": 6,
+          "filled": 3
+        },
+        {
+          "key": "restaurant",
+          "label": "Restaurant",
+          "shop": "Beit Shami",
+          "type": "Meal card",
+          "reward": "a free meal",
+          "total": 10,
+          "filled": 3
+        }
+      ]
+    },
+    "about": {
+      "eyebrow": "What is Wafa?",
+      "title": "The paper stamp card, now on your phone",
+      "lead": "Wafa lets every shop run a digital stamp card with its own name and colors. Customers never lose it, and merchants see who keeps coming back.",
+      "paper": { "label": "Paper", "note": "Gets lost, gets wet" },
+      "digital": { "label": "Digital", "note": "Always with you" }
+    },
+    "how": {
+      "eyebrow": "How it works",
+      "title": "Three steps, no paper cards",
+      "steps": [
+        {
+          "title": "The merchant creates a card",
+          "text": "They set the number of stamps and the reward, pick a colour and an icon, and the card is live for their customers."
+        },
+        {
+          "title": "The customer collects stamps",
+          "text": "On every visit they show their code in the app, and the merchant scans it to add a stamp."
+        },
+        {
+          "title": "A reward when it's full",
+          "text": "When the card is complete, the customer collects the reward from the shop and starts a new one."
+        }
+      ],
+      "card": {
+        "shop": "Yasmine Café",
+        "of": "of 5 stamps",
+        "status": [
+          "A new card, ready to fill",
+          "2 more stamps to your reward",
+          "Your reward is ready!"
+        ]
+      }
+    },
+    "features": {
+      "eyebrow": "Features",
+      "title": "Everything a shop and its customers need",
+      "lead": "Two apps that work together: a merchant app to run cards and customers, and a free customer app to collect stamps.",
+      "merchants": {
+        "title": "For merchants",
+        "items": [
+          {
+            "title": "Cards in your style",
+            "text": "Choose the number of stamps, the reward, the colour and the icon, and publish more than one card for your shop."
+          },
+          {
+            "title": "A stamp in one scan",
+            "text": "Scan the customer's code and add a stamp in seconds, or add it by phone number before they install the app."
+          },
+          {
+            "title": "Offers that reach your customers",
+            "text": "Send a text campaign that arrives as a notification, only to people who hold your card."
+          },
+          {
+            "title": "Birthday wishes",
+            "text": "See which of your customers have a birthday today, and send them your wishes yourself."
+          },
+          {
+            "title": "Stats and customers",
+            "text": "Follow stamps, rewards and your customer list, so you know who keeps coming back."
+          },
+          {
+            "title": "Your shop in the directory",
+            "text": "Your shop appears with its logo, cover and cards to every customer app user."
+          }
+        ],
+        "visuals": {
+          "stamp": "Stamp 4 of 6",
+          "campaignLabel": "A notification on your customer's phone",
+          "campaignText": "Today's offer: two stamps with every order",
+          "birthdayMonth": "November",
+          "birthdayDay": "24",
+          "birthdayBadge": "3 birthdays today",
+          "statsStamps": "84",
+          "statsStampsLabel": "stamps this month",
+          "statsRewards": "12",
+          "statsRewardsLabel": "rewards redeemed",
+          "shopName": "Yasmine Café",
+          "shopMeta": "Café · Damascus"
+        }
+      },
+      "customers": {
+        "headline": "A free app, with all your cards in one place",
+        "title": "For customers",
+        "items": [
+          {
+            "title": "Sign in with your phone",
+            "text": "Sign up with your number and a code sent on WhatsApp. No password."
+          },
+          {
+            "title": "Your code is your card",
+            "text": "Show your QR code in the shop and the stamp goes straight to your card."
+          },
+          {
+            "title": "Discover shops",
+            "text": "Browse the directory of participating shops and see their cards and rewards."
+          },
+          {
+            "title": "You control the offers",
+            "text": "You only get offers from shops whose cards you hold, and you can mute any shop."
+          }
+        ],
+        "note": "No shop can message you unless you hold its card."
+      }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Got a question?",
+      "lead": "Didn't find your answer here? Talk to us directly.",
+      "whatsapp": "Message us on WhatsApp",
+      "groupsLabel": "Questions by type of user",
+      "merchants": {
+        "label": "For merchants",
+        "items": [
+          {
+            "question": "How do I join Wafa?",
+            "answer": "Contact us, and we'll send you the merchant app and activate your shop's account."
+          },
+          {
+            "question": "Is the merchant app on iPhone?",
+            "answer": "For now it's Android only, and we send it to you directly: it isn't published on the stores."
+          },
+          {
+            "question": "Is there a free trial?",
+            "answer": "Yes, every new shop starts with a free trial before subscribing."
+          },
+          {
+            "question": "How do I pay the subscription?",
+            "answer": "By transfer through Sham Cash or Al-Haram. Then upload the proof of payment in the app, and we activate your subscription once it's reviewed."
+          },
+          {
+            "question": "What if my customer doesn't have the app?",
+            "answer": "Add their stamp with their phone number. When they install the app and sign up with the same number, their stamps are there."
+          },
+          {
+            "question": "Can I publish more than one card?",
+            "answer": "Yes, publish as many cards as you like for your shop, each with its own number of stamps and reward."
+          }
+        ]
+      },
+      "customers": {
+        "label": "For customers",
+        "items": [
+          {
+            "question": "Is the app free?",
+            "answer": "Yes, completely free, with no payments in it."
+          },
+          {
+            "question": "Where do I get the app?",
+            "answer": "On Google Play and the App Store."
+          },
+          {
+            "question": "How do I sign up?",
+            "answer": "With your mobile number and a code sent to you on WhatsApp. No password."
+          },
+          {
+            "question": "Will every shop send me messages?",
+            "answer": "No, only the shops whose cards you hold, and you can turn off any shop's offers."
+          },
+          {
+            "question": "What happens to my stamps if I delete my account?",
+            "answer": "They're deleted along with any rewards you haven't collected, and can't be restored, so collect your rewards first."
+          }
+        ]
+      }
     }
   },
   "privacy": {
