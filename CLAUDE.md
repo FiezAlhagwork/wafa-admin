@@ -2,7 +2,7 @@
 
 One Next.js project with two completely separate parts for the "Wafa" (وفاء) loyalty-card platform:
 
-1. **Website** (`/`, `/en`): the public marketing site. Merchants learn about the platform and download the apps. Arabic + English, Server Components, SEO. **No API calls, no sign-in.**
+1. **Website** (`/`, `/en`): the public marketing site. Merchants learn about the platform and download the apps. Arabic + English, Server Components, SEO. **No API calls except the public pricing (`GET /public/pricing`, see "Website pricing"), no sign-in.**
 2. **Admin dashboard** (`/admin`): the internal dashboard used only by the platform team (4 roles), not by merchants or customers. Arabic only, client-side behind Clerk.
 
 The two parts share only the design tokens (`styles/globals.css`), the font and `components/ui`. Nothing in the website imports from `features/`, `lib/api/` or `lib/auth/`, and nothing in the dashboard imports from `site/`.
@@ -189,6 +189,18 @@ api.interceptors.request.use(async (config) => {
 
 ---
 
+## Website pricing
+
+The one exception to "the website makes no API calls" (owner's decision, 2026-11-26): the packages and prices come from `GET /public/pricing`, so the site always shows what the merchant app shows. Everything else on the site stays static.
+
+- **On the server only:** a Server Component calls it with plain `fetch` and `next: { revalidate: 300 }` (the backend sends `Cache-Control: max-age=300`). The browser never calls the API.
+- **URL:** `${NEXT_PUBLIC_API_URL}/api/v1/public/pricing`. No axios, no Clerk, no auth header.
+- **Code lives in `src/site/pricing/`:** a small service and its own hand-written type. Still nothing from `lib/api` (not even types): the two parts stay separate.
+- **Failure never breaks the page:** without a response, the section shows no prices and keeps the download links.
+- **Amounts are display only:** USD and SYP shown separately, never added or computed.
+
+---
+
 ## Errors
 
 - Error shape: `{ error: { code, message, details } }`.
@@ -363,7 +375,7 @@ The dashboard comes first; the website is built after it.
 
 ## Forbidden
 
-- Any API call from the website.
+- Any API call from the website other than `GET /public/pricing` (see "Website pricing").
 - Website imports from `features/`, `lib/api/` or `lib/auth/`; dashboard imports from `site/`.
 - Hardcoded text in the website (use `messages/*.json`); next-intl in the dashboard.
 - An `app/layout.tsx` at the top level.
