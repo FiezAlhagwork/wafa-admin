@@ -147,7 +147,7 @@ function FeatureVisual({ index, text }: { index: number; text: VisualText }) {
   );
 }
 
-/** The merchant features as a list; the one you point at or pick is explained in the panel beside it. */
+/** The merchant features as a list; the one you click is explained in the panel beside it. */
 export function MerchantFeatures({ items, visuals }: { items: Item[]; visuals: VisualText }) {
   const [selected, setSelected] = useState(0);
   const current = items[selected] ?? items[0];
@@ -166,7 +166,6 @@ export function MerchantFeatures({ items, visuals }: { items: Item[]; visuals: V
                 type="button"
                 aria-pressed={active}
                 onClick={() => setSelected(index)}
-                onMouseEnter={() => setSelected(index)}
                 className={cn(
                   "relative flex w-full items-center gap-3 overflow-hidden rounded-xl border px-4 py-3 text-start font-bold transition-colors",
                   active

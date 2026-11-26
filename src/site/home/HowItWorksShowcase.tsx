@@ -13,7 +13,7 @@ const filledAt = [0, 3, 5];
 /** Stamps the sample card needs before its reward. */
 const total = 5;
 
-/** The steps as a list; the one you point at or pick shows its moment on the sample card beside it. */
+/** The steps as a list; the one you click shows its moment on the sample card beside it. */
 export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardText }) {
   const [selected, setSelected] = useState(0);
   const filled = filledAt[selected] ?? 0;
@@ -30,7 +30,6 @@ export function HowItWorksShowcase({ steps, card }: { steps: Step[]; card: CardT
                 type="button"
                 aria-pressed={active}
                 onClick={() => setSelected(index)}
-                onMouseEnter={() => setSelected(index)}
                 className={cn(
                   "flex w-full items-start gap-4 rounded-2xl border p-5 text-start transition-colors",
                   active ? "border-border bg-surface shadow-card" : "border-transparent hover:bg-surface/60",
