@@ -16,6 +16,7 @@ import { PaymentsScreen } from "@/features/payments/screens/PaymentsScreen";
 import { SettingsScreen } from "@/features/settings/screens/SettingsScreen";
 import { LookupsScreen } from "@/features/lookups/screens/LookupsScreen";
 import { DeletionRequestsScreen } from "@/features/deletion-requests/screens/DeletionRequestsScreen";
+import { AuditLogScreen } from "@/features/audit-logs/screens/AuditLogScreen";
 import { FinanceScreen } from "@/features/finance/screens/FinanceScreen";
 import type { AdminPermission, AdminRole, AdminUser } from "@/lib/api/types";
 import { AdminContext } from "@/lib/auth/admin-provider";
@@ -32,6 +33,7 @@ type Page =
   | "lookups"
   | "deletions"
   | "finance"
+  | "audit"
   | "admin-users";
 
 const pages: { id: Page; label: string; path: string }[] = [
@@ -44,6 +46,7 @@ const pages: { id: Page; label: string; path: string }[] = [
   { id: "lookups", label: "الأنواع", path: "/admin/lookups" },
   { id: "deletions", label: "الحذف", path: "/admin/deletion-requests" },
   { id: "finance", label: "المالية", path: "/admin/finance" },
+  { id: "audit", label: "السجل", path: "/admin/audit-logs" },
   { id: "admin-users", label: "الحسابات", path: "/admin/admin-users" },
 ];
 
@@ -296,6 +299,25 @@ function PreviewPage({ page }: { page: Page }) {
           )}
         </PermissionGate>
       );
+    case "audit": {
+      // A merchant or customer opens inside the preview, with a way back to the log
+      const openSubject = (href: string) => {
+        const [, kind, id] = href.split("/").slice(1);
+        if (kind === "merchants") setMerchantId(Number(id));
+        if (kind === "customers") setCustomerId(Number(id));
+      };
+      return (
+        <PermissionGate permission="view-audit-log">
+          {merchantId !== null ? (
+            <MerchantDetailScreen id={merchantId} onBack={() => setMerchantId(null)} />
+          ) : customerId !== null ? (
+            <CustomerDetailScreen id={customerId} onBack={() => setCustomerId(null)} />
+          ) : (
+            <AuditLogScreen onOpenSubject={openSubject} />
+          )}
+        </PermissionGate>
+      );
+    }
     case "admin-users":
       return (
         <PermissionGate permission="manage-admin-accounts">

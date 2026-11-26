@@ -47,6 +47,7 @@ function olderPayments(template: AdminPayment): AdminPayment[] {
       rejection_reason: rejected ? "transfer_not_received" : null,
       created_at: daysAgo(days),
       reviewed_at: daysAgo(days - 1),
+      period_starts_at: rejected ? null : daysAgo(days - 1),
       merchant: { ...merchant, status: "ACTIVE" },
       overdue: false,
       duplicate_reference: false,

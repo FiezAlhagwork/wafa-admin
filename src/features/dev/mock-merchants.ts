@@ -109,7 +109,8 @@ export function toMerchantDetail(seed: MerchantSeed) {
     subscription: hasSubscription
       ? {
           status: seed.status,
-          package: pkg,
+          // 114 used the trial before with the same email and chose no package: the API sends `package: null`
+          package: seed.id === 114 ? null : pkg,
           current_period: null,
           trial_used: true,
           days_remaining: seed.endsInDays !== null && seed.endsInDays > 0 ? seed.endsInDays : null,
@@ -128,8 +129,8 @@ export function toMerchantDetail(seed: MerchantSeed) {
       : [],
     payments: paid
       ? [
-          { id: 901, package: pkg, duration_months: 3, price_usd: "45.50", exchange_rate: "13000.00", amount_syp: "591500.00", method: "sham_cash", reference: "94817263", proof_url: "", status: "APPROVED", rejection_reason: null, created_at: daysAgo(30), reviewed_at: daysAgo(29) },
-          { id: 902, package: pkg, duration_months: 1, price_usd: "18.00", exchange_rate: "13000.00", amount_syp: "234000.00", method: "haram", reference: "TX-30771", proof_url: "", status: "REJECTED", rejection_reason: "amount_short", created_at: daysAgo(35), reviewed_at: daysAgo(34) },
+          { id: 901, package: pkg, duration_months: 3, price_usd: "45.50", exchange_rate: "13000.0000", amount_syp: "591500.00", method: "sham_cash", reference: "94817263", proof_url: "", status: "APPROVED", rejection_reason: null, created_at: daysAgo(30), reviewed_at: daysAgo(29), period_starts_at: daysAgo(29) },
+          { id: 902, package: pkg, duration_months: 1, price_usd: "18.00", exchange_rate: "13000.0000", amount_syp: "234000.00", method: "haram", reference: "TX-30771", proof_url: "", status: "REJECTED", rejection_reason: "amount_short", created_at: daysAgo(35), reviewed_at: daysAgo(34), period_starts_at: null },
         ]
       : [],
     cards:
