@@ -47,6 +47,12 @@ const withGrouping = (amount: string) => amount.replace(/^(-?\d+)/, (integer) =>
 export const formatDecimal = withGrouping;
 
 /**
+ * An exchange rate as stored with a payment, four decimals ("13000.0000"): the trailing zeros are dropped by text, so it
+ * reads "13,000" or "13,000.5". Nothing is parsed.
+ */
+export const formatRate = (rate: string) => withGrouping(rate.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, ""));
+
+/**
  * A typed amount as the server writes it: "18" → "18.00", "18.5" → "18.50". By text only, to compare a form value
  * with a stored one: amounts are never parsed to floats.
  */

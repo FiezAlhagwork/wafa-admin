@@ -1956,6 +1956,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/pricing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * الباقات والأسعار لموقع التطبيق
+         * @description نفس الباقات والأسعار يلي بيشوفها التاجر بالتطبيق (`merchant/lookups`)، الفعّالة بس وبترتيب الإدارة، مع مدة
+         *     التجربة المجانية. بدون تسجيل دخول. الرد فيه `Cache-Control: public, max-age=300`، فالموقع أو الـCDN بيقدر يخزّنه
+         *     5 دقائق.
+         */
+        get: operations["publicPricing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/account-deletion/otp": {
         parameters: {
             query?: never;
@@ -2037,6 +2059,21 @@ export interface components {
         Pin: string;
         /** @example 10.00 */
         Money: string;
+        PackageWithPrices: components["schemas"]["PackageSummary"] & {
+            /** @description مرتبة حسب المدة */
+            prices: {
+                /** @enum {integer} */
+                duration_months: 1 | 3 | 12;
+                price_usd: components["schemas"]["Money"];
+                /** @description بسعر الصرف الحالي، للعرض بس */
+                amount_syp: components["schemas"]["Money"];
+            }[];
+        };
+        /**
+         * @description سعر الصرف المحفوظ مع الدفعة، بأربع خانات عشرية
+         * @example 13000.0000
+         */
+        ExchangeRate: string;
         /** @enum {string} */
         Platform: "android" | "ios";
         /** @enum {string} */
@@ -2322,7 +2359,7 @@ export interface components {
             /** @enum {integer} */
             duration_months: 1 | 3 | 12;
             price_usd: components["schemas"]["Money"];
-            exchange_rate: components["schemas"]["Money"];
+            exchange_rate: components["schemas"]["ExchangeRate"];
             amount_syp: components["schemas"]["Money"];
             method: components["schemas"]["PaymentMethod"];
             reference: string | null;
@@ -2333,6 +2370,8 @@ export interface components {
             rejection_reason: components["schemas"]["PaymentRejectionReason"] | null;
             created_at: components["schemas"]["DateTime"];
             reviewed_at: components["schemas"]["DateTime"] | null;
+            /** @description بداية الفترة المدفوعة يلي ولّدتها هالدفعة لما انقبلت. `null` للمعلّقة والمرفوضة */
+            period_starts_at: components["schemas"]["DateTime"] | null;
         };
         /**
          * @description شو مسموح هلق، للعرض. `TRIAL` و`ACTIVE` و`GRACE` كلها `true`. وبـ`EXPIRED` و`SUSPENDED` و`PENDING_DELETION`
@@ -2363,8 +2402,8 @@ export interface components {
         };
         Subscription: {
             status: components["schemas"]["MerchantStatus"];
-            /** @description الباقة الحالية. قبل أي فترة (التجربة مستعملة قبل بنفس البريد) الباقة يلي اختارها التاجر بالتسجيل */
-            package: components["schemas"]["PackageSummary"];
+            /** @description الباقة الحالية. قبل أي فترة (التجربة مستعملة قبل بنفس البريد) الباقة يلي اختارها التاجر بالتسجيل، و`null` إذا ما اختار باقة */
+            package: components["schemas"]["PackageSummary"] | null;
             current_period: components["schemas"]["SubscriptionPeriod"] | null;
             trial_used: boolean;
             /** @description لنهاية التجربة أو الاشتراك، أو لنهاية المهلة بـ`GRACE`. `null` بباقي الحالات */
@@ -2388,8 +2427,11 @@ export interface components {
         MerchantMe: {
             /** @enum {string} */
             registration_step: "business" | "package" | "pin" | "done";
-            /** Format: email */
-            email: string;
+            /**
+             * Format: email
+             * @description `null` إذا جلسة Clerk ما فيها بريد
+             */
+            email: string | null;
             merchant: components["schemas"]["MerchantProfile"] | null;
             subscription: components["schemas"]["Subscription"] | null;
             usage: components["schemas"]["Usage"] | null;
@@ -2412,15 +2454,7 @@ export interface components {
              * @example 14
              */
             trial_days: number;
-            packages: (components["schemas"]["PackageSummary"] & {
-                prices: {
-                    /** @enum {integer} */
-                    duration_months: 1 | 3 | 12;
-                    price_usd: components["schemas"]["Money"];
-                    /** @description بسعر الصرف الحالي، للعرض بس */
-                    amount_syp: components["schemas"]["Money"];
-                }[];
-            })[];
+            packages: components["schemas"]["PackageWithPrices"][];
             payment: {
                 exchange_rate_syp: components["schemas"]["Money"];
                 /** @example 24 */
@@ -2738,8 +2772,8 @@ export interface components {
             logo_url: string | null;
             business_type: components["schemas"]["Lookup"];
             governorate: components["schemas"]["Lookup"];
-            /** @description `null` لحد ما يختار باقة */
-            status: components["schemas"]["MerchantStatus"] | null;
+            /** @description `null` لحد ما يختار باقة. `DELETED` بعد ما ينمسحوا بياناته الشخصية */
+            status: components["schemas"]["MerchantStatus"] | "DELETED" | null;
             /**
              * @description `package`: لم يختر باقة بعد. `pin`: ما حط PIN
              * @enum {string}
@@ -3673,6 +3707,7 @@ export interface operations {
         responses: {
             200: components["responses"]["CustomerData"];
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
         };
     };
     customerDeleteMe: {
@@ -6598,6 +6633,34 @@ export interface operations {
             422: components["responses"]["ValidationFailed"];
         };
     };
+    publicPricing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description الباقات */
+            200: {
+                headers: {
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @example 30 */
+                            trial_days: number;
+                            exchange_rate_syp: components["schemas"]["Money"];
+                            packages: components["schemas"]["PackageWithPrices"][];
+                        };
+                    };
+                };
+            };
+        };
+    };
     publicRequestDeletionOtp: {
         parameters: {
             query?: never;
@@ -6698,14 +6761,21 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        /** @example Received. */
+                        message: string;
+                    };
+                };
             };
             /** @description توقيع غلط أو أقدم من 5 دقائق */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };

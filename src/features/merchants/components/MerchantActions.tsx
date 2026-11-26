@@ -19,8 +19,7 @@ function useMerchantActions(merchant: AdminMerchantDetail): Item[] {
   const canExtend = usePermission("grant-extensions");
   const canSuspend = usePermission("suspend-merchants");
   const canDelete = usePermission("execute-deletion-requests");
-  // DELETED is in the backend guide but not in the generated status type (A07)
-  const status: string | null = merchant.status;
+  const status = merchant.status;
 
   const items: Item[] = [];
   if (canEdit && status !== "DELETED") {

@@ -6,7 +6,7 @@ import { Badge, Button, ConfirmDialog, CopyValue, Dialog, StatusBadge, toast } f
 import { toastActionError } from "@/lib/api/action-errors";
 import { isApiError } from "@/lib/api/errors";
 import type { AdminPayment } from "@/lib/api/types";
-import { formatDecimal, formatSyp, formatUsd } from "@/lib/format";
+import { formatRate, formatSyp, formatUsd } from "@/lib/format";
 import { useApprovePayment, usePayment } from "../hooks";
 import { formatDuration, methodLabels, rejectionReasonLabels } from "../labels";
 import { ProofImage, Row, When } from "./PaymentDetailParts";
@@ -110,7 +110,7 @@ function ReviewContent({ payment, onClose }: { payment: AdminPayment; onClose: (
             <p className="text-xs text-fg-muted">المبلغ المطلوب</p>
             <p className="text-2xl font-semibold tabular-nums text-fg">{formatSyp(current.amount_syp)}</p>
             <p className="text-sm tabular-nums text-fg-muted">
-              {formatUsd(current.price_usd)} · سعر الصرف {formatDecimal(current.exchange_rate)}
+              {formatUsd(current.price_usd)} · سعر الصرف {formatRate(current.exchange_rate)}
             </p>
           </div>
 
@@ -145,6 +145,11 @@ function ReviewContent({ payment, onClose }: { payment: AdminPayment; onClose: (
                 {current.rejection_reason && <Row label="سبب الرفض">{rejectionReasonLabels[current.rejection_reason]}</Row>}
                 <Row label="راجعها">{current.reviewed_by?.name ?? "—"}</Row>
                 <Row label="تاريخ المراجعة">{current.reviewed_at ? <When iso={current.reviewed_at} /> : "—"}</Row>
+                {current.period_starts_at && (
+                  <Row label="بداية الفترة">
+                    <When iso={current.period_starts_at} />
+                  </Row>
+                )}
               </>
             )}
           </dl>

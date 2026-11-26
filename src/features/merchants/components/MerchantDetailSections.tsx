@@ -181,7 +181,7 @@ export function SubscriptionCard({ merchant }: MerchantProps) {
           <div className="flex flex-wrap gap-5 p-5">
             <div className="flex min-w-0 flex-1 basis-64 flex-col gap-3 rounded-xl bg-neutral-50 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xl font-black text-fg">{subscription.package.name}</span>
+                <span className="text-xl font-black text-fg">{subscription.package?.name ?? "بدون باقة"}</span>
                 <StatusBadge status={subscription.status} />
               </div>
               {progress !== null && (
@@ -214,8 +214,11 @@ export function SubscriptionCard({ merchant }: MerchantProps) {
             </div>
 
             <dl className="grid min-w-0 flex-1 basis-56 grid-cols-2 content-start gap-4">
-              <Fact label="حدود البطاقات">{formatNumber(subscription.package.cards_limit)}</Fact>
-              <Fact label="حملات أسبوعية">{formatNumber(subscription.package.weekly_campaigns_limit)}</Fact>
+              {/* No package yet (the trial was used before with the same email, and none was chosen): no limits to show */}
+              <Fact label="حدود البطاقات">{subscription.package ? formatNumber(subscription.package.cards_limit) : dash}</Fact>
+              <Fact label="حملات أسبوعية">
+                {subscription.package ? formatNumber(subscription.package.weekly_campaigns_limit) : dash}
+              </Fact>
               <Fact label="التجربة">{subscription.trial_used ? "مستعملة" : "غير مستعملة"}</Fact>
               <Fact label="دفعة معلّقة">
                 {subscription.pending_payment ? formatDate(subscription.pending_payment.created_at) : "لا يوجد"}
