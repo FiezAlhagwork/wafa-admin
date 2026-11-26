@@ -1,4 +1,4 @@
-export { Avatar, initialsOf } from "./Avatar";
+export { Avatar } from "./Avatar";
 export { Badge, type BadgeTone } from "./Badge";
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from "./Button";
 export { ByWidth } from "./ByWidth";
