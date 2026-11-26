@@ -166,26 +166,6 @@
       },
       "customers": {
         "headline": "A free app, with all your cards in one place",
-        "phone": {
-          "title": "My cards",
-          "cards": [
-            {
-              "name": "Yasmine Café",
-              "filled": 4,
-              "total": 6
-            },
-            {
-              "name": "Sanabel Bakery",
-              "filled": 7,
-              "total": 8
-            },
-            {
-              "name": "Lamsa Salon",
-              "filled": 2,
-              "total": 10
-            }
-          ]
-        },
         "title": "For customers",
         "items": [
           {

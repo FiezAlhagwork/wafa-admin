@@ -7,8 +7,9 @@ import {
   Storefront,
   User,
 } from "@phosphor-icons/react/ssr";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { CustomerPhone, type PhoneCard } from "./CustomerPhone";
+import customerApp from "./customer-app.webp";
 import { MerchantFeatures, type VisualText } from "./MerchantFeatures";
 import { SectionHeading } from "./SectionHeading";
 import { StampsBackdrop } from "./StampsBackdrop";
@@ -23,7 +24,6 @@ export async function Features() {
   const merchantItems = t.raw("merchants.items") as Item[];
   const merchantVisuals = t.raw("merchants.visuals") as VisualText;
   const customerItems = t.raw("customers.items") as Item[];
-  const phoneCards = t.raw("customers.phone.cards") as PhoneCard[];
 
   return (
     <section id="features" aria-labelledby="features-title" className="relative scroll-mt-20 overflow-hidden py-16 sm:py-24">
@@ -41,8 +41,20 @@ export async function Features() {
         </div>
 
         {/* Customers: the app on a phone beside what it does for them */}
-        <div data-reveal="start" className="grid items-center gap-10 rounded-3xl bg-brand p-6 text-neutral-0 sm:p-10 lg:grid-cols-[2fr_3fr] lg:gap-14">
-          <CustomerPhone title={t("customers.phone.title")} cards={phoneCards} />
+        <div
+          data-reveal="start"
+          className="grid items-center gap-10 overflow-hidden rounded-3xl bg-brand p-6 text-neutral-0 sm:p-10 lg:grid-cols-[2fr_3fr] lg:gap-14"
+        >
+          {/*
+            A real screenshot of the customer app. The photo cuts the phone off at the bottom, so it sits on the
+            panel's bottom edge (the negative margin cancels the padding) and comes last on small screens.
+          */}
+          <Image
+            src={customerApp}
+            alt=""
+            sizes="(min-width: 640px) 16rem, 15rem"
+            className="order-last mx-auto -mb-6 w-60 self-end sm:-mb-10 sm:w-64 lg:order-none"
+          />
 
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
