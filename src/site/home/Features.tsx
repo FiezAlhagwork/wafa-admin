@@ -46,14 +46,14 @@ export async function Features() {
           className="grid items-center gap-10 overflow-hidden rounded-3xl bg-brand p-6 text-neutral-0 sm:p-10 lg:grid-cols-[2fr_3fr] lg:gap-14"
         >
           {/*
-            A real screenshot of the customer app. The photo cuts the phone off at the bottom, so it sits on the
+            A hand holding the customer app on its card list. The photo is cut off at the wrist, so it sits on the
             panel's bottom edge (the negative margin cancels the padding) and comes last on small screens.
           */}
           <Image
             src={customerApp}
             alt=""
-            sizes="(min-width: 640px) 16rem, 15rem"
-            className="order-last mx-auto -mb-6 w-60 self-end sm:-mb-10 sm:w-64 lg:order-none"
+            sizes="(min-width: 640px) 18rem, 16rem"
+            className="order-last mx-auto -mb-6 w-64 self-end sm:-mb-10 sm:w-72 lg:order-none"
           />
 
           <div className="flex flex-col gap-6">
